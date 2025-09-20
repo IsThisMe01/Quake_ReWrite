@@ -107,7 +107,7 @@ end
 function Button:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Button"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 58 or 44)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -123,32 +123,32 @@ function Button:Create()
     end)
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
-    self.ButtonLeftIcon.Size = UDim2.new(0, 22, 0, 22)
-    self.ButtonLeftIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 14)
+    self.ButtonLeftIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ButtonLeftIcon.Position = UDim2.new(0, 12, 0, self.Description ~= "" and 8 or 12)
     self.ButtonLeftIcon.BackgroundTransparency = 1
     self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
     self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.ButtonLeftIcon.Parent = self.Container
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
-    self.ButtonText.Size = UDim2.new(0, 200, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.ButtonText.Size = UDim2.new(0, 200, 0, 20)
+    self.ButtonText.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
     self.ButtonText.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.ButtonText.TextSize = 15
+    self.ButtonText.TextSize = 14
     self.ButtonText.Font = Enum.Font.GothamSemibold
     self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
     self.ButtonText.Parent = self.Container
     if self.Description ~= "" then
         self.ButtonDescription = Instance.new("TextLabel")
         self.ButtonDescription.Name = "Description"
-        self.ButtonDescription.Size = UDim2.new(0, 250, 0, 16)
-        self.ButtonDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.ButtonDescription.Size = UDim2.new(0, 250, 0, 14)
+        self.ButtonDescription.Position = UDim2.new(0, 38, 0, 28)
         self.ButtonDescription.BackgroundTransparency = 1
         self.ButtonDescription.Text = self.Description
         self.ButtonDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.ButtonDescription.TextSize = 12
+        self.ButtonDescription.TextSize = 11
         self.ButtonDescription.Font = Enum.Font.Gotham
         self.ButtonDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.ButtonDescription.Parent = self.Container
@@ -156,13 +156,13 @@ function Button:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, 38, 0, 30)
-        self.KeybindButton.Position = UDim2.new(1, -50, 0.5, 0)
+        self.KeybindButton.Size = UDim2.new(0, 32, 0, 24)
+        self.KeybindButton.Position = UDim2.new(1, -42, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
         self.KeybindButton.TextColor3 = Color3.fromRGB(200, 205, 210)
-        self.KeybindButton.TextSize = 16
+        self.KeybindButton.TextSize = 12
         self.KeybindButton.Font = Enum.Font.GothamBold
         self.KeybindButton.BorderSizePixel = 0
         self.KeybindButton.Parent = self.Container
@@ -244,8 +244,8 @@ function Button:Create()
     end
     self.ButtonIcon = Instance.new("ImageLabel")
     self.ButtonIcon.Name = "Icon"
-    self.ButtonIcon.Size = UDim2.new(0, 24, 0, 24)
-    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -84 or -34, 0.5, 0) 
+    self.ButtonIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -72 or -30, 0.5, 0) 
     self.ButtonIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.ButtonIcon.BackgroundTransparency = 1
     self.ButtonIcon.Image = (success and Lucide and Lucide["fingerprint"]) or "rbxassetid://10723375250" 
@@ -253,7 +253,7 @@ function Button:Create()
     self.ButtonIcon.Parent = self.Container
     self.ButtonInteraction = Instance.new("TextButton")
     self.ButtonInteraction.Name = "Interaction"
-    self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -50 or 0, 1, 0) 
+    self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -42 or 0, 1, 0) 
     self.ButtonInteraction.BackgroundTransparency = 1
     self.ButtonInteraction.Text = ""
     self.ButtonInteraction.Parent = self.Container
@@ -3540,7 +3540,7 @@ function Tab:Create()
     end)
     self.TabButton = Instance.new("TextButton")
     self.TabButton.Name = self.Name .. "Tab"
-    self.TabButton.Size = UDim2.new(1, 0, 0, 50) 
+    self.TabButton.Size = UDim2.new(1, 0, 0, 42) 
     self.TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32) 
     self.TabButton.BackgroundTransparency = 1 
     self.TabButton.BorderSizePixel = 0
@@ -3629,8 +3629,8 @@ function Tab:Create()
     indicatorCorner.Parent = self.TabIndicator
     self.Container = Instance.new("ScrollingFrame")
     self.Container.Name = self.Name .. "Container"
-    self.Container.Size = UDim2.new(1, -8, 1, -8) 
-    self.Container.Position = UDim2.new(0, 4, 0, 4) 
+    self.Container.Size = UDim2.new(1, -4, 1, -4) 
+    self.Container.Position = UDim2.new(0, 2, 0, 2) 
     self.Container.BackgroundTransparency = 1
     self.Container.BorderSizePixel = 0
     self.Container.ScrollBarThickness = 3 
@@ -3642,13 +3642,13 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, 12) 
+    self.ContainerLayout.Padding = UDim.new(0, 8) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
-    containerPadding.PaddingLeft = UDim.new(0, 12) 
-    containerPadding.PaddingRight = UDim.new(0, 12)
-    containerPadding.PaddingTop = UDim.new(0, 12)
-    containerPadding.PaddingBottom = UDim.new(0, 12)
+    containerPadding.PaddingLeft = UDim.new(0, 8) 
+    containerPadding.PaddingRight = UDim.new(0, 8)
+    containerPadding.PaddingTop = UDim.new(0, 8)
+    containerPadding.PaddingBottom = UDim.new(0, 8)
     containerPadding.Parent = self.Container
     self.TabButton.MouseButton1Click:Connect(function()
         self.Window:SelectTab(self)
@@ -4110,7 +4110,7 @@ end
 function Toggle:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Toggle"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 58 or 44)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4126,40 +4126,40 @@ function Toggle:Create()
     end)
     self.ToggleIcon = Instance.new("ImageLabel")
     self.ToggleIcon.Name = "Icon"
-    self.ToggleIcon.Size = UDim2.new(0, 22, 0, 22)
-    self.ToggleIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 14)
+    self.ToggleIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ToggleIcon.Position = UDim2.new(0, 12, 0, self.Description ~= "" and 8 or 12)
     self.ToggleIcon.BackgroundTransparency = 1
     self.ToggleIcon.Image = (success and Lucide and Lucide["power"]) or "rbxassetid://10734930466"
     self.ToggleIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.ToggleIcon.Parent = self.Container
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.Size = UDim2.new(0, 200, 0, 20)
+    self.NameLabel.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.NameLabel.TextSize = 15
+    self.NameLabel.TextSize = 14
     self.NameLabel.Font = Enum.Font.GothamSemibold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     if self.Description ~= "" then
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
-        self.ToggleDescription.Size = UDim2.new(0, 250, 0, 16)
-        self.ToggleDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.ToggleDescription.Size = UDim2.new(0, 250, 0, 14)
+        self.ToggleDescription.Position = UDim2.new(0, 38, 0, 28)
         self.ToggleDescription.BackgroundTransparency = 1
         self.ToggleDescription.Text = self.Description
         self.ToggleDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.ToggleDescription.TextSize = 12
+        self.ToggleDescription.TextSize = 11
         self.ToggleDescription.Font = Enum.Font.Gotham
         self.ToggleDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.ToggleDescription.Parent = self.Container
     end
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, 44, 0, 24) 
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -94 or -54, 0.5, 0) 
+    self.ToggleBackground.Size = UDim2.new(0, 38, 0, 20) 
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -82 or -46, 0.5, 0) 
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5) 
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 65) 
     self.ToggleBackground.BorderSizePixel = 0
@@ -4169,8 +4169,8 @@ function Toggle:Create()
     bgCorner.Parent = self.ToggleBackground
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, 18, 0, 18) 
-    self.ToggleIndicator.Position = UDim2.new(0, 3, 0.5, 0) 
+    self.ToggleIndicator.Size = UDim2.new(0, 16, 0, 16) 
+    self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0) 
     self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5) 
     self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
     self.ToggleIndicator.BorderSizePixel = 0
@@ -4181,13 +4181,13 @@ function Toggle:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, 36, 0, 28)
-        self.KeybindButton.Position = UDim2.new(1, -44, 0.5, 0) 
+        self.KeybindButton.Size = UDim2.new(0, 32, 0, 24)
+        self.KeybindButton.Position = UDim2.new(1, -38, 0.5, 0) 
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
         self.KeybindButton.TextColor3 = Color3.fromRGB(200, 205, 210)
-        self.KeybindButton.TextSize = 14
+        self.KeybindButton.TextSize = 12
         self.KeybindButton.Font = Enum.Font.GothamBold
         self.KeybindButton.BorderSizePixel = 0
         self.KeybindButton.ZIndex = 10 
@@ -4325,7 +4325,7 @@ function Toggle:SetValue(value, callCallback)
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             self.Library.TweenInfo,
-            {Position = UDim2.new(0, 23, 0.5, 0)} 
+            {Position = UDim2.new(0, 20, 0.5, 0)} 
         )
         indicatorTween:Play()
         local bgTween = TweenService:Create(
@@ -4338,7 +4338,7 @@ function Toggle:SetValue(value, callCallback)
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             self.Library.TweenInfo,
-            {Position = UDim2.new(0, 3, 0.5, 0)} 
+            {Position = UDim2.new(0, 2, 0.5, 0)} 
         )
         indicatorTween:Play()
         local bgTween = TweenService:Create(
@@ -4684,8 +4684,8 @@ function Window:CreateGui()
     shadowCorner.Parent = self.SidebarShadow
     self.TabListContainer = Instance.new("ScrollingFrame")
     self.TabListContainer.Name = "TabListContainer"
-    self.TabListContainer.Size = UDim2.new(1, -24, 1, -24)
-    self.TabListContainer.Position = UDim2.new(0, 12, 0, 12)
+    self.TabListContainer.Size = UDim2.new(1, -16, 1, -16)
+    self.TabListContainer.Position = UDim2.new(0, 8, 0, 8)
     self.TabListContainer.BackgroundTransparency = 1
     self.TabListContainer.BorderSizePixel = 0
     self.TabListContainer.ScrollBarThickness = 2
@@ -4697,13 +4697,13 @@ function Window:CreateGui()
     self.TabListLayout = Instance.new("UIListLayout")
     self.TabListLayout.FillDirection = Enum.FillDirection.Vertical
     self.TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.TabListLayout.Padding = UDim.new(0, 4) 
+    self.TabListLayout.Padding = UDim.new(0, 2) 
     self.TabListLayout.Parent = self.TabListContainer
     local tabPadding = Instance.new("UIPadding")
-    tabPadding.PaddingLeft = UDim.new(0, 12)
-    tabPadding.PaddingRight = UDim.new(0, 12)
-    tabPadding.PaddingTop = UDim.new(0, 12)
-    tabPadding.PaddingBottom = UDim.new(0, 12)
+    tabPadding.PaddingLeft = UDim.new(0, 8)
+    tabPadding.PaddingRight = UDim.new(0, 8)
+    tabPadding.PaddingTop = UDim.new(0, 8)
+    tabPadding.PaddingBottom = UDim.new(0, 8)
     tabPadding.Parent = self.TabListContainer
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
@@ -4718,10 +4718,10 @@ function Window:CreateGui()
     contentBorder.Transparency = 0.8 
     contentBorder.Parent = self.ContentContainer
     local contentPadding = Instance.new("UIPadding")
-    contentPadding.PaddingLeft = UDim.new(0, 12)
-    contentPadding.PaddingRight = UDim.new(0, 12)
-    contentPadding.PaddingTop = UDim.new(0, 12)
-    contentPadding.PaddingBottom = UDim.new(0, 12)
+    contentPadding.PaddingLeft = UDim.new(0, 8)
+    contentPadding.PaddingRight = UDim.new(0, 8)
+    contentPadding.PaddingTop = UDim.new(0, 8)
+    contentPadding.PaddingBottom = UDim.new(0, 8)
     contentPadding.Parent = self.ContentContainer
     self:MakeDraggable()
     self:SetupKeybindSystem()
@@ -6283,6 +6283,41 @@ local ObjectTree = {
         },
         {
             {
+                8,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
                 5,
                 2,
                 {
@@ -6297,80 +6332,10 @@ local ObjectTree = {
                 }
             },
             {
-                8,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
                 17,
                 2,
                 {
                     "Window"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Tab"
                 }
             },
             {
@@ -6381,17 +6346,24 @@ local ObjectTree = {
                 }
             },
             {
-                3,
+                12,
                 2,
                 {
-                    "Config"
+                    "Paragraph"
                 }
             },
             {
-                13,
+                2,
                 2,
                 {
-                    "Slider"
+                    "Button"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "TextBox"
                 }
             },
             {
@@ -6399,6 +6371,34 @@ local ObjectTree = {
                 2,
                 {
                     "Label"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "FloatingControls"
                 }
             }
         }
