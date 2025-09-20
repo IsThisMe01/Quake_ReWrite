@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- version 0.01.
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -1548,7 +1548,7 @@ function Dropdown:Create()
         selectAllCorner.CornerRadius = UDim.new(0, 4)
         selectAllCorner.Parent = self.SelectAllButton
         self.SelectAllButton.MouseButton1Click:Connect(function()
-            self:SelectAllItems()
+            self:ToggleSelectAll()
         end)
         self.SelectAllButton.MouseEnter:Connect(function()
             local hoverTween = TweenService:Create(
@@ -1566,6 +1566,9 @@ function Dropdown:Create()
             )
             leaveTween:Play()
         end)
+        
+        -- Initialize button text based on current selection state
+        self:UpdateSelectAllButtonText()
     end
     self.SearchBox = Instance.new("TextBox")
     self.SearchBox.Name = "SearchBox"
@@ -1812,6 +1815,7 @@ function Dropdown:SelectItem(item)
             end
         end
         self:UpdateSelectedText()
+        self:UpdateSelectAllButtonText()
         local selectedItems = {}
         for selectedItem, selected in pairs(self.Selected) do
             if selected == true then 
@@ -1968,6 +1972,7 @@ function Dropdown:SetItems(items)
         end
         self.Selected = newSelected
         self:UpdateSelectedText()
+        self:UpdateSelectAllButtonText()
     end
     return self
 end
@@ -2028,6 +2033,7 @@ function Dropdown:ClearAllSelections()
         end
     end
     self:UpdateSelectedText()
+    self:UpdateSelectAllButtonText()
     self.Callback({})
 end
 function Dropdown:SelectAllItems()
@@ -2066,6 +2072,7 @@ function Dropdown:SelectAllItems()
         end
     end
     self:UpdateSelectedText()
+    self:UpdateSelectAllButtonText()
     local selectedItems = {}
     for item, selected in pairs(self.Selected) do
         if selected == true then 
@@ -2073,6 +2080,48 @@ function Dropdown:SelectAllItems()
         end
     end
     self.Callback(selectedItems)
+end
+function Dropdown:ToggleSelectAll()
+    if not self.Multiselect then return end
+    
+    -- Check if all items are currently selected
+    local allSelected = true
+    for _, item in ipairs(self.Items) do
+        if not self.Selected[item] then
+            allSelected = false
+            break
+        end
+    end
+    
+    if allSelected then
+        -- If all are selected, clear all selections
+        self:ClearAllSelections()
+    else
+        -- If not all are selected, select all
+        self:SelectAllItems()
+    end
+    
+    -- Update the button text based on new state
+    self:UpdateSelectAllButtonText()
+end
+function Dropdown:UpdateSelectAllButtonText()
+    if not self.Multiselect or not self.SelectAllButton then return end
+    
+    -- Check if all items are currently selected
+    local allSelected = true
+    for _, item in ipairs(self.Items) do
+        if not self.Selected[item] then
+            allSelected = false
+            break
+        end
+    end
+    
+    -- Update button text
+    if allSelected then
+        self.SelectAllButton.Text = "None"
+    else
+        self.SelectAllButton.Text = "All"
+    end
 end
 return Dropdown
 end)() end,
@@ -6812,31 +6861,10 @@ local ObjectTree = {
         },
         {
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
                 6,
                 2,
                 {
                     "Dropdown"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
                 }
             },
             {
@@ -6847,80 +6875,10 @@ local ObjectTree = {
                 }
             },
             {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "Credits"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
                 }
             },
             {
@@ -6931,10 +6889,101 @@ local ObjectTree = {
                 }
             },
             {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
                 11,
                 2,
                 {
                     "Notifications"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
                 }
             }
         }
@@ -6949,19 +6998,19 @@ local LineOffsets = {
     500,
     1018,
     1356,
-    2079,
-    2661,
-    2715,
-    3059,
-    3306,
-    3609,
-    3706,
-    3844,
-    4040,
-    4470,
-    4619,
-    4930,
-    5980
+    2128,
+    2710,
+    2764,
+    3108,
+    3355,
+    3658,
+    3755,
+    3893,
+    4089,
+    4519,
+    4668,
+    4979,
+    6029
 }
 
 -- Misc AOT variable imports
@@ -7458,4 +7507,3 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
-
