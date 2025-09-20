@@ -5,9943 +5,7978 @@ local ImportGlobals
 
 -- Holds direct closure data (defining this before the DOM tree for line debugging etc)
 local ClosureBindings = {
-    function()local wax,script,require=ImportGlobals(1)local ImportGlobals return (function(...)local theme = require(script.Bundles.themeSystem)
-local data = require(script.Bundles.data)
-local references = require(script.utilities.references)
-local connections = require(script.utilities.connections)
-local get = require(script.utilities.get)
-
-local function addComponent(name, parent, properties)
-	properties.Parent = parent
-	return require(script.components["new"..name])(properties)
-end
-
-local quake = {}
-function quake:Window(windowProperty)
-	assert(windowProperty.Title, ":Window needs a Title")
-
-	windowProperty.Parent = windowProperty.Parent or game.CoreGui
-	windowProperty.KeyCode = windowProperty.KeyCode or nil
-	windowProperty.isMobile = windowProperty.isMobile or false
-	theme.create(windowProperty.CustomTheme or {})
-	if windowProperty.Size then
-		windowProperty.Size.X = windowProperty.Size.X or 550
-		windowProperty.Size.Y = windowProperty.Size.Y or 400
-		math.clamp(windowProperty.Size.X, 550, 9e9)
-		math.clamp(windowProperty.Size.Y, 400, 9e9)
-	elseif not windowProperty.Size then
-		windowProperty.Size = {X = 550, Y = 400}
-	end
-
-	if windowProperty.Parent:FindFirstChild(windowProperty.Title) then
-		windowProperty.Parent:FindFirstChild(windowProperty.Title):Destroy()
-	end
-
-	-- Platforms
-
-	local mobile = require(script.platforms.mobile)
-	local computer = require(script.platforms.computer)
-
-	-- Data
-
-	local isToggled = data.add({boolean = true}, "isToggled")
-	data.add({EnumItem = windowProperty.KeyCode}, "keyCode")
-	data.add({data = {}}, "selectedTab")
-	data.add({boolean = false}, "selectedFirst")
-	local window_data = data.add({data = windowProperty})
-	windowProperty.uid = window_data.uid
-
-	-- Library
-
-	local platform = windowProperty.isMobile and mobile(windowProperty) or computer(windowProperty)
-
-	local windowsList = references.get("windowsList")
-	local sideBar = references.get("sideBar")
-	local notificationList = references.get("notificationList")
-
-	quake.Windows = {}
-	function quake.Windows:Tab(tabProperty)
-		local tab_data = data.add({data = tabProperty})
-		tabProperty.uid = tab_data.uid
-
-		tabProperty.tabPage = addComponent("Window", windowsList, tabProperty)
-		local tabPage = tabProperty.tabPage
-		tabProperty.tabButton = addComponent("Tab", sideBar, {tab_data = tab_data})
-
-		tab_data:update("data", tabProperty)
-
-		quake.Windows.Component = {}
-		function quake.Windows.Component:Button(buttonProperty)
-			buttonProperty.tabColor = tabProperty.tabColor
-			return addComponent("Button", tabPage, buttonProperty)
-		end
-		function quake.Windows.Component:Toggle(toggleProperty)
-			toggleProperty.tabColor = tabProperty.tabColor
-			return addComponent("Toggle", tabPage, toggleProperty)
-		end
-		function quake.Windows.Component:TextBox(textboxProperty)
-			textboxProperty.tabColor = tabProperty.tabColor
-			return addComponent("TextBox", tabPage, textboxProperty)
-		end
-		function quake.Windows.Component:Keybind(keybindProperty)
-			keybindProperty.tabColor = tabProperty.tabColor
-			return addComponent("Keybind", tabPage, keybindProperty)
-		end
-		function quake.Windows.Component:Dropdown(dropdownProperty)
-			dropdownProperty.tabColor = tabProperty.tabColor
-			return addComponent("Dropdown", tabPage, dropdownProperty)
-		end
-		function quake.Windows.Component:Slider(sliderProprety)
-			sliderProprety.tabColor = tabProperty.tabColor
-			return addComponent("Slider", tabPage, sliderProprety)
-		end
-		function quake.Windows.Component:Section(text: string)
-			return addComponent("Section", tabPage, {Text = text})
-		end
-		function quake.Windows.Component:Paragraph(paragraphProperty)
-			paragraphProperty.tabColor = tabProperty.tabColor
-			return addComponent("Paragraph", tabPage, paragraphProperty)
-		end
-		function quake.Windows.Component:Label(text: string)
-			local lableProperty = {
-				Text = text,
-				tabColor = tabProperty.tabColor
-			}
-			return addComponent("Label", tabPage, lableProperty)
-		end
-		function quake.Windows.Component:Group(groupProperty)
-			groupProperty.tabColor = tabProperty.tabColor
-			local group,returnFunctions = addComponent("Group", tabPage, groupProperty)
-			function returnFunctions:Button(buttonProperty)
-				buttonProperty.tabColor = tabProperty.tabColor
-				return addComponent("Button", group, buttonProperty)
-			end
-			function returnFunctions:Toggle(toggleProperty)
-				toggleProperty.tabColor = tabProperty.tabColor
-				return addComponent("Toggle", group, toggleProperty)
-			end
-			function returnFunctions:TextBox(textboxProperty)
-				textboxProperty.tabColor = tabProperty.tabColor
-				return addComponent("TextBox", group, textboxProperty)
-			end
-			function returnFunctions:Keybind(keybindProperty)
-				keybindProperty.tabColor = tabProperty.tabColor
-				return addComponent("Keybind", group, keybindProperty)
-			end
-			function returnFunctions:Dropdown(dropdownProperty)
-				dropdownProperty.tabColor = tabProperty.tabColor
-				return addComponent("Dropdown", group, dropdownProperty)
-			end
-			function returnFunctions:Slider(sliderProprety)
-				sliderProprety.tabColor = tabProperty.tabColor
-				return addComponent("Slider", group, sliderProprety)
-			end
-			function returnFunctions:Section(text: string)
-				return addComponent("Section", group, {Text = text})
-			end
-			function returnFunctions:Paragraph(paragraphProperty)
-				paragraphProperty.tabColor = tabProperty.tabColor
-				return addComponent("Paragraph", group, paragraphProperty)
-			end
-			function returnFunctions:Label(text: string)
-				local lableProperty = {
-					Text = text,
-					tabColor = tabProperty.tabColor
-				}
-				return addComponent("Label", group, lableProperty)
-			end
-			function returnFunctions:ColorPicker(colorpickerProperty)
-				colorpickerProperty.tabColor = tabProperty.tabColor
-				return addComponent("ColorPicker", group, colorpickerProperty)
-			end
-			return returnFunctions
-		end
-		function quake.Windows.Component:ColorPicker(colorpickerProperty)
-			colorpickerProperty.tabColor = tabProperty.tabColor
-			return addComponent("ColorPicker", tabPage, colorpickerProperty)
-		end
-		return quake.Windows.Component
-	end
-	function quake:SetCustomTheme(newCustomTheme)
-		theme.create(newCustomTheme)
-	end
-	function quake:Destroy()
-		connections.deleteConnections()
-		references.clear()
-		platform:Destroy()
-	end
-	function quake:ToggleQuake()
-		isToggled:update("boolean", not get(isToggled.boolean))
-	end
-	function quake.Windows:Notify(NotificationProperty)
-		return addComponent("Notification", notificationList, NotificationProperty)
-	end
-	return quake.Windows
-end
-return quake
-end)() end,
-    [3] = function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)--!strict
-
---[[
-	The entry point for the Fusion library.
+    function()local wax,script,require=ImportGlobals(1)local ImportGlobals return (function(...)--[[
+    ProjectMadara UI Library
+    A modern UI library for Roblox
 ]]
 
-local PubTypes = require(script.PubTypes)
-local restrictRead = require(script.Utility.restrictRead)
+local ProjectMadara = {}
+local Components = {}
 
-export type StateObject<T> = PubTypes.StateObject<T>
-export type CanBeState<T> = PubTypes.CanBeState<T>
-export type Symbol = PubTypes.Symbol
-export type Value<T> = PubTypes.Value<T>
-export type Computed<T> = PubTypes.Computed<T>
-export type ForPairs<KO, VO> = PubTypes.ForPairs<KO, VO>
-export type ForKeys<KI, KO> = PubTypes.ForKeys<KI, KO>
-export type ForValues<VI, VO> = PubTypes.ForKeys<VI, VO>
-export type Observer = PubTypes.Observer
-export type Tween<T> = PubTypes.Tween<T>
-export type Spring<T> = PubTypes.Spring<T>
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local TextService = game:GetService("TextService")
 
-type Fusion = {
-	version: PubTypes.Version,
-
-	New: (className: string) -> ((propertyTable: PubTypes.PropertyTable) -> Instance),
-	Hydrate: (target: Instance) -> ((propertyTable: PubTypes.PropertyTable) -> Instance),
-	Ref: PubTypes.SpecialKey,
-	Cleanup: PubTypes.SpecialKey,
-	Children: PubTypes.SpecialKey,
-	Out: PubTypes.SpecialKey,
-	OnEvent: (eventName: string) -> PubTypes.SpecialKey,
-	OnChange: (propertyName: string) -> PubTypes.SpecialKey,
-
-	Value: <T>(initialValue: T) -> Value<T>,
-	Computed: <T>(callback: () -> T, destructor: (T) -> ()?) -> Computed<T>,
-	ForPairs: <KI, VI, KO, VO, M>(inputTable: CanBeState<{[KI]: VI}>, processor: (KI, VI) -> (KO, VO, M?), destructor: (KO, VO, M?) -> ()?) -> ForPairs<KO, VO>,
-	ForKeys: <KI, KO, M>(inputTable: CanBeState<{[KI]: any}>, processor: (KI) -> (KO, M?), destructor: (KO, M?) -> ()?) -> ForKeys<KO, any>,
-	ForValues: <VI, VO, M>(inputTable: CanBeState<{[any]: VI}>, processor: (VI) -> (VO, M?), destructor: (VO, M?) -> ()?) -> ForValues<any, VO>,
-	Observer: (watchedState: StateObject<any>) -> Observer,
-
-	Tween: <T>(goalState: StateObject<T>, tweenInfo: TweenInfo?) -> Tween<T>,
-	Spring: <T>(goalState: StateObject<T>, speed: number?, damping: number?) -> Spring<T>,
-
-	cleanup: (...any) -> (),
-	doNothing: (...any) -> ()
+-- Constants
+local TWEEN_INFO = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local COLORS = {
+    Background = Color3.fromRGB(32, 37, 44), -- Main background - Darius style
+    DarkBackground = Color3.fromRGB(28, 32, 38), -- Component backgrounds - darker
+    LightText = Color3.fromRGB(255, 255, 255), -- Primary text
+    DarkText = Color3.fromRGB(170, 175, 185), -- Secondary text - better contrast
+    Accent = Color3.fromRGB(88, 166, 255), -- Modern blue accent like Darius
+    Toggle = Color3.fromRGB(88, 166, 255), -- Toggle active color - modern blue
+    Hover = Color3.fromRGB(38, 43, 50), -- Hover state - subtle
+    Border = Color3.fromRGB(45, 50, 57), -- Borders - modern
+    Red = Color3.fromRGB(255, 85, 85), -- Close button - modern red
 }
 
-return restrictRead("Fusion", {
-	version = {major = 0, minor = 2, isRelease = true},
+-- Load components
+for _, componentName in ipairs({"Window", "Tab", "Toggle", "Button", "TextBox", "Slider", "Dropdown", "Label", "Paragraph", "Loading", "FloatingControls", "MobileFloatingIcon", "DraggableKeybind"}) do
+    Components[componentName] = require(script:WaitForChild(componentName))
+end
 
-	New = require(script.Instances.New),
-	Hydrate = require(script.Instances.Hydrate),
-	Ref = require(script.Instances.Ref),
-	Out = require(script.Instances.Out),
-	Cleanup = require(script.Instances.Cleanup),
-	Children = require(script.Instances.Children),
-	OnEvent = require(script.Instances.OnEvent),
-	OnChange = require(script.Instances.OnChange),
+-- Load notification system
+Components.Notifications = require(script:WaitForChild("Notifications"))
+-- Load options manager
+Components.OptionsManager = require(script:WaitForChild("OptionsManager"))
+-- Config system disabled for now
+-- Components.Config = require(script:WaitForChild("Config"))
 
-	Value = require(script.State.Value),
-	Computed = require(script.State.Computed),
-	ForPairs = require(script.State.ForPairs),
-	ForKeys = require(script.State.ForKeys),
-	ForValues = require(script.State.ForValues),
-	Observer = require(script.State.Observer),
+-- Create a new window
+function ProjectMadara:Window(options)
+    options = options or {}
+    options.Title = options.Title or "ProjectMadara UI"
+    
+    return Components.Window.new(options, self)
+end
 
-	Tween = require(script.Animation.Tween),
-	Spring = require(script.Animation.Spring),
+-- Create options manager
+function ProjectMadara:CreateOptionsManager()
+    return Components.OptionsManager.new()
+end
 
-	cleanup = require(script.Utility.cleanup),
-	doNothing = require(script.Utility.doNothing)
-}) :: Fusion
+-- Create a loading screen
+function ProjectMadara:Loading(options)
+    options = options or {}
+    
+    return Components.Loading.new(options, self)
+end
 
+-- Create floating controls
+function ProjectMadara:FloatingControls(options)
+    options = options or {}
+    
+    return Components.FloatingControls.new(options, self)
+end
+
+-- Initialize global notification system
+ProjectMadara.Notifications = Components.Notifications.new()
+
+-- Notification convenience methods
+function ProjectMadara:ShowNotification(options)
+    return self.Notifications:Show(options)
+end
+
+function ProjectMadara:Success(title, content, duration)
+    return self.Notifications:Success(title, content, duration)
+end
+
+function ProjectMadara:Error(title, content, duration)
+    return self.Notifications:Error(title, content, duration)
+end
+
+function ProjectMadara:Warning(title, content, duration)
+    return self.Notifications:Warning(title, content, duration)
+end
+
+function ProjectMadara:Info(title, content, duration)
+    return self.Notifications:Info(title, content, duration)
+end
+
+-- Expose components and utilities
+ProjectMadara.Components = Components
+ProjectMadara.Colors = COLORS
+ProjectMadara.TweenInfo = TWEEN_INFO
+
+return ProjectMadara
 end)() end,
-    [5] = function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new computed state object, which follows the value of another
-	state object using a spring simulation.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local logError = require(Package.Logging.logError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local unpackType = require(Package.Animation.unpackType)
-local SpringScheduler = require(Package.Animation.SpringScheduler)
-local useDependency = require(Package.Dependencies.useDependency)
-local initDependency = require(Package.Dependencies.initDependency)
-local updateAll = require(Package.Dependencies.updateAll)
-local xtypeof = require(Package.Utility.xtypeof)
-local unwrap = require(Package.State.unwrap)
-
-local class = {}
-
-local CLASS_METATABLE = {__index = class}
-local WEAK_KEYS_METATABLE = {__mode = "k"}
-
---[[
-	Returns the current value of this Spring object.
-	The object will be registered as a dependency unless `asDependency` is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._currentValue
-end
-
---[[
-	Sets the position of the internal springs, meaning the value of this
-	Spring will jump to the given value. This doesn't affect velocity.
-
-	If the type doesn't match the current type of the spring, an error will be
-	thrown.
-]]
-function class:setPosition(newValue: PubTypes.Animatable)
-	local newType = typeof(newValue)
-	if newType ~= self._currentType then
-		logError("springTypeMismatch", nil, newType, self._currentType)
-	end
-
-	self._springPositions = unpackType(newValue, newType)
-	self._currentValue = newValue
-	SpringScheduler.add(self)
-	updateAll(self)
-end
-
---[[
-	Sets the velocity of the internal springs, overwriting the existing velocity
-	of this Spring. This doesn't affect position.
-
-	If the type doesn't match the current type of the spring, an error will be
-	thrown.
-]]
-function class:setVelocity(newValue: PubTypes.Animatable)
-	local newType = typeof(newValue)
-	if newType ~= self._currentType then
-		logError("springTypeMismatch", nil, newType, self._currentType)
-	end
-
-	self._springVelocities = unpackType(newValue, newType)
-	SpringScheduler.add(self)
-end
-
---[[
-	Adds to the velocity of the internal springs, on top of the existing
-	velocity of this Spring. This doesn't affect position.
-
-	If the type doesn't match the current type of the spring, an error will be
-	thrown.
-]]
-function class:addVelocity(deltaValue: PubTypes.Animatable)
-	local deltaType = typeof(deltaValue)
-	if deltaType ~= self._currentType then
-		logError("springTypeMismatch", nil, deltaType, self._currentType)
-	end
-
-	local springDeltas = unpackType(deltaValue, deltaType)
-	for index, delta in ipairs(springDeltas) do
-		self._springVelocities[index] += delta
-	end
-	SpringScheduler.add(self)
-end
-
---[[
-	Called when the goal state changes value, or when the speed or damping has
-	changed.
-]]
-function class:update(): boolean
-	local goalValue = self._goalState:get(false)
-
-	-- figure out if this was a goal change or a speed/damping change
-	if goalValue == self._goalValue then
-		-- speed/damping change
-		local damping = unwrap(self._damping)
-		if typeof(damping) ~= "number" then
-			logErrorNonFatal("mistypedSpringDamping", nil, typeof(damping))
-		elseif damping < 0 then
-			logErrorNonFatal("invalidSpringDamping", nil, damping)
-		else
-			self._currentDamping = damping
-		end
-
-		local speed = unwrap(self._speed)
-		if typeof(speed) ~= "number" then
-			logErrorNonFatal("mistypedSpringSpeed", nil, typeof(speed))
-		elseif speed < 0 then
-			logErrorNonFatal("invalidSpringSpeed", nil, speed)
-		else
-			self._currentSpeed = speed
-		end
-
-		return false
-	else
-		-- goal change - reconfigure spring to target new goal
-		self._goalValue = goalValue
-
-		local oldType = self._currentType
-		local newType = typeof(goalValue)
-		self._currentType = newType
-
-		local springGoals = unpackType(goalValue, newType)
-		local numSprings = #springGoals
-		self._springGoals = springGoals
-
-		if newType ~= oldType then
-			-- if the type changed, snap to the new value and rebuild the
-			-- position and velocity tables
-			self._currentValue = self._goalValue
-
-			local springPositions = table.create(numSprings, 0)
-			local springVelocities = table.create(numSprings, 0)
-			for index, springGoal in ipairs(springGoals) do
-				springPositions[index] = springGoal
-			end
-			self._springPositions = springPositions
-			self._springVelocities = springVelocities
-
-			-- the spring may have been animating before, so stop that
-			SpringScheduler.remove(self)
-			return true
-
-			-- otherwise, the type hasn't changed, just the goal...
-		elseif numSprings == 0 then
-			-- if the type isn't animatable, snap to the new value
-			self._currentValue = self._goalValue
-			return true
-
-		else
-			-- if it's animatable, let it animate to the goal
-			SpringScheduler.add(self)
-			return false
-		end
-	end
-end
-
-local function Spring<T>(
-	goalState: PubTypes.Value<T>,
-	speed: PubTypes.CanBeState<number>?,
-	damping: PubTypes.CanBeState<number>?
-): Types.Spring<T>
-	-- apply defaults for speed and damping
-	if speed == nil then
-		speed = 10
-	end
-	if damping == nil then
-		damping = 1
-	end
-
-	local dependencySet = {[goalState] = true}
-	if xtypeof(speed) == "State" then
-		dependencySet[speed] = true
-	end
-	if xtypeof(damping) == "State" then
-		dependencySet[damping] = true
-	end
-
-	local self = setmetatable({
-		type = "State",
-		kind = "Spring",
-		dependencySet = dependencySet,
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_speed = speed,
-		_damping = damping,
-
-		_goalState = goalState,
-		_goalValue = nil,
-
-		_currentType = nil,
-		_currentValue = nil,
-		_currentSpeed = unwrap(speed),
-		_currentDamping = unwrap(damping),
-
-		_springPositions = nil,
-		_springGoals = nil,
-		_springVelocities = nil
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	-- add this object to the goal state's dependent set
-	goalState.dependentSet[self] = true
-	self:update()
-
-	return self
-end
-
-return Spring
-end)() end,
-    [6] = function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)--!strict
-
---[[
-	Manages batch updating of spring objects.
-]]
-
-local RunService = game:GetService("RunService")
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local packType = require(Package.Animation.packType)
-local springCoefficients = require(Package.Animation.springCoefficients)
-local updateAll = require(Package.Dependencies.updateAll)
-
-type Set<T> = {[T]: any}
-type Spring = Types.Spring<any>
-
-local SpringScheduler = {}
-
-local EPSILON = 0.0001
-local activeSprings: Set<Spring> = {}
-local lastUpdateTime = os.clock()
-
-function SpringScheduler.add(spring: Spring)
-	-- we don't necessarily want to use the most accurate time - here we snap to
-	-- the last update time so that springs started within the same frame have
-	-- identical time steps
-	spring._lastSchedule = lastUpdateTime
-	spring._startDisplacements = {}
-	spring._startVelocities = {}
-	for index, goal in ipairs(spring._springGoals) do
-		spring._startDisplacements[index] = spring._springPositions[index] - goal
-		spring._startVelocities[index] = spring._springVelocities[index]
-	end
-
-	activeSprings[spring] = true
-end
-
-function SpringScheduler.remove(spring: Spring)
-	activeSprings[spring] = nil
-end
-
-
-local function updateAllSprings()
-	local springsToSleep: Set<Spring> = {}
-	lastUpdateTime = os.clock()
-
-	for spring in pairs(activeSprings) do
-		local posPos, posVel, velPos, velVel = springCoefficients(lastUpdateTime - spring._lastSchedule, spring._currentDamping, spring._currentSpeed)
-
-		local positions = spring._springPositions
-		local velocities = spring._springVelocities
-		local startDisplacements = spring._startDisplacements
-		local startVelocities = spring._startVelocities
-		local isMoving = false
-
-		for index, goal in ipairs(spring._springGoals) do
-			local oldDisplacement = startDisplacements[index]
-			local oldVelocity = startVelocities[index]
-			local newDisplacement = oldDisplacement * posPos + oldVelocity * posVel
-			local newVelocity = oldDisplacement * velPos + oldVelocity * velVel
-
-			if math.abs(newDisplacement) > EPSILON or math.abs(newVelocity) > EPSILON then
-				isMoving = true
-			end
-
-			positions[index] = newDisplacement + goal
-			velocities[index] = newVelocity
-		end
-
-		if not isMoving then
-			springsToSleep[spring] = true
-		end
-	end
-
-	for spring in pairs(activeSprings) do
-		spring._currentValue = packType(spring._springPositions, spring._currentType)
-		updateAll(spring)
-	end
-
-	for spring in pairs(springsToSleep) do
-		activeSprings[spring] = nil
-	end
-end
-
-RunService:BindToRenderStep(
-	"__FusionSpringScheduler",
-	Enum.RenderPriority.First.Value,
-	updateAllSprings
-)
-
-return SpringScheduler
-end)() end,
-    [7] = function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new computed state object, which follows the value of another
-	state object using a tween.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local TweenScheduler = require(Package.Animation.TweenScheduler)
-local useDependency = require(Package.Dependencies.useDependency)
-local initDependency = require(Package.Dependencies.initDependency)
-local logError = require(Package.Logging.logError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local xtypeof = require(Package.Utility.xtypeof)
-
-local class = {}
-
-local CLASS_METATABLE = {__index = class}
-local WEAK_KEYS_METATABLE = {__mode = "k"}
-
---[[
-	Returns the current value of this Tween object.
-	The object will be registered as a dependency unless `asDependency` is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._currentValue
-end
-
---[[
-	Called when the goal state changes value; this will initiate a new tween.
-	Returns false as the current value doesn't change right away.
-]]
-function class:update(): boolean
-	local goalValue = self._goalState:get(false)
-
-	-- if the goal hasn't changed, then this is a TweenInfo change.
-	-- in that case, if we're not currently animating, we can skip everything
-	if goalValue == self._nextValue and not self._currentlyAnimating then
-		return false
-	end
-
-	local tweenInfo = self._tweenInfo
-	if self._tweenInfoIsState then
-		tweenInfo = tweenInfo:get()
-	end
-
-	-- if we receive a bad TweenInfo, then error and stop the update
-	if typeof(tweenInfo) ~= "TweenInfo" then
-		logErrorNonFatal("mistypedTweenInfo", nil, typeof(tweenInfo))
-		return false
-	end
-
-	self._prevValue = self._currentValue
-	self._nextValue = goalValue
-
-	self._currentTweenStartTime = os.clock()
-	self._currentTweenInfo = tweenInfo
-
-	local tweenDuration = tweenInfo.DelayTime + tweenInfo.Time
-	if tweenInfo.Reverses then
-		tweenDuration += tweenInfo.Time
-	end
-	tweenDuration *= tweenInfo.RepeatCount + 1
-	self._currentTweenDuration = tweenDuration
-
-	-- start animating this tween
-	TweenScheduler.add(self)
-
-	return false
-end
-
-local function Tween<T>(
-	goalState: PubTypes.StateObject<PubTypes.Animatable>,
-	tweenInfo: PubTypes.CanBeState<TweenInfo>?
-): Types.Tween<T>
-	local currentValue = goalState:get(false)
-
-	-- apply defaults for tween info
-	if tweenInfo == nil then
-		tweenInfo = TweenInfo.new()
-	end
-
-	local dependencySet = {[goalState] = true}
-	local tweenInfoIsState = xtypeof(tweenInfo) == "State"
-
-	if tweenInfoIsState then
-		dependencySet[tweenInfo] = true
-	end
-
-	local startingTweenInfo = tweenInfo
-	if tweenInfoIsState then
-		startingTweenInfo = startingTweenInfo:get()
-	end
-
-	-- If we start with a bad TweenInfo, then we don't want to construct a Tween
-	if typeof(startingTweenInfo) ~= "TweenInfo" then
-		logError("mistypedTweenInfo", nil, typeof(startingTweenInfo))
-	end
-
-	local self = setmetatable({
-		type = "State",
-		kind = "Tween",
-		dependencySet = dependencySet,
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_goalState = goalState,
-		_tweenInfo = tweenInfo,
-		_tweenInfoIsState = tweenInfoIsState,
-
-		_prevValue = currentValue,
-		_nextValue = currentValue,
-		_currentValue = currentValue,
-
-		-- store current tween into separately from 'real' tween into, so it
-		-- isn't affected by :setTweenInfo() until next change
-		_currentTweenInfo = tweenInfo,
-		_currentTweenDuration = 0,
-		_currentTweenStartTime = 0,
-		_currentlyAnimating = false
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	-- add this object to the goal state's dependent set
-	goalState.dependentSet[self] = true
-
-	return self
-end
-
-return Tween
-end)() end,
-    [8] = function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)--!strict
-
---[[
-	Manages batch updating of tween objects.
-]]
-
-local RunService = game:GetService("RunService")
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local lerpType = require(Package.Animation.lerpType)
-local getTweenRatio = require(Package.Animation.getTweenRatio)
-local updateAll = require(Package.Dependencies.updateAll)
-
-local TweenScheduler = {}
-
-type Set<T> = {[T]: any}
-type Tween = Types.Tween<any>
-
-local WEAK_KEYS_METATABLE = {__mode = "k"}
-
--- all the tweens currently being updated
-local allTweens: Set<Tween> = {}
-setmetatable(allTweens, WEAK_KEYS_METATABLE)
-
---[[
-	Adds a Tween to be updated every render step.
-]]
-function TweenScheduler.add(tween: Tween)
-	allTweens[tween] = true
-end
-
---[[
-	Removes a Tween from the scheduler.
-]]
-function TweenScheduler.remove(tween: Tween)
-	allTweens[tween] = nil
-end
-
---[[
-	Updates all Tween objects.
-]]
-local function updateAllTweens()
-	local now = os.clock()
-	-- FIXME: Typed Luau doesn't understand this loop yet
-	for tween: Tween in pairs(allTweens :: any) do
-		local currentTime = now - tween._currentTweenStartTime
-
-		if currentTime > tween._currentTweenDuration then
-			if tween._currentTweenInfo.Reverses then
-				tween._currentValue = tween._prevValue
-			else
-				tween._currentValue = tween._nextValue
-			end
-			tween._currentlyAnimating = false
-			updateAll(tween)
-			TweenScheduler.remove(tween)
-		else
-			local ratio = getTweenRatio(tween._currentTweenInfo, currentTime)
-			local currentValue = lerpType(tween._prevValue, tween._nextValue, ratio)
-			tween._currentValue = currentValue
-			tween._currentlyAnimating = true
-			updateAll(tween)
-		end
-	end
-end
-
-RunService:BindToRenderStep(
-	"__FusionTweenScheduler",
-	Enum.RenderPriority.First.Value,
-	updateAllTweens
-)
-
-return TweenScheduler
-end)() end,
-    [9] = function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)--!strict
-
---[[
-	Given a `tweenInfo` and `currentTime`, returns a ratio which can be used to
-	tween between two values over time.
+    function()local wax,script,require=ImportGlobals(2)local ImportGlobals return (function(...)--[[
+    Button Component
+    A clickable button UI element
 ]]
 
 local TweenService = game:GetService("TweenService")
 
-local function getTweenRatio(tweenInfo: TweenInfo, currentTime: number): number
-	local delay = tweenInfo.DelayTime
-	local duration = tweenInfo.Time
-	local reverses = tweenInfo.Reverses
-	local numCycles = 1 + tweenInfo.RepeatCount
-	local easeStyle = tweenInfo.EasingStyle
-	local easeDirection = tweenInfo.EasingDirection
-
-	local cycleDuration = delay + duration
-	if reverses then
-		cycleDuration += duration
-	end
-
-	if currentTime >= cycleDuration * numCycles then
-		return 1
-	end
-
-	local cycleTime = currentTime % cycleDuration
-
-	if cycleTime <= delay then
-		return 0
-	end
-
-	local tweenProgress = (cycleTime - delay) / duration
-	if tweenProgress > 1 then
-		tweenProgress = 2 - tweenProgress
-	end
-
-	local ratio = TweenService:GetValue(tweenProgress, easeStyle, easeDirection)
-	return ratio
-end
-
-return getTweenRatio
-end)() end,
-    [10] = function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)--!strict
-
---[[
-	Linearly interpolates the given animatable types by a ratio.
-	If the types are different or not animatable, then the first value will be
-	returned for ratios below 0.5, and the second value for 0.5 and above.
-
-	FIXME: This function uses a lot of redefinitions to suppress false positives
-	from the Luau typechecker - ideally these wouldn't be required
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Oklab = require(Package.Colour.Oklab)
-
-local function lerpType(from: any, to: any, ratio: number): any
-	local typeString = typeof(from)
-
-	if typeof(to) == typeString then
-		-- both types must match for interpolation to make sense
-		if typeString == "number" then
-			local to, from = to :: number, from :: number
-			return (to - from) * ratio + from
-
-		elseif typeString == "CFrame" then
-			local to, from = to :: CFrame, from :: CFrame
-			return from:Lerp(to, ratio)
-
-		elseif typeString == "Color3" then
-			local to, from = to :: Color3, from :: Color3
-			local fromLab = Oklab.to(from)
-			local toLab = Oklab.to(to)
-			return Oklab.from(
-				fromLab:Lerp(toLab, ratio),
-				false
-			)
-
-		elseif typeString == "ColorSequenceKeypoint" then
-			local to, from = to :: ColorSequenceKeypoint, from :: ColorSequenceKeypoint
-			local fromLab = Oklab.to(from.Value)
-			local toLab = Oklab.to(to.Value)
-			return ColorSequenceKeypoint.new(
-				(to.Time - from.Time) * ratio + from.Time,
-				Oklab.from(
-					fromLab:Lerp(toLab, ratio),
-					false
-				)
-			)
-
-		elseif typeString == "DateTime" then
-			local to, from = to :: DateTime, from :: DateTime
-			return DateTime.fromUnixTimestampMillis(
-				(to.UnixTimestampMillis - from.UnixTimestampMillis) * ratio + from.UnixTimestampMillis
-			)
-
-		elseif typeString == "NumberRange" then
-			local to, from = to :: NumberRange, from :: NumberRange
-			return NumberRange.new(
-				(to.Min - from.Min) * ratio + from.Min,
-				(to.Max - from.Max) * ratio + from.Max
-			)
-
-		elseif typeString == "NumberSequenceKeypoint" then
-			local to, from = to :: NumberSequenceKeypoint, from :: NumberSequenceKeypoint
-			return NumberSequenceKeypoint.new(
-				(to.Time - from.Time) * ratio + from.Time,
-				(to.Value - from.Value) * ratio + from.Value,
-				(to.Envelope - from.Envelope) * ratio + from.Envelope
-			)
-
-		elseif typeString == "PhysicalProperties" then
-			local to, from = to :: PhysicalProperties, from :: PhysicalProperties
-			return PhysicalProperties.new(
-				(to.Density - from.Density) * ratio + from.Density,
-				(to.Friction - from.Friction) * ratio + from.Friction,
-				(to.Elasticity - from.Elasticity) * ratio + from.Elasticity,
-				(to.FrictionWeight - from.FrictionWeight) * ratio + from.FrictionWeight,
-				(to.ElasticityWeight - from.ElasticityWeight) * ratio + from.ElasticityWeight
-			)
-
-		elseif typeString == "Ray" then
-			local to, from = to :: Ray, from :: Ray
-			return Ray.new(
-				from.Origin:Lerp(to.Origin, ratio),
-				from.Direction:Lerp(to.Direction, ratio)
-			)
-
-		elseif typeString == "Rect" then
-			local to, from = to :: Rect, from :: Rect
-			return Rect.new(
-				from.Min:Lerp(to.Min, ratio),
-				from.Max:Lerp(to.Max, ratio)
-			)
-
-		elseif typeString == "Region3" then
-			local to, from = to :: Region3, from :: Region3
-			-- FUTURE: support rotated Region3s if/when they become constructable
-			local position = from.CFrame.Position:Lerp(to.CFrame.Position, ratio)
-			local halfSize = from.Size:Lerp(to.Size, ratio) / 2
-			return Region3.new(position - halfSize, position + halfSize)
-
-		elseif typeString == "Region3int16" then
-			local to, from = to :: Region3int16, from :: Region3int16
-			return Region3int16.new(
-				Vector3int16.new(
-					(to.Min.X - from.Min.X) * ratio + from.Min.X,
-					(to.Min.Y - from.Min.Y) * ratio + from.Min.Y,
-					(to.Min.Z - from.Min.Z) * ratio + from.Min.Z
-				),
-				Vector3int16.new(
-					(to.Max.X - from.Max.X) * ratio + from.Max.X,
-					(to.Max.Y - from.Max.Y) * ratio + from.Max.Y,
-					(to.Max.Z - from.Max.Z) * ratio + from.Max.Z
-				)
-			)
-
-		elseif typeString == "UDim" then
-			local to, from = to :: UDim, from :: UDim
-			return UDim.new(
-				(to.Scale - from.Scale) * ratio + from.Scale,
-				(to.Offset - from.Offset) * ratio + from.Offset
-			)
-
-		elseif typeString == "UDim2" then
-			local to, from = to :: UDim2, from :: UDim2
-			return from:Lerp(to, ratio)
-
-		elseif typeString == "Vector2" then
-			local to, from = to :: Vector2, from :: Vector2
-			return from:Lerp(to, ratio)
-
-		elseif typeString == "Vector2int16" then
-			local to, from = to :: Vector2int16, from :: Vector2int16
-			return Vector2int16.new(
-				(to.X - from.X) * ratio + from.X,
-				(to.Y - from.Y) * ratio + from.Y
-			)
-
-		elseif typeString == "Vector3" then
-			local to, from = to :: Vector3, from :: Vector3
-			return from:Lerp(to, ratio)
-
-		elseif typeString == "Vector3int16" then
-			local to, from = to :: Vector3int16, from :: Vector3int16
-			return Vector3int16.new(
-				(to.X - from.X) * ratio + from.X,
-				(to.Y - from.Y) * ratio + from.Y,
-				(to.Z - from.Z) * ratio + from.Z
-			)
-		end
-	end
-
-	-- fallback case: the types are different or not animatable
-	if ratio < 0.5 then
-		return from
-	else
-		return to
-	end
-end
-
-return lerpType
-end)() end,
-    [11] = function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)--!strict
-
---[[
-	Packs an array of numbers into a given animatable data type.
-	If the type is not animatable, nil will be returned.
-
-	FUTURE: When Luau supports singleton types, those could be used in
-	conjunction with intersection types to make this function fully statically
-	type checkable.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Oklab = require(Package.Colour.Oklab)
-
-local function packType(numbers: {number}, typeString: string): PubTypes.Animatable?
-	if typeString == "number" then
-		return numbers[1]
-
-	elseif typeString == "CFrame" then
-		return
-			CFrame.new(numbers[1], numbers[2], numbers[3]) *
-			CFrame.fromAxisAngle(
-				Vector3.new(numbers[4], numbers[5], numbers[6]).Unit,
-				numbers[7]
-			)
-
-	elseif typeString == "Color3" then
-		return Oklab.from(
-			Vector3.new(numbers[1], numbers[2], numbers[3]),
-			false
-		)
-
-	elseif typeString == "ColorSequenceKeypoint" then
-		return ColorSequenceKeypoint.new(
-			numbers[4],
-			Oklab.from(
-				Vector3.new(numbers[1], numbers[2], numbers[3]),
-				false
-			)
-		)
-
-	elseif typeString == "DateTime" then
-		return DateTime.fromUnixTimestampMillis(numbers[1])
-
-	elseif typeString == "NumberRange" then
-		return NumberRange.new(numbers[1], numbers[2])
-
-	elseif typeString == "NumberSequenceKeypoint" then
-		return NumberSequenceKeypoint.new(numbers[2], numbers[1], numbers[3])
-
-	elseif typeString == "PhysicalProperties" then
-		return PhysicalProperties.new(numbers[1], numbers[2], numbers[3], numbers[4], numbers[5])
-
-	elseif typeString == "Ray" then
-		return Ray.new(
-			Vector3.new(numbers[1], numbers[2], numbers[3]),
-			Vector3.new(numbers[4], numbers[5], numbers[6])
-		)
-
-	elseif typeString == "Rect" then
-		return Rect.new(numbers[1], numbers[2], numbers[3], numbers[4])
-
-	elseif typeString == "Region3" then
-		-- FUTURE: support rotated Region3s if/when they become constructable
-		local position = Vector3.new(numbers[1], numbers[2], numbers[3])
-		local halfSize = Vector3.new(numbers[4] / 2, numbers[5] / 2, numbers[6] / 2)
-		return Region3.new(position - halfSize, position + halfSize)
-
-	elseif typeString == "Region3int16" then
-		return Region3int16.new(
-			Vector3int16.new(numbers[1], numbers[2], numbers[3]),
-			Vector3int16.new(numbers[4], numbers[5], numbers[6])
-		)
-
-	elseif typeString == "UDim" then
-		return UDim.new(numbers[1], numbers[2])
-
-	elseif typeString == "UDim2" then
-		return UDim2.new(numbers[1], numbers[2], numbers[3], numbers[4])
-
-	elseif typeString == "Vector2" then
-		return Vector2.new(numbers[1], numbers[2])
-
-	elseif typeString == "Vector2int16" then
-		return Vector2int16.new(numbers[1], numbers[2])
-
-	elseif typeString == "Vector3" then
-		return Vector3.new(numbers[1], numbers[2], numbers[3])
-
-	elseif typeString == "Vector3int16" then
-		return Vector3int16.new(numbers[1], numbers[2], numbers[3])
-	else
-		return nil
-	end
-end
-
-return packType
-end)() end,
-    [12] = function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)--!strict
-
---[[
-	Returns a 2x2 matrix of coefficients for a given time, damping and speed.
-	Specifically, this returns four coefficients - posPos, posVel, velPos, and
-	velVel - which can be multiplied with position and velocity like so:
-
-	local newPosition = oldPosition * posPos + oldVelocity * posVel
-	local newVelocity = oldPosition * velPos + oldVelocity * velVel
-
-	Special thanks to AxisAngle for helping to improve numerical precision.
-]]
-
-local function springCoefficients(time: number, damping: number, speed: number): (number, number, number, number)
-	-- if time or speed is 0, then the spring won't move
-	if time == 0 or speed == 0 then
-		return 1, 0, 0, 1
-	end
-	local posPos, posVel, velPos, velVel
-
-	if damping > 1 then
-		-- overdamped spring
-		-- solution to the characteristic equation:
-		-- z = -ζω ± Sqrt[ζ^2 - 1] ω
-		-- x[t] -> x0(e^(t z2) z1 - e^(t z1) z2)/(z1 - z2)
-		--		 + v0(e^(t z1) - e^(t z2))/(z1 - z2)
-		-- v[t] -> x0(z1 z2(-e^(t z1) + e^(t z2)))/(z1 - z2)
-		--		 + v0(z1 e^(t z1) - z2 e^(t z2))/(z1 - z2)
-
-		local scaledTime = time * speed
-		local alpha = math.sqrt(damping^2 - 1)
-		local scaledInvAlpha = -0.5 / alpha
-		local z1 = -alpha - damping
-		local z2 = 1 / z1
-		local expZ1 = math.exp(scaledTime * z1)
-		local expZ2 = math.exp(scaledTime * z2)
-
-		posPos = (expZ2*z1 - expZ1*z2) * scaledInvAlpha
-		posVel = (expZ1 - expZ2) * scaledInvAlpha / speed
-		velPos = (expZ2 - expZ1) * scaledInvAlpha * speed
-		velVel = (expZ1*z1 - expZ2*z2) * scaledInvAlpha
-
-	elseif damping == 1 then
-		-- critically damped spring
-		-- x[t] -> x0(e^-tω)(1+tω) + v0(e^-tω)t
-		-- v[t] -> x0(t ω^2)(-e^-tω) + v0(1 - tω)(e^-tω)
-
-		local scaledTime = time * speed
-		local expTerm = math.exp(-scaledTime)
-
-		posPos = expTerm * (1 + scaledTime)
-		posVel = expTerm * time
-		velPos = expTerm * (-scaledTime*speed)
-		velVel = expTerm * (1 - scaledTime)
-
-	else
-		-- underdamped spring
-		-- factored out of the solutions to the characteristic equation:
-		-- α = Sqrt[1 - ζ^2]
-		-- x[t] -> x0(e^-tζω)(α Cos[tα] + ζω Sin[tα])/α
-		--       + v0(e^-tζω)(Sin[tα])/α
-		-- v[t] -> x0(-e^-tζω)(α^2 + ζ^2 ω^2)(Sin[tα])/α
-		--       + v0(e^-tζω)(α Cos[tα] - ζω Sin[tα])/α
-
-		local scaledTime = time * speed
-		local alpha = math.sqrt(1 - damping^2)
-		local invAlpha = 1 / alpha
-		local alphaTime = alpha * scaledTime
-		local expTerm = math.exp(-scaledTime*damping)
-		local sinTerm = expTerm * math.sin(alphaTime)
-		local cosTerm = expTerm * math.cos(alphaTime)
-		local sinInvAlpha = sinTerm*invAlpha
-		local sinInvAlphaDamp = sinInvAlpha*damping
-
-		posPos = sinInvAlphaDamp + cosTerm
-		posVel = sinInvAlpha
-		velPos = -(sinInvAlphaDamp*damping + sinTerm*alpha)
-		velVel = cosTerm - sinInvAlphaDamp
-	end
-
-	return posPos, posVel, velPos, velVel
-end
-
-return springCoefficients
-
-end)() end,
-    [13] = function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)--!strict
-
---[[
-	Unpacks an animatable type into an array of numbers.
-	If the type is not animatable, an empty array will be returned.
-
-	FIXME: This function uses a lot of redefinitions to suppress false positives
-	from the Luau typechecker - ideally these wouldn't be required
-
-	FUTURE: When Luau supports singleton types, those could be used in
-	conjunction with intersection types to make this function fully statically
-	type checkable.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Oklab = require(Package.Colour.Oklab)
-
-local function unpackType(value: any, typeString: string): {number}
-	if typeString == "number" then
-		local value = value :: number
-		return {value}
-
-	elseif typeString == "CFrame" then
-		-- FUTURE: is there a better way of doing this? doing distance
-		-- calculations on `angle` may be incorrect
-		local axis, angle = value:ToAxisAngle()
-		return {value.X, value.Y, value.Z, axis.X, axis.Y, axis.Z, angle}
-
-	elseif typeString == "Color3" then
-		local lab = Oklab.to(value)
-		return {lab.X, lab.Y, lab.Z}
-
-	elseif typeString == "ColorSequenceKeypoint" then
-		local lab = Oklab.to(value.Value)
-		return {lab.X, lab.Y, lab.Z, value.Time}
-
-	elseif typeString == "DateTime" then
-		return {value.UnixTimestampMillis}
-
-	elseif typeString == "NumberRange" then
-		return {value.Min, value.Max}
-
-	elseif typeString == "NumberSequenceKeypoint" then
-		return {value.Value, value.Time, value.Envelope}
-
-	elseif typeString == "PhysicalProperties" then
-		return {value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight}
-
-	elseif typeString == "Ray" then
-		return {value.Origin.X, value.Origin.Y, value.Origin.Z, value.Direction.X, value.Direction.Y, value.Direction.Z}
-
-	elseif typeString == "Rect" then
-		return {value.Min.X, value.Min.Y, value.Max.X, value.Max.Y}
-
-	elseif typeString == "Region3" then
-		-- FUTURE: support rotated Region3s if/when they become constructable
-		return {
-			value.CFrame.X, value.CFrame.Y, value.CFrame.Z,
-			value.Size.X, value.Size.Y, value.Size.Z
-		}
-
-	elseif typeString == "Region3int16" then
-		return {value.Min.X, value.Min.Y, value.Min.Z, value.Max.X, value.Max.Y, value.Max.Z}
-
-	elseif typeString == "UDim" then
-		return {value.Scale, value.Offset}
-
-	elseif typeString == "UDim2" then
-		return {value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset}
-
-	elseif typeString == "Vector2" then
-		return {value.X, value.Y}
-
-	elseif typeString == "Vector2int16" then
-		return {value.X, value.Y}
-
-	elseif typeString == "Vector3" then
-		return {value.X, value.Y, value.Z}
-
-	elseif typeString == "Vector3int16" then
-		return {value.X, value.Y, value.Z}
-	else
-		return {}
-	end
-end
-
-return unpackType
-end)() end,
-    [15] = function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)--!strict
-
---[[
-	Provides functions for converting Color3s into Oklab space, for more
-	perceptually uniform colour blending.
-
-	See: https://bottosson.github.io/posts/oklab/
-]]
-
-local Oklab = {}
-
--- Converts a Color3 in RGB space to a Vector3 in Oklab space.
-function Oklab.to(rgb: Color3): Vector3
-	local l = rgb.R * 0.4122214708 + rgb.G * 0.5363325363 + rgb.B * 0.0514459929
-	local m = rgb.R * 0.2119034982 + rgb.G * 0.6806995451 + rgb.B * 0.1073969566
-	local s = rgb.R * 0.0883024619 + rgb.G * 0.2817188376 + rgb.B * 0.6299787005
-
-	local lRoot = l ^ (1/3)
-	local mRoot = m ^ (1/3)
-	local sRoot = s ^ (1/3)
-
-	return Vector3.new(
-		lRoot * 0.2104542553 + mRoot * 0.7936177850 - sRoot * 0.0040720468,
-		lRoot * 1.9779984951 - mRoot * 2.4285922050 + sRoot * 0.4505937099,
-		lRoot * 0.0259040371 + mRoot * 0.7827717662 - sRoot * 0.8086757660
-	)
-end
-
--- Converts a Vector3 in CIELAB space to a Color3 in RGB space.
--- The Color3 will be clamped by default unless specified otherwise.
-function Oklab.from(lab: Vector3, unclamped: boolean?): Color3
-	local lRoot = lab.X + lab.Y * 0.3963377774 + lab.Z * 0.2158037573
-	local mRoot = lab.X - lab.Y * 0.1055613458 - lab.Z * 0.0638541728
-	local sRoot = lab.X - lab.Y * 0.0894841775 - lab.Z * 1.2914855480
-
-	local l = lRoot ^ 3
-	local m = mRoot ^ 3
-	local s = sRoot ^ 3
-
-	local red = l * 4.0767416621 - m * 3.3077115913 + s * 0.2309699292
-	local green = l * -1.2684380046 + m * 2.6097574011 - s * 0.3413193965
-	local blue = l * -0.0041960863 - m * 0.7034186147 + s * 1.7076147010
-
-	if not unclamped then
-		red = math.clamp(red, 0, 1)
-		green = math.clamp(green, 0, 1)
-		blue = math.clamp(blue, 0, 1)
-	end
-
-	return Color3.new(red, green, blue)
-end
-
-return Oklab
-
-end)() end,
-    [17] = function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)--!strict
-
---[[
-	Calls the given callback, and stores any used external dependencies.
-	Arguments can be passed in after the callback.
-	If the callback completed successfully, returns true and the returned value,
-	otherwise returns false and the error thrown.
-	The callback shouldn't yield or run asynchronously.
-
-	NOTE: any calls to useDependency() inside the callback (even if inside any
-	nested captureDependencies() call) will not be included in the set, to avoid
-	self-dependencies.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local parseError = require(Package.Logging.parseError)
-local sharedState = require(Package.Dependencies.sharedState)
-
-type Set<T> = {[T]: any}
-
-local initialisedStack = sharedState.initialisedStack
-local initialisedStackCapacity = 0
-
-local function captureDependencies(
-	saveToSet: Set<PubTypes.Dependency>,
-	callback: (...any) -> any,
-	...
-): (boolean, any)
-
-	local prevDependencySet = sharedState.dependencySet
-	sharedState.dependencySet = saveToSet
-
-	sharedState.initialisedStackSize += 1
-	local initialisedStackSize = sharedState.initialisedStackSize
-
-	local initialisedSet
-	if initialisedStackSize > initialisedStackCapacity then
-		initialisedSet = {}
-		initialisedStack[initialisedStackSize] = initialisedSet
-		initialisedStackCapacity = initialisedStackSize
-	else
-		initialisedSet = initialisedStack[initialisedStackSize]
-		table.clear(initialisedSet)
-	end
-
-	local data = table.pack(xpcall(callback, parseError, ...))
-
-	sharedState.dependencySet = prevDependencySet
-	sharedState.initialisedStackSize -= 1
-
-	return table.unpack(data, 1, data.n)
-end
-
-return captureDependencies
-
-end)() end,
-    [18] = function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)--!strict
-
---[[
-	Registers the creation of an object which can be used as a dependency.
-
-	This is used to make sure objects don't capture dependencies originating
-	from inside of themselves.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local sharedState = require(Package.Dependencies.sharedState)
-
-local initialisedStack = sharedState.initialisedStack
-
-local function initDependency(dependency: PubTypes.Dependency)
-	local initialisedStackSize = sharedState.initialisedStackSize
-
-	for index, initialisedSet in ipairs(initialisedStack) do
-		if index > initialisedStackSize then
-			return
-		end
-
-		initialisedSet[dependency] = true
-	end
-end
-
-return initDependency
-end)() end,
-    [19] = function()local wax,script,require=ImportGlobals(19)local ImportGlobals return (function(...)--!strict
-
---[[
-	Stores shared state for dependency management functions.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-
-type Set<T> = {[T]: any}
-
--- The set where used dependencies should be saved to.
-local dependencySet: Set<PubTypes.Dependency>? = nil
-
--- A stack of sets where newly created dependencies should be stored.
-local initialisedStack: {Set<PubTypes.Dependency>} = {}
-local initialisedStackSize = 0
-
-return {
-	dependencySet = dependencySet,
-	initialisedStack = initialisedStack,
-	initialisedStackSize = initialisedStackSize
-}
-end)() end,
-    [20] = function()local wax,script,require=ImportGlobals(20)local ImportGlobals return (function(...)--!strict
-
---[[
-	Given a reactive object, updates all dependent reactive objects.
-	Objects are only ever updated after all of their dependencies are updated,
-	are only ever updated once, and won't be updated if their dependencies are
-	unchanged.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-
-type Set<T> = {[T]: any}
-type Descendant = (PubTypes.Dependent & PubTypes.Dependency) | PubTypes.Dependent
-
--- Credit: https://blog.elttob.uk/2022/11/07/sets-efficient-topological-search.html
-local function updateAll(root: PubTypes.Dependency)
-	local counters: {[Descendant]: number} = {}
-	local flags: {[Descendant]: boolean} = {}
-	local queue: {Descendant} = {}
-	local queueSize = 0
-	local queuePos = 1
-
-	for object in root.dependentSet do
-		queueSize += 1
-		queue[queueSize] = object
-		flags[object] = true
-	end
-
-	-- Pass 1: counting up
-	while queuePos <= queueSize do
-		local next = queue[queuePos]
-		local counter = counters[next]
-		counters[next] = if counter == nil then 1 else counter + 1
-		if (next :: any).dependentSet ~= nil then
-			for object in (next :: any).dependentSet do
-				queueSize += 1
-				queue[queueSize] = object
-			end
-		end
-		queuePos += 1
-	end
-
-	-- Pass 2: counting down + processing
-	queuePos = 1
-	while queuePos <= queueSize do
-		local next = queue[queuePos]
-		local counter = counters[next] - 1
-		counters[next] = counter
-		if counter == 0 and flags[next] and next:update() and (next :: any).dependentSet ~= nil then
-			for object in (next :: any).dependentSet do
-				flags[object] = true
-			end
-		end
-		queuePos += 1
-	end
-end
-
-return updateAll
-end)() end,
-    [21] = function()local wax,script,require=ImportGlobals(21)local ImportGlobals return (function(...)--!strict
-
---[[
-	If a target set was specified by captureDependencies(), this will add the
-	given dependency to the target set.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local sharedState = require(Package.Dependencies.sharedState)
-
-local initialisedStack = sharedState.initialisedStack
-
-local function useDependency(dependency: PubTypes.Dependency)
-	local dependencySet = sharedState.dependencySet
-
-	if dependencySet ~= nil then
-		local initialisedStackSize = sharedState.initialisedStackSize
-		if initialisedStackSize > 0 then
-			local initialisedSet = initialisedStack[initialisedStackSize]
-			if initialisedSet[dependency] ~= nil then
-				return
-			end
-		end
-		dependencySet[dependency] = true
-	end
-end
-
-return useDependency
-end)() end,
-    [23] = function()local wax,script,require=ImportGlobals(23)local ImportGlobals return (function(...)--!strict
-
---[[
-	A special key for property tables, which parents any given descendants into
-	an instance.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local logWarn = require(Package.Logging.logWarn)
-local Observer = require(Package.State.Observer)
-local xtypeof = require(Package.Utility.xtypeof)
-
-type Set<T> = {[T]: boolean}
-
--- Experimental flag: name children based on the key used in the [Children] table
-local EXPERIMENTAL_AUTO_NAMING = false
-
-local Children = {}
-Children.type = "SpecialKey"
-Children.kind = "Children"
-Children.stage = "descendants"
-
-function Children:apply(propValue: any, applyTo: Instance, cleanupTasks: {PubTypes.Task})
-	local newParented: Set<Instance> = {}
-	local oldParented: Set<Instance> = {}
-
-	-- save disconnection functions for state object observers
-	local newDisconnects: {[PubTypes.StateObject<any>]: () -> ()} = {}
-	local oldDisconnects: {[PubTypes.StateObject<any>]: () -> ()} = {}
-
-	local updateQueued = false
-	local queueUpdate: () -> ()
-
-	-- Rescans this key's value to find new instances to parent and state objects
-	-- to observe for changes; then unparents instances no longer found and
-	-- disconnects observers for state objects no longer present.
-	local function updateChildren()
-		if not updateQueued then
-			return -- this update may have been canceled by destruction, etc.
-		end
-		updateQueued = false
-
-		oldParented, newParented = newParented, oldParented
-		oldDisconnects, newDisconnects = newDisconnects, oldDisconnects
-		table.clear(newParented)
-		table.clear(newDisconnects)
-
-		local function processChild(child: any, autoName: string?)
-			local kind = xtypeof(child)
-
-			if kind == "Instance" then
-				-- case 1; single instance
-
-				newParented[child] = true
-				if oldParented[child] == nil then
-					-- wasn't previously present
-
-					-- TODO: check for ancestry conflicts here
-					child.Parent = applyTo
-				else
-					-- previously here; we want to reuse, so remove from old
-					-- set so we don't encounter it during unparenting
-					oldParented[child] = nil
-				end
-
-				if EXPERIMENTAL_AUTO_NAMING and autoName ~= nil then
-					child.Name = autoName
-				end
-
-			elseif kind == "State" then
-				-- case 2; state object
-
-				local value = child:get(false)
-				-- allow nil to represent the absence of a child
-				if value ~= nil then
-					processChild(value, autoName)
-				end
-
-				local disconnect = oldDisconnects[child]
-				if disconnect == nil then
-					-- wasn't previously present
-					disconnect = Observer(child):onChange(queueUpdate)
-				else
-					-- previously here; we want to reuse, so remove from old
-					-- set so we don't encounter it during unparenting
-					oldDisconnects[child] = nil
-				end
-
-				newDisconnects[child] = disconnect
-
-			elseif kind == "table" then
-				-- case 3; table of objects
-
-				for key, subChild in pairs(child) do
-					local keyType = typeof(key)
-					local subAutoName: string? = nil
-
-					if keyType == "string" then
-						subAutoName = key
-					elseif keyType == "number" and autoName ~= nil then
-						subAutoName = autoName .. "_" .. key
-					end
-
-					processChild(subChild, subAutoName)
-				end
-
-			else
-				logWarn("unrecognisedChildType", kind)
-			end
-		end
-
-		if propValue ~= nil then
-			-- `propValue` is set to nil on cleanup, so we don't process children
-			-- in that case
-			processChild(propValue)
-		end
-
-		-- unparent any children that are no longer present
-		for oldInstance in pairs(oldParented) do
-			oldInstance.Parent = nil
-		end
-
-		-- disconnect observers which weren't reused
-		for oldState, disconnect in pairs(oldDisconnects) do
-			disconnect()
-		end
-	end
-
-	queueUpdate = function()
-		if not updateQueued then
-			updateQueued = true
-			task.defer(updateChildren)
-		end
-	end
-
-	table.insert(cleanupTasks, function()
-		propValue = nil
-		updateQueued = true
-		updateChildren()
-	end)
-
-	-- perform initial child parenting
-	updateQueued = true
-	updateChildren()
-end
-
-return Children :: PubTypes.SpecialKey
-end)() end,
-    [24] = function()local wax,script,require=ImportGlobals(24)local ImportGlobals return (function(...)--!strict
-
---[[
-	A special key for property tables, which adds user-specified tasks to be run
-	when the instance is destroyed.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-
-local Cleanup = {}
-Cleanup.type = "SpecialKey"
-Cleanup.kind = "Cleanup"
-Cleanup.stage = "observer"
-
-function Cleanup:apply(userTask: any, applyTo: Instance, cleanupTasks: {PubTypes.Task})
-	table.insert(cleanupTasks, userTask)
-end
-
-return Cleanup
-end)() end,
-    [25] = function()local wax,script,require=ImportGlobals(25)local ImportGlobals return (function(...)--!strict
-
---[[
-	Processes and returns an existing instance, with options for setting
-	properties, event handlers and other attributes on the instance.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local applyInstanceProps = require(Package.Instances.applyInstanceProps)
-
-local function Hydrate(target: Instance)
-	return function(props: PubTypes.PropertyTable): Instance
-		applyInstanceProps(props, target)
-		return target
-	end
-end
-
-return Hydrate
-end)() end,
-    [26] = function()local wax,script,require=ImportGlobals(26)local ImportGlobals return (function(...)--!strict
-
---[[
-	Constructs and returns a new instance, with options for setting properties,
-	event handlers and other attributes on the instance right away.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local defaultProps = require(Package.Instances.defaultProps)
-local applyInstanceProps = require(Package.Instances.applyInstanceProps)
-local logError= require(Package.Logging.logError)
-
-local function New(className: string)
-	return function(props: PubTypes.PropertyTable): Instance
-		local ok, instance = pcall(Instance.new, className)
-
-		if not ok then
-			logError("cannotCreateClass", nil, className)
-		end
-
-		local classDefaults = defaultProps[className]
-		if classDefaults ~= nil then
-			for defaultProp, defaultValue in pairs(classDefaults) do
-				instance[defaultProp] = defaultValue
-			end
-		end
-
-		applyInstanceProps(props, instance)
-
-		return instance
-	end
-end
-
-return New
-end)() end,
-    [27] = function()local wax,script,require=ImportGlobals(27)local ImportGlobals return (function(...)--!strict
-
---[[
-	Constructs special keys for property tables which connect property change
-	listeners to an instance.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local logError = require(Package.Logging.logError)
-
-local function OnChange(propertyName: string): PubTypes.SpecialKey
-	local changeKey = {}
-	changeKey.type = "SpecialKey"
-	changeKey.kind = "OnChange"
-	changeKey.stage = "observer"
-
-	function changeKey:apply(callback: any, applyTo: Instance, cleanupTasks: {PubTypes.Task})
-		local ok, event = pcall(applyTo.GetPropertyChangedSignal, applyTo, propertyName)
-		if not ok then
-			logError("cannotConnectChange", nil, applyTo.ClassName, propertyName)
-		elseif typeof(callback) ~= "function" then
-			logError("invalidChangeHandler", nil, propertyName)
-		else
-			table.insert(cleanupTasks, event:Connect(function()
-				callback((applyTo :: any)[propertyName])
-			end))
-		end
-	end
-
-	return changeKey
-end
-
-return OnChange
-end)() end,
-    [28] = function()local wax,script,require=ImportGlobals(28)local ImportGlobals return (function(...)--!strict
-
---[[
-	Constructs special keys for property tables which connect event listeners to
-	an instance.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local logError = require(Package.Logging.logError)
-
-local function getProperty_unsafe(instance: Instance, property: string)
-	return (instance :: any)[property]
-end
-
-local function OnEvent(eventName: string): PubTypes.SpecialKey
-	local eventKey = {}
-	eventKey.type = "SpecialKey"
-	eventKey.kind = "OnEvent"
-	eventKey.stage = "observer"
-
-	function eventKey:apply(callback: any, applyTo: Instance, cleanupTasks: {PubTypes.Task})
-		local ok, event = pcall(getProperty_unsafe, applyTo, eventName)
-		if not ok or typeof(event) ~= "RBXScriptSignal" then
-			logError("cannotConnectEvent", nil, applyTo.ClassName, eventName)
-		elseif typeof(callback) ~= "function" then
-			logError("invalidEventHandler", nil, eventName)
-		else
-			table.insert(cleanupTasks, event:Connect(callback))
-		end
-	end
-
-	return eventKey
-end
-
-return OnEvent
-end)() end,
-    [29] = function()local wax,script,require=ImportGlobals(29)local ImportGlobals return (function(...)--!strict
-
---[[
-	A special key for property tables, which allows users to extract values from
-	an instance into an automatically-updated Value object.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local logError = require(Package.Logging.logError)
-local xtypeof = require(Package.Utility.xtypeof)
-
-local function Out(propertyName: string): PubTypes.SpecialKey
-	local outKey = {}
-	outKey.type = "SpecialKey"
-	outKey.kind = "Out"
-	outKey.stage = "observer"
-
-	function outKey:apply(outState: any, applyTo: Instance, cleanupTasks: { PubTypes.Task })
-		local ok, event = pcall(applyTo.GetPropertyChangedSignal, applyTo, propertyName)
-		if not ok then
-			logError("invalidOutProperty", nil, applyTo.ClassName, propertyName)
-		elseif xtypeof(outState) ~= "State" or outState.kind ~= "Value" then
-			logError("invalidOutType")
-		else
-			outState:set((applyTo :: any)[propertyName])
-			table.insert(
-				cleanupTasks,
-				event:Connect(function()
-					outState:set((applyTo :: any)[propertyName])
-				end)
-			)
-			table.insert(cleanupTasks, function()
-				outState:set(nil)
-			end)
-		end
-	end
-
-	return outKey
-end
-
-return Out
-
-end)() end,
-    [30] = function()local wax,script,require=ImportGlobals(30)local ImportGlobals return (function(...)--!strict
-
---[[
-	A special key for property tables, which stores a reference to the instance
-	in a user-provided Value object.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local logError = require(Package.Logging.logError)
-local xtypeof = require(Package.Utility.xtypeof)
-
-local Ref = {}
-Ref.type = "SpecialKey"
-Ref.kind = "Ref"
-Ref.stage = "observer"
-
-function Ref:apply(refState: any, applyTo: Instance, cleanupTasks: {PubTypes.Task})
-	if xtypeof(refState) ~= "State" or refState.kind ~= "Value" then
-		logError("invalidRefType")
-	else
-		refState:set(applyTo)
-		table.insert(cleanupTasks, function()
-			refState:set(nil)
-		end)
-	end
-end
-
-return Ref
-end)() end,
-    [31] = function()local wax,script,require=ImportGlobals(31)local ImportGlobals return (function(...)--!strict
-
---[[
-	Applies a table of properties to an instance, including binding to any
-	given state objects and applying any special keys.
-
-	No strong reference is kept by default - special keys should take care not
-	to accidentally hold strong references to instances forever.
-
-	If a key is used twice, an error will be thrown. This is done to avoid
-	double assignments or double bindings. However, some special keys may want
-	to enable such assignments - in which case unique keys should be used for
-	each occurence.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local cleanup = require(Package.Utility.cleanup)
-local xtypeof = require(Package.Utility.xtypeof)
-local logError = require(Package.Logging.logError)
-local Observer = require(Package.State.Observer)
-
-local function setProperty_unsafe(instance: Instance, property: string, value: any)
-	(instance :: any)[property] = value
-end
-
-local function testPropertyAssignable(instance: Instance, property: string)
-	(instance :: any)[property] = (instance :: any)[property]
-end
-
-local function setProperty(instance: Instance, property: string, value: any)
-	if not pcall(setProperty_unsafe, instance, property, value) then
-		if not pcall(testPropertyAssignable, instance, property) then
-			if instance == nil then
-				-- reference has been lost
-				logError("setPropertyNilRef", nil, property, tostring(value))
-			else
-				-- property is not assignable
-				logError("cannotAssignProperty", nil, instance.ClassName, property)
-			end
-		else
-			-- property is assignable, but this specific assignment failed
-			-- this typically implies the wrong type was received
-			local givenType = typeof(value)
-			local expectedType = typeof((instance :: any)[property])
-			logError("invalidPropertyType", nil, instance.ClassName, property, expectedType, givenType)
-		end
-	end
-end
-
-local function bindProperty(instance: Instance, property: string, value: PubTypes.CanBeState<any>, cleanupTasks: {PubTypes.Task})
-	if xtypeof(value) == "State" then
-		-- value is a state object - assign and observe for changes
-		local willUpdate = false
-		local function updateLater()
-			if not willUpdate then
-				willUpdate = true
-				task.defer(function()
-					willUpdate = false
-					setProperty(instance, property, value:get(false))
-				end)
-			end
-		end
-
-		setProperty(instance, property, value:get(false))
-		table.insert(cleanupTasks, Observer(value :: any):onChange(updateLater))
-	else
-		-- value is a constant - assign once only
-		setProperty(instance, property, value)
-	end
-end
-
-local function applyInstanceProps(props: PubTypes.PropertyTable, applyTo: Instance)
-	local specialKeys = {
-		self = {} :: {[PubTypes.SpecialKey]: any},
-		descendants = {} :: {[PubTypes.SpecialKey]: any},
-		ancestor = {} :: {[PubTypes.SpecialKey]: any},
-		observer = {} :: {[PubTypes.SpecialKey]: any}
-	}
-	local cleanupTasks = {}
-
-	for key, value in pairs(props) do
-		local keyType = xtypeof(key)
-
-		if keyType == "string" then
-			if key ~= "Parent" then
-				bindProperty(applyTo, key :: string, value, cleanupTasks)
-			end
-		elseif keyType == "SpecialKey" then
-			local stage = (key :: PubTypes.SpecialKey).stage
-			local keys = specialKeys[stage]
-			if keys == nil then
-				logError("unrecognisedPropertyStage", nil, stage)
-			else
-				keys[key] = value
-			end
-		else
-			-- we don't recognise what this key is supposed to be
-			logError("unrecognisedPropertyKey", nil, xtypeof(key))
-		end
-	end
-
-	for key, value in pairs(specialKeys.self) do
-		key:apply(value, applyTo, cleanupTasks)
-	end
-	for key, value in pairs(specialKeys.descendants) do
-		key:apply(value, applyTo, cleanupTasks)
-	end
-
-	if props.Parent ~= nil then
-		bindProperty(applyTo, "Parent", props.Parent, cleanupTasks)
-	end
-
-	for key, value in pairs(specialKeys.ancestor) do
-		key:apply(value, applyTo, cleanupTasks)
-	end
-	for key, value in pairs(specialKeys.observer) do
-		key:apply(value, applyTo, cleanupTasks)
-	end
-
-	applyTo.Destroying:Connect(function()
-		cleanup(cleanupTasks)
-	end)
-end
-
-return applyInstanceProps
-end)() end,
-    [32] = function()local wax,script,require=ImportGlobals(32)local ImportGlobals return (function(...)--!strict
-
---[[
-	Stores 'sensible default' properties to be applied to instances created by
-	the New function.
-]]
-
-return {
-	ScreenGui = {
-		ResetOnSpawn = false,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	},
-
-	BillboardGui = {
-		ResetOnSpawn = false,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	},
-
-	SurfaceGui = {
-		ResetOnSpawn = false,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-
-		SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
-		PixelsPerStud = 50
-	},
-
-	Frame = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0
-	},
-
-	ScrollingFrame = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0,
-
-		ScrollBarImageColor3 = Color3.new(0, 0, 0)
-	},
-
-	TextLabel = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0,
-
-		Font = Enum.Font.SourceSans,
-		Text = "",
-		TextColor3 = Color3.new(0, 0, 0),
-		TextSize = 14
-	},
-
-	TextButton = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0,
-
-		AutoButtonColor = false,
-
-		Font = Enum.Font.SourceSans,
-		Text = "",
-		TextColor3 = Color3.new(0, 0, 0),
-		TextSize = 14
-	},
-
-	TextBox = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0,
-
-		ClearTextOnFocus = false,
-
-		Font = Enum.Font.SourceSans,
-		Text = "",
-		TextColor3 = Color3.new(0, 0, 0),
-		TextSize = 14
-	},
-
-	ImageLabel = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0
-	},
-
-	ImageButton = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0,
-
-		AutoButtonColor = false
-	},
-
-	ViewportFrame = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0
-	},
-
-	VideoFrame = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0
-	},
-	
-	CanvasGroup = {
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		BorderColor3 = Color3.new(0, 0, 0),
-		BorderSizePixel = 0
-	}
-}
-
-end)() end,
-    [34] = function()local wax,script,require=ImportGlobals(34)local ImportGlobals return (function(...)--!strict
-
---[[
-	Utility function to log a Fusion-specific error.
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local messages = require(Package.Logging.messages)
-
-local function logError(messageID: string, errObj: Types.Error?, ...)
-	local formatString: string
-
-	if messages[messageID] ~= nil then
-		formatString = messages[messageID]
-	else
-		messageID = "unknownMessage"
-		formatString = messages[messageID]
-	end
-
-	local errorString
-	if errObj == nil then
-		errorString = string.format("[Fusion] " .. formatString .. "\n(ID: " .. messageID .. ")", ...)
-	else
-		formatString = formatString:gsub("ERROR_MESSAGE", errObj.message)
-		errorString = string.format("[Fusion] " .. formatString .. "\n(ID: " .. messageID .. ")\n---- Stack trace ----\n" .. errObj.trace, ...)
-	end
-
-	error(errorString:gsub("\n", "\n    "), 0)
-end
-
-return logError
-end)() end,
-    [35] = function()local wax,script,require=ImportGlobals(35)local ImportGlobals return (function(...)--!strict
-
---[[
-	Utility function to log a Fusion-specific error, without halting execution.
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local messages = require(Package.Logging.messages)
-
-local function logErrorNonFatal(messageID: string, errObj: Types.Error?, ...)
-	local formatString: string
-
-	if messages[messageID] ~= nil then
-		formatString = messages[messageID]
-	else
-		messageID = "unknownMessage"
-		formatString = messages[messageID]
-	end
-
-	local errorString
-	if errObj == nil then
-		errorString = string.format("[Fusion] " .. formatString .. "\n(ID: " .. messageID .. ")", ...)
-	else
-		formatString = formatString:gsub("ERROR_MESSAGE", errObj.message)
-		errorString = string.format("[Fusion] " .. formatString .. "\n(ID: " .. messageID .. ")\n---- Stack trace ----\n" .. errObj.trace, ...)
-	end
-
-	task.spawn(function(...)
-		error(errorString:gsub("\n", "\n    "), 0)
-	end, ...)
-end
-
-return logErrorNonFatal
-end)() end,
-    [36] = function()local wax,script,require=ImportGlobals(36)local ImportGlobals return (function(...)--!strict
-
---[[
-	Utility function to log a Fusion-specific warning.
-]]
-
-local Package = script.Parent.Parent
-local messages = require(Package.Logging.messages)
-
-local function logWarn(messageID, ...)
-	local formatString: string
-
-	if messages[messageID] ~= nil then
-		formatString = messages[messageID]
-	else
-		messageID = "unknownMessage"
-		formatString = messages[messageID]
-	end
-
-	warn(string.format("[Fusion] " .. formatString .. "\n(ID: " .. messageID .. ")", ...))
-end
-
-return logWarn
-end)() end,
-    [37] = function()local wax,script,require=ImportGlobals(37)local ImportGlobals return (function(...)--!strict
-
---[[
-	Stores templates for different kinds of logging messages.
-]]
-
-return {
-	cannotAssignProperty = "The class type '%s' has no assignable property '%s'.",
-	cannotConnectChange = "The %s class doesn't have a property called '%s'.",
-	cannotConnectEvent = "The %s class doesn't have an event called '%s'.",
-	cannotCreateClass = "Can't create a new instance of class '%s'.",
-	computedCallbackError = "Computed callback error: ERROR_MESSAGE",
-	destructorNeededValue = "To save instances into Values, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
-	destructorNeededComputed = "To return instances from Computeds, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
-	multiReturnComputed = "Returning multiple values from Computeds is discouraged, as behaviour will change soon - see discussion #189 on GitHub.",
-	destructorNeededForKeys = "To return instances from ForKeys, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
-	destructorNeededForValues = "To return instances from ForValues, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
-	destructorNeededForPairs = "To return instances from ForPairs, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
-	duplicatePropertyKey = "",
-	forKeysProcessorError = "ForKeys callback error: ERROR_MESSAGE",
-	forKeysKeyCollision = "ForKeys should only write to output key '%s' once when processing key changes, but it wrote to it twice. Previously input key: '%s'; New input key: '%s'",
-	forKeysDestructorError = "ForKeys destructor error: ERROR_MESSAGE",
-	forPairsDestructorError = "ForPairs destructor error: ERROR_MESSAGE",
-	forPairsKeyCollision = "ForPairs should only write to output key '%s' once when processing key changes, but it wrote to it twice. Previous input pair: '[%s] = %s'; New input pair: '[%s] = %s'",
-	forPairsProcessorError = "ForPairs callback error: ERROR_MESSAGE",
-	forValuesProcessorError = "ForValues callback error: ERROR_MESSAGE",
-	forValuesDestructorError = "ForValues destructor error: ERROR_MESSAGE",
-	invalidChangeHandler = "The change handler for the '%s' property must be a function.",
-	invalidEventHandler = "The handler for the '%s' event must be a function.",
-	invalidPropertyType = "'%s.%s' expected a '%s' type, but got a '%s' type.",
-	invalidRefType = "Instance refs must be Value objects.",
-	invalidOutType = "[Out] properties must be given Value objects.",
-	invalidOutProperty = "The %s class doesn't have a property called '%s'.",
-	invalidSpringDamping = "The damping ratio for a spring must be >= 0. (damping was %.2f)",
-	invalidSpringSpeed = "The speed of a spring must be >= 0. (speed was %.2f)",
-	mistypedSpringDamping = "The damping ratio for a spring must be a number. (got a %s)",
-	mistypedSpringSpeed = "The speed of a spring must be a number. (got a %s)",
-	mistypedTweenInfo = "The tween info of a tween must be a TweenInfo. (got a %s)",
-	springTypeMismatch = "The type '%s' doesn't match the spring's type '%s'.",
-	strictReadError = "'%s' is not a valid member of '%s'.",
-	unknownMessage = "Unknown error: ERROR_MESSAGE",
-	unrecognisedChildType = "'%s' type children aren't accepted by `[Children]`.",
-	unrecognisedPropertyKey = "'%s' keys aren't accepted in property tables.",
-	unrecognisedPropertyStage = "'%s' isn't a valid stage for a special key to be applied at."
-}
-end)() end,
-    [38] = function()local wax,script,require=ImportGlobals(38)local ImportGlobals return (function(...)--!strict
-
---[[
-	An xpcall() error handler to collect and parse useful information about
-	errors, such as clean messages and stack traces.
-
-	TODO: this should have a 'type' field for runtime type checking!
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-
-local function parseError(err: string): Types.Error
-	return {
-		type = "Error",
-		raw = err,
-		message = err:gsub("^.+:%d+:%s*", ""),
-		trace = debug.traceback(nil, 2)
-	}
-end
-
-return parseError
-end)() end,
-    [39] = function()local wax,script,require=ImportGlobals(39)local ImportGlobals return (function(...)--!strict
-
---[[
-	Stores common public-facing type information for Fusion APIs.
-]]
-
-type Set<T> = {[T]: any}
-
---[[
-	General use types
-]]
-
--- A unique symbolic value.
-export type Symbol = {
-	type: string, -- replace with "Symbol" when Luau supports singleton types
-	name: string
-}
-
--- Types that can be expressed as vectors of numbers, and so can be animated.
-export type Animatable =
-	number |
-	CFrame |
-	Color3 |
-	ColorSequenceKeypoint |
-	DateTime |
-	NumberRange |
-	NumberSequenceKeypoint |
-	PhysicalProperties |
-	Ray |
-	Rect |
-	Region3 |
-	Region3int16 |
-	UDim |
-	UDim2 |
-	Vector2 |
-	Vector2int16 |
-	Vector3 |
-	Vector3int16
-
--- A task which can be accepted for cleanup.
-export type Task =
-	Instance |
-	RBXScriptConnection |
-	() -> () |
-	{destroy: (any) -> ()} |
-	{Destroy: (any) -> ()} |
-	{Task}
-
--- Script-readable version information.
-export type Version = {
-	major: number,
-	minor: number,
-	isRelease: boolean
-}
---[[
-	Generic reactive graph types
-]]
-
--- A graph object which can have dependents.
-export type Dependency = {
-	dependentSet: Set<Dependent>
-}
-
--- A graph object which can have dependencies.
-export type Dependent = {
-	update: (Dependent) -> boolean,
-	dependencySet: Set<Dependency>
-}
-
--- An object which stores a piece of reactive state.
-export type StateObject<T> = Dependency & {
-	type: string, -- replace with "State" when Luau supports singleton types
-	kind: string,
-	get: (StateObject<T>, asDependency: boolean?) -> T
-}
-
--- Either a constant value of type T, or a state object containing type T.
-export type CanBeState<T> = StateObject<T> | T
-
---[[
-	Specific reactive graph types
-]]
-
--- A state object whose value can be set at any time by the user.
-export type Value<T> = StateObject<T> & {
-	-- kind: "State" (add this when Luau supports singleton types)
- 	set: (Value<T>, newValue: any, force: boolean?) -> ()
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type Computed<T> = StateObject<T> & Dependent & {
-	-- kind: "Computed" (add this when Luau supports singleton types)
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type ForPairs<KO, VO> = StateObject<{ [KO]: VO }> & Dependent & {
-	-- kind: "ForPairs" (add this when Luau supports singleton types)
-}
--- A state object whose value is derived from other objects using a callback.
-export type ForKeys<KO, V> = StateObject<{ [KO]: V }> & Dependent & {
-	-- kind: "ForKeys" (add this when Luau supports singleton types)
-}
--- A state object whose value is derived from other objects using a callback.
-export type ForValues<K, VO> = StateObject<{ [K]: VO }> & Dependent & {
-	-- kind: "ForKeys" (add this when Luau supports singleton types)
-}
-
--- A state object which follows another state object using tweens.
-export type Tween<T> = StateObject<T> & Dependent & {
-	-- kind: "Tween" (add this when Luau supports singleton types)
-}
-
--- A state object which follows another state object using spring simulation.
-export type Spring<T> = StateObject<T> & Dependent & {
-	-- kind: "Spring" (add this when Luau supports singleton types)
-	-- Uncomment when ENABLE_PARAM_SETTERS is enabled
-	-- setPosition: (Spring<T>, newValue: Animatable) -> (),
-	-- setVelocity: (Spring<T>, newValue: Animatable) -> (),
-	-- addVelocity: (Spring<T>, deltaValue: Animatable) -> ()
-}
-
--- An object which can listen for updates on another state object.
-export type Observer = Dependent & {
-	-- kind: "Observer" (add this when Luau supports singleton types)
-  	onChange: (Observer, callback: () -> ()) -> (() -> ())
-}
-
---[[
-	Instance related types
-]]
-
--- Denotes children instances in an instance or component's property table.
-export type SpecialKey = {
-	type: string, -- replace with "SpecialKey" when Luau supports singleton types
-	kind: string,
-	stage: string, -- replace with "self" | "descendants" | "ancestor" | "observer" when Luau supports singleton types
-	apply: (SpecialKey, value: any, applyTo: Instance, cleanupTasks: {Task}) -> ()
-}
-
--- A collection of instances that may be parented to another instance.
-export type Children = Instance | StateObject<Children> | {[any]: Children}
-
--- A table that defines an instance's properties, handlers and children.
-export type PropertyTable = {[string | SpecialKey]: any}
-
-return nil
-end)() end,
-    [41] = function()local wax,script,require=ImportGlobals(41)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs and returns objects which can be used to model derived reactive
-	state.
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local captureDependencies = require(Package.Dependencies.captureDependencies)
-local initDependency = require(Package.Dependencies.initDependency)
-local useDependency = require(Package.Dependencies.useDependency)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local logWarn = require(Package.Logging.logWarn)
-local isSimilar = require(Package.Utility.isSimilar)
-local needsDestruction = require(Package.Utility.needsDestruction)
-
-local class = {}
-
-local CLASS_METATABLE = {__index = class}
-local WEAK_KEYS_METATABLE = {__mode = "k"}
-
---[[
-	Returns the last cached value calculated by this Computed object.
-	The computed object will be registered as a dependency unless `asDependency`
-	is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._value
-end
-
---[[
-	Recalculates this Computed's cached value and dependencies.
-	Returns true if it changed, or false if it's identical.
-]]
-function class:update(): boolean
-	-- remove this object from its dependencies' dependent sets
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
-
-	-- we need to create a new, empty dependency set to capture dependencies
-	-- into, but in case there's an error, we want to restore our old set of
-	-- dependencies. by using this table-swapping solution, we can avoid the
-	-- overhead of allocating new tables each update.
-	self._oldDependencySet, self.dependencySet = self.dependencySet, self._oldDependencySet
-	table.clear(self.dependencySet)
-
-	local ok, newValue, newMetaValue = captureDependencies(self.dependencySet, self._processor)
-
-	if ok then
-		if self._destructor == nil and needsDestruction(newValue) then
-			logWarn("destructorNeededComputed")
-		end
-
-		if newMetaValue ~= nil then
-			logWarn("multiReturnComputed")
-		end
-
-		local oldValue = self._value
-		local similar = isSimilar(oldValue, newValue)
-		if self._destructor ~= nil then
-			self._destructor(oldValue)
-		end
-		self._value = newValue
-
-		-- add this object to the dependencies' dependent sets
-		for dependency in pairs(self.dependencySet) do
-			dependency.dependentSet[self] = true
-		end
-
-		return not similar
-	else
-		-- this needs to be non-fatal, because otherwise it'd disrupt the
-		-- update process
-		logErrorNonFatal("computedCallbackError", newValue)
-
-		-- restore old dependencies, because the new dependencies may be corrupt
-		self._oldDependencySet, self.dependencySet = self.dependencySet, self._oldDependencySet
-
-		-- restore this object in the dependencies' dependent sets
-		for dependency in pairs(self.dependencySet) do
-			dependency.dependentSet[self] = true
-		end
-
-		return false
-	end
-end
-
-local function Computed<T>(processor: () -> T, destructor: ((T) -> ())?): Types.Computed<T>
-	local self = setmetatable({
-		type = "State",
-		kind = "Computed",
-		dependencySet = {},
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_oldDependencySet = {},
-		_processor = processor,
-		_destructor = destructor,
-		_value = nil,
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	self:update()
-
-	return self
-end
-
-return Computed
-end)() end,
-    [42] = function()local wax,script,require=ImportGlobals(42)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new ForKeys state object which maps keys of an array using
-	a `processor` function.
-
-	Optionally, a `destructor` function can be specified for cleaning up
-	calculated keys. If omitted, the default cleanup function will be used instead.
-
-	Optionally, a `meta` value can be returned in the processor function as the
-	second value to pass data from the processor to the destructor.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local captureDependencies = require(Package.Dependencies.captureDependencies)
-local initDependency = require(Package.Dependencies.initDependency)
-local useDependency = require(Package.Dependencies.useDependency)
-local parseError = require(Package.Logging.parseError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local logError = require(Package.Logging.logError)
-local logWarn = require(Package.Logging.logWarn)
-local cleanup = require(Package.Utility.cleanup)
-local needsDestruction = require(Package.Utility.needsDestruction)
-
-local class = {}
-
-local CLASS_METATABLE = { __index = class }
-local WEAK_KEYS_METATABLE = { __mode = "k" }
-
---[[
-	Returns the current value of this ForKeys object.
-	The object will be registered as a dependency unless `asDependency` is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._outputTable
-end
-
-
---[[
-	Called when the original table is changed.
-
-	This will firstly find any keys meeting any of the following criteria:
-
-	- they were not previously present
-	- a dependency used during generation of this value has changed
-
-	It will recalculate those key pairs, storing information about any
-	dependencies used in the processor callback during output key generation,
-	and save the new key to the output array with the same value. If it is
-	overwriting an older value, that older value will be passed to the
-	destructor for cleanup.
-
-	Finally, this function will find keys that are no longer present, and remove
-	their output keys from the output table and pass them to the destructor.
-]]
-
-function class:update(): boolean
-	local inputIsState = self._inputIsState
-	local newInputTable = if inputIsState then self._inputTable:get(false) else self._inputTable
-	local oldInputTable = self._oldInputTable
-	local outputTable = self._outputTable
-
-	local keyOIMap = self._keyOIMap
-	local keyIOMap = self._keyIOMap
-	local meta = self._meta
-
-	local didChange = false
-
-
-	-- clean out main dependency set
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
-
-	self._oldDependencySet, self.dependencySet = self.dependencySet, self._oldDependencySet
-	table.clear(self.dependencySet)
-
-	-- if the input table is a state object, add it as a dependency
-	if inputIsState then
-		self._inputTable.dependentSet[self] = true
-		self.dependencySet[self._inputTable] = true
-	end
-
-
-	-- STEP 1: find keys that changed or were not previously present
-	for newInKey, value in pairs(newInputTable) do
-		-- get or create key data
-		local keyData = self._keyData[newInKey]
-
-		if keyData == nil then
-			keyData = {
-				dependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				oldDependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				dependencyValues = setmetatable({}, WEAK_KEYS_METATABLE),
-			}
-			self._keyData[newInKey] = keyData
-		end
-
-		-- check if the key is new
-		local shouldRecalculate = oldInputTable[newInKey] == nil
-
-		-- check if the key's dependencies have changed
-		if shouldRecalculate == false then
-			for dependency, oldValue in pairs(keyData.dependencyValues) do
-				if oldValue ~= dependency:get(false) then
-					shouldRecalculate = true
-					break
-				end
-			end
-		end
-
-
-		-- recalculate the output key if necessary
-		if shouldRecalculate then
-			keyData.oldDependencySet, keyData.dependencySet = keyData.dependencySet, keyData.oldDependencySet
-			table.clear(keyData.dependencySet)
-
-			local processOK, newOutKey, newMetaValue = captureDependencies(
-				keyData.dependencySet,
-				self._processor,
-				newInKey
-			)
-
-			if processOK then
-				if self._destructor == nil and (needsDestruction(newOutKey) or needsDestruction(newMetaValue)) then
-					logWarn("destructorNeededForKeys")
-				end
-
-				local oldInKey = keyOIMap[newOutKey]
-				local oldOutKey = keyIOMap[newInKey]
-
-				-- check for key collision
-				if oldInKey ~= newInKey and newInputTable[oldInKey] ~= nil then
-					logError("forKeysKeyCollision", nil, tostring(newOutKey), tostring(oldInKey), tostring(newOutKey))
-				end
-
-				-- check for a changed output key
-				if oldOutKey ~= newOutKey and keyOIMap[oldOutKey] == newInKey then
-					-- clean up the old calculated value
-					local oldMetaValue = meta[oldOutKey]
-
-					local destructOK, err = xpcall(self._destructor or cleanup, parseError, oldOutKey, oldMetaValue)
-					if not destructOK then
-						logErrorNonFatal("forKeysDestructorError", err)
-					end
-
-					keyOIMap[oldOutKey] = nil
-					outputTable[oldOutKey] = nil
-					meta[oldOutKey] = nil
-				end
-
-				-- update the stored data for this key
-				oldInputTable[newInKey] = value
-				meta[newOutKey] = newMetaValue
-				keyOIMap[newOutKey] = newInKey
-				keyIOMap[newInKey] = newOutKey
-				outputTable[newOutKey] = value
-
-				-- if we had to recalculate the output, then we did change
-				didChange = true
-			else
-				-- restore old dependencies, because the new dependencies may be corrupt
-				keyData.oldDependencySet, keyData.dependencySet = keyData.dependencySet, keyData.oldDependencySet
-
-				logErrorNonFatal("forKeysProcessorError", newOutKey)
-			end
-		end
-
-
-		-- save dependency values and add to main dependency set
-		for dependency in pairs(keyData.dependencySet) do
-			keyData.dependencyValues[dependency] = dependency:get(false)
-
-			self.dependencySet[dependency] = true
-			dependency.dependentSet[self] = true
-		end
-	end
-
-
-	-- STEP 2: find keys that were removed
-	for outputKey, inputKey in pairs(keyOIMap) do
-		if newInputTable[inputKey] == nil then
-			-- clean up the old calculated value
-			local oldMetaValue = meta[outputKey]
-
-			local destructOK, err = xpcall(self._destructor or cleanup, parseError, outputKey, oldMetaValue)
-			if not destructOK then
-				logErrorNonFatal("forKeysDestructorError", err)
-			end
-
-			-- remove data
-			oldInputTable[inputKey] = nil
-			meta[outputKey] = nil
-			keyOIMap[outputKey] = nil
-			keyIOMap[inputKey] = nil
-			outputTable[outputKey] = nil
-			self._keyData[inputKey] = nil
-
-			-- if we removed a key, then the table/state changed
-			didChange = true
-		end
-	end
-
-	return didChange
-end
-
-local function ForKeys<KI, KO, M>(
-	inputTable: PubTypes.CanBeState<{ [KI]: any }>,
-	processor: (KI) -> (KO, M?),
-	destructor: (KO, M?) -> ()?
-): Types.ForKeys<KI, KO, M>
-
-	local inputIsState = inputTable.type == "State" and typeof(inputTable.get) == "function"
-
-	local self = setmetatable({
-		type = "State",
-		kind = "ForKeys",
-		dependencySet = {},
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_oldDependencySet = {},
-
-		_processor = processor,
-		_destructor = destructor,
-		_inputIsState = inputIsState,
-
-		_inputTable = inputTable,
-		_oldInputTable = {},
-		_outputTable = {},
-		_keyOIMap = {},
-		_keyIOMap = {},
-		_keyData = {},
-		_meta = {},
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	self:update()
-
-	return self
-end
-
-return ForKeys
-end)() end,
-    [43] = function()local wax,script,require=ImportGlobals(43)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new ForPairs object which maps pairs of a table using
-	a `processor` function.
-
-	Optionally, a `destructor` function can be specified for cleaning up values.
-	If omitted, the default cleanup function will be used instead.
-
-	Additionally, a `meta` table/value can optionally be returned to pass data created
-	when running the processor to the destructor when the created object is cleaned up.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local captureDependencies = require(Package.Dependencies.captureDependencies)
-local initDependency = require(Package.Dependencies.initDependency)
-local useDependency = require(Package.Dependencies.useDependency)
-local parseError = require(Package.Logging.parseError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local logError = require(Package.Logging.logError)
-local logWarn = require(Package.Logging.logWarn)
-local cleanup = require(Package.Utility.cleanup)
-local needsDestruction = require(Package.Utility.needsDestruction)
-
-local class = {}
-
-local CLASS_METATABLE = { __index = class }
-local WEAK_KEYS_METATABLE = { __mode = "k" }
-
---[[
-	Returns the current value of this ForPairs object.
-	The object will be registered as a dependency unless `asDependency` is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._outputTable
-end
-
---[[
-	Called when the original table is changed.
-
-	This will firstly find any keys meeting any of the following criteria:
-
-	- they were not previously present
-	- their associated value has changed
-	- a dependency used during generation of this value has changed
-
-	It will recalculate those key/value pairs, storing information about any
-	dependencies used in the processor callback during value generation, and
-	save the new key/value pair to the output array. If it is overwriting an
-	older key/value pair, that older pair will be passed to the destructor
-	for cleanup.
-
-	Finally, this function will find keys that are no longer present, and remove
-	their key/value pairs from the output table and pass them to the destructor.
-]]
-function class:update(): boolean
-	local inputIsState = self._inputIsState
-	local newInputTable = if inputIsState then self._inputTable:get(false) else self._inputTable
-	local oldInputTable = self._oldInputTable
-
-	local keyIOMap = self._keyIOMap
-	local meta = self._meta
-
-	local didChange = false
-
-
-	-- clean out main dependency set
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
-
-	self._oldDependencySet, self.dependencySet = self.dependencySet, self._oldDependencySet
-	table.clear(self.dependencySet)
-
-	-- if the input table is a state object, add it as a dependency
-	if inputIsState then
-		self._inputTable.dependentSet[self] = true
-		self.dependencySet[self._inputTable] = true
-	end
-
-	-- clean out output table
-	self._oldOutputTable, self._outputTable = self._outputTable, self._oldOutputTable
-
-	local oldOutputTable = self._oldOutputTable
-	local newOutputTable = self._outputTable
-	table.clear(newOutputTable)
-
-	-- Step 1: find key/value pairs that changed or were not previously present
-
-	for newInKey, newInValue in pairs(newInputTable) do
-		-- get or create key data
-		local keyData = self._keyData[newInKey]
-
-		if keyData == nil then
-			keyData = {
-				dependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				oldDependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				dependencyValues = setmetatable({}, WEAK_KEYS_METATABLE),
-			}
-			self._keyData[newInKey] = keyData
-		end
-
-
-		-- check if the pair is new or changed
-		local shouldRecalculate = oldInputTable[newInKey] ~= newInValue
-
-		-- check if the pair's dependencies have changed
-		if shouldRecalculate == false then
-			for dependency, oldValue in pairs(keyData.dependencyValues) do
-				if oldValue ~= dependency:get(false) then
-					shouldRecalculate = true
-					break
-				end
-			end
-		end
-
-
-		-- recalculate the output pair if necessary
-		if shouldRecalculate then
-			keyData.oldDependencySet, keyData.dependencySet = keyData.dependencySet, keyData.oldDependencySet
-			table.clear(keyData.dependencySet)
-
-			local processOK, newOutKey, newOutValue, newMetaValue = captureDependencies(
-				keyData.dependencySet,
-				self._processor,
-				newInKey,
-				newInValue
-			)
-
-			if processOK then
-				if self._destructor == nil and (needsDestruction(newOutKey) or needsDestruction(newOutValue) or needsDestruction(newMetaValue)) then
-					logWarn("destructorNeededForPairs")
-				end
-
-				-- if this key was already written to on this run-through, throw a fatal error.
-				if newOutputTable[newOutKey] ~= nil then
-					-- figure out which key/value pair previously wrote to this key
-					local previousNewKey, previousNewValue
-					for inKey, outKey in pairs(keyIOMap) do
-						if outKey == newOutKey then
-							previousNewValue = newInputTable[inKey]
-							if previousNewValue ~= nil then
-								previousNewKey = inKey
-								break
-							end
-						end
-					end
-
-					if previousNewKey ~= nil then
-						logError(
-							"forPairsKeyCollision",
-							nil,
-							tostring(newOutKey),
-							tostring(previousNewKey),
-							tostring(previousNewValue),
-							tostring(newInKey),
-							tostring(newInValue)
-						)
-					end
-				end
-
-				local oldOutValue = oldOutputTable[newOutKey]
-
-				if oldOutValue ~= newOutValue then
-					local oldMetaValue = meta[newOutKey]
-					if oldOutValue ~= nil then
-						local destructOK, err = xpcall(self._destructor or cleanup, parseError, newOutKey, oldOutValue, oldMetaValue)
-						if not destructOK then
-							logErrorNonFatal("forPairsDestructorError", err)
-						end
-					end
-
-					oldOutputTable[newOutKey] = nil
-				end
-
-				-- update the stored data for this key/value pair
-				oldInputTable[newInKey] = newInValue
-				keyIOMap[newInKey] = newOutKey
-				meta[newOutKey] = newMetaValue
-				newOutputTable[newOutKey] = newOutValue
-
-				-- if we had to recalculate the output, then we did change
-				didChange = true
-			else
-				-- restore old dependencies, because the new dependencies may be corrupt
-				keyData.oldDependencySet, keyData.dependencySet = keyData.dependencySet, keyData.oldDependencySet
-
-				logErrorNonFatal("forPairsProcessorError", newOutKey)
-			end
-		else
-			local storedOutKey = keyIOMap[newInKey]
-
-			-- check for key collision
-			if newOutputTable[storedOutKey] ~= nil then
-				-- figure out which key/value pair previously wrote to this key
-				local previousNewKey, previousNewValue
-				for inKey, outKey in pairs(keyIOMap) do
-					if storedOutKey == outKey then
-						previousNewValue = newInputTable[inKey]
-
-						if previousNewValue ~= nil then
-							previousNewKey = inKey
-							break
-						end
-					end
-				end
-
-				if previousNewKey ~= nil then
-					logError(
-						"forPairsKeyCollision",
-						nil,
-						tostring(storedOutKey),
-						tostring(previousNewKey),
-						tostring(previousNewValue),
-						tostring(newInKey),
-						tostring(newInValue)
-					)
-				end
-			end
-
-			-- copy the stored key/value pair into the new output table
-			newOutputTable[storedOutKey] = oldOutputTable[storedOutKey]
-		end
-
-
-		-- save dependency values and add to main dependency set
-		for dependency in pairs(keyData.dependencySet) do
-			keyData.dependencyValues[dependency] = dependency:get(false)
-
-			self.dependencySet[dependency] = true
-			dependency.dependentSet[self] = true
-		end
-	end
-
-	-- STEP 2: find keys that were removed
-	for oldOutKey, oldOutValue in pairs(oldOutputTable) do
-		-- check if this key/value pair is in the new output table
-		if newOutputTable[oldOutKey] ~= oldOutValue then
-			-- clean up the old output pair
-			local oldMetaValue = meta[oldOutKey]
-			if oldOutValue ~= nil then
-				local destructOK, err = xpcall(self._destructor or cleanup, parseError, oldOutKey, oldOutValue, oldMetaValue)
-				if not destructOK then
-					logErrorNonFatal("forPairsDestructorError", err)
-				end
-			end
-
-			-- check if the key was completely removed from the output table
-			if newOutputTable[oldOutKey] == nil then
-				meta[oldOutKey] = nil
-				self._keyData[oldOutKey] = nil
-			end
-
-			didChange = true
-		end
-	end
-
-	for key in pairs(oldInputTable) do
-		if newInputTable[key] == nil then
-			oldInputTable[key] = nil
-			keyIOMap[key] = nil
-		end
-	end
-
-	return didChange
-end
-
-local function ForPairs<KI, VI, KO, VO, M>(
-	inputTable: PubTypes.CanBeState<{ [KI]: VI }>,
-	processor: (KI, VI) -> (KO, VO, M?),
-	destructor: (KO, VO, M?) -> ()?
-): Types.ForPairs<KI, VI, KO, VO, M>
-
-	local inputIsState = inputTable.type == "State" and typeof(inputTable.get) == "function"
-
-	local self = setmetatable({
-		type = "State",
-		kind = "ForPairs",
-		dependencySet = {},
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_oldDependencySet = {},
-
-		_processor = processor,
-		_destructor = destructor,
-		_inputIsState = inputIsState,
-
-		_inputTable = inputTable,
-		_oldInputTable = {},
-		_outputTable = {},
-		_oldOutputTable = {},
-		_keyIOMap = {},
-		_keyData = {},
-		_meta = {},
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	self:update()
-
-	return self
-end
-
-return ForPairs
-end)() end,
-    [44] = function()local wax,script,require=ImportGlobals(44)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new ForValues object which maps values of a table using
-	a `processor` function.
-
-	Optionally, a `destructor` function can be specified for cleaning up values.
-	If omitted, the default cleanup function will be used instead.
-
-	Additionally, a `meta` table/value can optionally be returned to pass data created
-	when running the processor to the destructor when the created object is cleaned up.
-]]
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local captureDependencies = require(Package.Dependencies.captureDependencies)
-local initDependency = require(Package.Dependencies.initDependency)
-local useDependency = require(Package.Dependencies.useDependency)
-local parseError = require(Package.Logging.parseError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
-local logWarn = require(Package.Logging.logWarn)
-local cleanup = require(Package.Utility.cleanup)
-local needsDestruction = require(Package.Utility.needsDestruction)
-
-local class = {}
-
-local CLASS_METATABLE = { __index = class }
-local WEAK_KEYS_METATABLE = { __mode = "k" }
-
---[[
-	Returns the current value of this ForValues object.
-	The object will be registered as a dependency unless `asDependency` is false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._outputTable
-end
-
---[[
-	Called when the original table is changed.
-
-	This will firstly find any values meeting any of the following criteria:
-
-	- they were not previously present
-	- a dependency used during generation of this value has changed
-
-	It will recalculate those values, storing information about any dependencies
-	used in the processor callback during value generation, and save the new value
-	to the output array with the same key. If it is overwriting an older value,
-	that older value will be passed to the destructor for cleanup.
-
-	Finally, this function will find values that are no longer present, and remove
-	their values from the output table and pass them to the destructor. You can re-use
-	the same value multiple times and this will function will update them as little as
-	possible; reusing the same values where possible.
-]]
-function class:update(): boolean
-	local inputIsState = self._inputIsState
-	local inputTable = if inputIsState then self._inputTable:get(false) else self._inputTable
-	local outputValues = {}
-
-	local didChange = false
-
-	-- clean out value cache
-	self._oldValueCache, self._valueCache = self._valueCache, self._oldValueCache
-	local newValueCache = self._valueCache
-	local oldValueCache = self._oldValueCache
-	table.clear(newValueCache)
-
-	-- clean out main dependency set
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
-	self._oldDependencySet, self.dependencySet = self.dependencySet, self._oldDependencySet
-	table.clear(self.dependencySet)
-
-	-- if the input table is a state object, add it as a dependency
-	if inputIsState then
-		self._inputTable.dependentSet[self] = true
-		self.dependencySet[self._inputTable] = true
-	end
-
-
-	-- STEP 1: find values that changed or were not previously present
-	for inKey, inValue in pairs(inputTable) do
-		-- check if the value is new or changed
-		local oldCachedValues = oldValueCache[inValue]
-		local shouldRecalculate = oldCachedValues == nil
-
-		-- get a cached value and its dependency/meta data if available
-		local value, valueData, meta
-
-		if type(oldCachedValues) == "table" and #oldCachedValues > 0 then
-			local valueInfo = table.remove(oldCachedValues, #oldCachedValues)
-			value = valueInfo.value
-			valueData = valueInfo.valueData
-			meta = valueInfo.meta
-
-			if #oldCachedValues <= 0 then
-				oldValueCache[inValue] = nil
-			end
-		elseif oldCachedValues ~= nil then
-			oldValueCache[inValue] = nil
-			shouldRecalculate = true
-		end
-
-		if valueData == nil then
-			valueData = {
-				dependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				oldDependencySet = setmetatable({}, WEAK_KEYS_METATABLE),
-				dependencyValues = setmetatable({}, WEAK_KEYS_METATABLE),
-			}
-		end
-
-		-- check if the value's dependencies have changed
-		if shouldRecalculate == false then
-			for dependency, oldValue in pairs(valueData.dependencyValues) do
-				if oldValue ~= dependency:get(false) then
-					shouldRecalculate = true
-					break
-				end
-			end
-		end
-
-		-- recalculate the output value if necessary
-		if shouldRecalculate then
-			valueData.oldDependencySet, valueData.dependencySet = valueData.dependencySet, valueData.oldDependencySet
-			table.clear(valueData.dependencySet)
-
-			local processOK, newOutValue, newMetaValue = captureDependencies(
-				valueData.dependencySet,
-				self._processor,
-				inValue
-			)
-
-			if processOK then
-				if self._destructor == nil and (needsDestruction(newOutValue) or needsDestruction(newMetaValue)) then
-					logWarn("destructorNeededForValues")
-				end
-
-				-- pass the old value to the destructor if it exists
-				if value ~= nil then
-					local destructOK, err = xpcall(self._destructor or cleanup, parseError, value, meta)
-					if not destructOK then
-						logErrorNonFatal("forValuesDestructorError", err)
-					end
-				end
-
-				-- store the new value and meta data
-				value = newOutValue
-				meta = newMetaValue
-				didChange = true
-			else
-				-- restore old dependencies, because the new dependencies may be corrupt
-				valueData.oldDependencySet, valueData.dependencySet = valueData.dependencySet, valueData.oldDependencySet
-
-				logErrorNonFatal("forValuesProcessorError", newOutValue)
-			end
-		end
-
-
-		-- store the value and its dependency/meta data
-		local newCachedValues = newValueCache[inValue]
-		if newCachedValues == nil then
-			newCachedValues = {}
-			newValueCache[inValue] = newCachedValues
-		end
-
-		table.insert(newCachedValues, {
-			value = value,
-			valueData = valueData,
-			meta = meta,
-		})
-
-		outputValues[inKey] = value
-
-
-		-- save dependency values and add to main dependency set
-		for dependency in pairs(valueData.dependencySet) do
-			valueData.dependencyValues[dependency] = dependency:get(false)
-
-			self.dependencySet[dependency] = true
-			dependency.dependentSet[self] = true
-		end
-	end
-
-
-	-- STEP 2: find values that were removed
-	-- for tables of data, we just need to check if it's still in the cache
-	for _oldInValue, oldCachedValueInfo in pairs(oldValueCache) do
-		for _, valueInfo in ipairs(oldCachedValueInfo) do
-			local oldValue = valueInfo.value
-			local oldMetaValue = valueInfo.meta
-
-			local destructOK, err = xpcall(self._destructor or cleanup, parseError, oldValue, oldMetaValue)
-			if not destructOK then
-				logErrorNonFatal("forValuesDestructorError", err)
-			end
-
-			didChange = true
-		end
-
-		table.clear(oldCachedValueInfo)
-	end
-
-	self._outputTable = outputValues
-
-	return didChange
-end
-
-local function ForValues<VI, VO, M>(
-	inputTable: PubTypes.CanBeState<{ [any]: VI }>,
-	processor: (VI) -> (VO, M?),
-	destructor: (VO, M?) -> ()?
-): Types.ForValues<VI, VO, M>
-
-	local inputIsState = inputTable.type == "State" and typeof(inputTable.get) == "function"
-
-	local self = setmetatable({
-		type = "State",
-		kind = "ForValues",
-		dependencySet = {},
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_oldDependencySet = {},
-
-		_processor = processor,
-		_destructor = destructor,
-		_inputIsState = inputIsState,
-
-		_inputTable = inputTable,
-		_outputTable = {},
-		_valueCache = {},
-		_oldValueCache = {},
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	self:update()
-
-	return self
-end
-
-return ForValues
-end)() end,
-    [45] = function()local wax,script,require=ImportGlobals(45)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs a new state object which can listen for updates on another state
-	object.
-
-	FIXME: enabling strict types here causes free types to leak
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local Types = require(Package.Types)
-local initDependency = require(Package.Dependencies.initDependency)
-
-type Set<T> = {[T]: any}
-
-local class = {}
-local CLASS_METATABLE = {__index = class}
-
--- Table used to hold Observer objects in memory.
-local strongRefs: Set<Types.Observer> = {}
-
---[[
-	Called when the watched state changes value.
-]]
-function class:update(): boolean
-	for _, callback in pairs(self._changeListeners) do
-		task.spawn(callback)
-	end
-	return false
-end
-
---[[
-	Adds a change listener. When the watched state changes value, the listener
-	will be fired.
-
-	Returns a function which, when called, will disconnect the change listener.
-	As long as there is at least one active change listener, this Observer
-	will be held in memory, preventing GC, so disconnecting is important.
-]]
-function class:onChange(callback: () -> ()): () -> ()
-	local uniqueIdentifier = {}
-
-	self._numChangeListeners += 1
-	self._changeListeners[uniqueIdentifier] = callback
-
-	-- disallow gc (this is important to make sure changes are received)
-	strongRefs[self] = true
-
-	local disconnected = false
-	return function()
-		if disconnected then
-			return
-		end
-		disconnected = true
-		self._changeListeners[uniqueIdentifier] = nil
-		self._numChangeListeners -= 1
-
-		if self._numChangeListeners == 0 then
-			-- allow gc if all listeners are disconnected
-			strongRefs[self] = nil
-		end
-	end
-end
-
-local function Observer(watchedState: PubTypes.Value<any>): Types.Observer
-	local self = setmetatable({
-		type = "State",
-		kind = "Observer",
-		dependencySet = {[watchedState] = true},
-		dependentSet = {},
-		_changeListeners = {},
-		_numChangeListeners = 0,
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-	-- add this object to the watched state's dependent set
-	watchedState.dependentSet[self] = true
-
-	return self
-end
-
-return Observer
-end)() end,
-    [46] = function()local wax,script,require=ImportGlobals(46)local ImportGlobals return (function(...)--!nonstrict
-
---[[
-	Constructs and returns objects which can be used to model independent
-	reactive state.
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-local useDependency = require(Package.Dependencies.useDependency)
-local initDependency = require(Package.Dependencies.initDependency)
-local updateAll = require(Package.Dependencies.updateAll)
-local isSimilar = require(Package.Utility.isSimilar)
-
-local class = {}
-
-local CLASS_METATABLE = {__index = class}
-local WEAK_KEYS_METATABLE = {__mode = "k"}
-
---[[
-	Returns the value currently stored in this State object.
-	The state object will be registered as a dependency unless `asDependency` is
-	false.
-]]
-function class:get(asDependency: boolean?): any
-	if asDependency ~= false then
-		useDependency(self)
-	end
-	return self._value
-end
-
---[[
-	Updates the value stored in this State object.
-
-	If `force` is enabled, this will skip equality checks and always update the
-	state object and any dependents - use this with care as this can lead to
-	unnecessary updates.
-]]
-function class:set(newValue: any, force: boolean?)
-	local oldValue = self._value
-	if force or not isSimilar(oldValue, newValue) then
-		self._value = newValue
-		updateAll(self)
-	end
-end
-
-local function Value<T>(initialValue: T): Types.State<T>
-	local self = setmetatable({
-		type = "State",
-		kind = "Value",
-		-- if we held strong references to the dependents, then they wouldn't be
-		-- able to get garbage collected when they fall out of scope
-		dependentSet = setmetatable({}, WEAK_KEYS_METATABLE),
-		_value = initialValue
-	}, CLASS_METATABLE)
-
-	initDependency(self)
-
-	return self
-end
-
-return Value
-end)() end,
-    [47] = function()local wax,script,require=ImportGlobals(47)local ImportGlobals return (function(...)--!strict
-
---[[
-	A common interface for accessing the values of state objects or constants.
-]]
-
-local Package = script.Parent.Parent
-local PubTypes = require(Package.PubTypes)
-local xtypeof = require(Package.Utility.xtypeof)
-
-local function unwrap<T>(item: PubTypes.CanBeState<T>, useDependency: boolean?): T
-	return if xtypeof(item) == "State" then (item :: PubTypes.StateObject<T>):get(useDependency) else (item :: T)
-end
-
-return unwrap
-end)() end,
-    [48] = function()local wax,script,require=ImportGlobals(48)local ImportGlobals return (function(...)--!strict
-
---[[
-	Stores common type information used internally.
-
-	These types may be used internally so Fusion code can type-check, but
-	should never be exposed to public users, as these definitions are fair game
-	for breaking changes.
-]]
-
-local Package = script.Parent
-local PubTypes = require(Package.PubTypes)
-
-type Set<T> = {[T]: any}
-
---[[
-	General use types
-]]
-
--- A symbol that represents the absence of a value.
-export type None = PubTypes.Symbol & {
-	-- name: "None" (add this when Luau supports singleton types)
-}
-
--- Stores useful information about Luau errors.
-export type Error = {
-	type: string, -- replace with "Error" when Luau supports singleton types
-	raw: string,
-	message: string,
-	trace: string
-}
-
---[[
-	Specific reactive graph types
-]]
-
--- A state object whose value can be set at any time by the user.
-export type State<T> = PubTypes.Value<T> & {
-	_value: T
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type Computed<T> = PubTypes.Computed<T> & {
-	_oldDependencySet: Set<PubTypes.Dependency>,
-	_callback: () -> T,
-	_value: T
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type ForPairs<KI, VI, KO, VO, M> = PubTypes.ForPairs<KO, VO> & {
-	_oldDependencySet: Set<PubTypes.Dependency>,
-	_processor: (KI, VI) -> (KO, VO),
-	_destructor: (VO, M?) -> (),
-	_inputIsState: boolean,
-	_inputTable: PubTypes.CanBeState<{ [KI]: VI }>,
-	_oldInputTable: { [KI]: VI },
-	_outputTable: { [KO]: VO },
-	_oldOutputTable: { [KO]: VO },
-	_keyIOMap: { [KI]: KO },
-	_meta: { [KO]: M? },
-	_keyData: {
-		[KI]: {
-			dependencySet: Set<PubTypes.Dependency>,
-			oldDependencySet: Set<PubTypes.Dependency>,
-			dependencyValues: { [PubTypes.Dependency]: any },
-		},
-	},
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type ForKeys<KI, KO, M> = PubTypes.ForKeys<KO, any> & {
-	_oldDependencySet: Set<PubTypes.Dependency>,
-	_processor: (KI) -> (KO),
-	_destructor: (KO, M?) -> (),
-	_inputIsState: boolean,
-	_inputTable: PubTypes.CanBeState<{ [KI]: KO }>,
-	_oldInputTable: { [KI]: KO },
-	_outputTable: { [KO]: any },
-	_keyOIMap: { [KO]: KI },
-	_meta: { [KO]: M? },
-	_keyData: {
-		[KI]: {
-			dependencySet: Set<PubTypes.Dependency>,
-			oldDependencySet: Set<PubTypes.Dependency>,
-			dependencyValues: { [PubTypes.Dependency]: any },
-		},
-	},
-}
-
--- A state object whose value is derived from other objects using a callback.
-export type ForValues<VI, VO, M> = PubTypes.ForValues<any, VO> & {
-	_oldDependencySet: Set<PubTypes.Dependency>,
-	_processor: (VI) -> (VO),
-	_destructor: (VO, M?) -> (),
-	_inputIsState: boolean,
-	_inputTable: PubTypes.CanBeState<{ [VI]: VO }>,
-	_outputTable: { [any]: VI },
-	_valueCache: { [VO]: any },
-	_oldValueCache: { [VO]: any },
-	_meta: { [VO]: M? },
-	_valueData: {
-		[VI]: {
-			dependencySet: Set<PubTypes.Dependency>,
-			oldDependencySet: Set<PubTypes.Dependency>,
-			dependencyValues: { [PubTypes.Dependency]: any },
-		},
-	},
-}
-
--- A state object which follows another state object using tweens.
-export type Tween<T> = PubTypes.Tween<T> & {
-	_goalState: State<T>,
-	_tweenInfo: TweenInfo,
-	_prevValue: T,
-	_nextValue: T,
-	_currentValue: T,
-	_currentTweenInfo: TweenInfo,
-	_currentTweenDuration: number,
-	_currentTweenStartTime: number,
-	_currentlyAnimating: boolean
-}
-
--- A state object which follows another state object using spring simulation.
-export type Spring<T> = PubTypes.Spring<T> & {
-	_speed: PubTypes.CanBeState<number>,
-	_speedIsState: boolean,
-	_lastSpeed: number,
-	_damping: PubTypes.CanBeState<number>,
-	_dampingIsState: boolean,
-	_lastDamping: number,
-	_goalState: State<T>,
-	_goalValue: T,
-	_currentType: string,
-	_currentValue: T,
-	_springPositions: {number},
-	_springGoals: {number},
-	_springVelocities: {number}
-}
-
--- An object which can listen for updates on another state object.
-export type Observer = PubTypes.Observer & {
-	_changeListeners: Set<() -> ()>,
-	_numChangeListeners: number
-}
-
-return nil
-end)() end,
-    [50] = function()local wax,script,require=ImportGlobals(50)local ImportGlobals return (function(...)--!strict
-
---[[
-	A symbol for representing nil values in contexts where nil is not usable.
-]]
-
-local Package = script.Parent.Parent
-local Types = require(Package.Types)
-
-return {
-	type = "Symbol",
-	name = "None"
-} :: Types.None
-end)() end,
-    [51] = function()local wax,script,require=ImportGlobals(51)local ImportGlobals return (function(...)--!strict
-
---[[
-	Cleans up the tasks passed in as the arguments.
-	A task can be any of the following:
-
-	- an Instance - will be destroyed
-	- an RBXScriptConnection - will be disconnected
-	- a function - will be run
-	- a table with a `Destroy` or `destroy` function - will be called
-	- an array - `cleanup` will be called on each item
-]]
-
-local function cleanupOne(task: any)
-	local taskType = typeof(task)
-
-	-- case 1: Instance
-	if taskType == "Instance" then
-		task:Destroy()
-
-	-- case 2: RBXScriptConnection
-	elseif taskType == "RBXScriptConnection" then
-		task:Disconnect()
-
-	-- case 3: callback
-	elseif taskType == "function" then
-		task()
-
-	elseif taskType == "table" then
-		-- case 4: destroy() function
-		if typeof(task.destroy) == "function" then
-			task:destroy()
-
-		-- case 5: Destroy() function
-		elseif typeof(task.Destroy) == "function" then
-			task:Destroy()
-
-		-- case 6: array of tasks
-		elseif task[1] ~= nil then
-			for _, subtask in ipairs(task) do
-				cleanupOne(subtask)
-			end
-		end
-	end
-end
-
-local function cleanup(...: any)
-	for index = 1, select("#", ...) do
-		cleanupOne(select(index, ...))
-	end
-end
-
-return cleanup
-end)() end,
-    [52] = function()local wax,script,require=ImportGlobals(52)local ImportGlobals return (function(...)--!strict
-
---[[
-	An empty function. Often used as a destructor to indicate no destruction.
-]]
-
-local function doNothing(...: any)
-end
-
-return doNothing
-end)() end,
-    [53] = function()local wax,script,require=ImportGlobals(53)local ImportGlobals return (function(...)--!strict
---[[
-    Returns true if A and B are 'similar' - i.e. any user of A would not need
-    to recompute if it changed to B.
-]]
-
-local function isSimilar(a: any, b: any): boolean
-    -- HACK: because tables are mutable data structures, don't make assumptions
-    -- about similarity from equality for now (see issue #44)
-    if typeof(a) == "table" then
-        return false
-    else
-        return a == b
-    end
-end
-
-return isSimilar
-end)() end,
-    [54] = function()local wax,script,require=ImportGlobals(54)local ImportGlobals return (function(...)--!strict
-
---[[
-    Returns true if the given value is not automatically memory managed, and
-    requires manual cleanup.
-]]
-
-local function needsDestruction(x: any): boolean
-    return typeof(x) == "Instance"
-end
-
-return needsDestruction
-end)() end,
-    [55] = function()local wax,script,require=ImportGlobals(55)local ImportGlobals return (function(...)--!strict
-
---[[
-	Restricts the reading of missing members for a table.
-]]
-
-local Package = script.Parent.Parent
-local logError = require(Package.Logging.logError)
-
-type table = {[any]: any}
-
-local function restrictRead(tableName: string, strictTable: table): table
-	-- FIXME: Typed Luau doesn't recognise this correctly yet
-	local metatable = getmetatable(strictTable :: any)
-
-	if metatable == nil then
-		metatable = {}
-		setmetatable(strictTable, metatable)
-	end
-
-	function metatable:__index(memberName)
-		logError("strictReadError", nil, tostring(memberName), tableName)
-	end
-
-	return strictTable
-end
-
-return restrictRead
-end)() end,
-    [56] = function()local wax,script,require=ImportGlobals(56)local ImportGlobals return (function(...)--!strict
-
---[[
-	Extended typeof, designed for identifying custom objects.
-	If given a table with a `type` string, returns that.
-	Otherwise, returns `typeof()` the argument.
-]]
-
-local function xtypeof(x: any)
-	local typeString = typeof(x)
-
-	if typeString == "table" and typeof(x.type) == "string" then
-		return x.type
-	else
-		return typeString
-	end
-end
-
-return xtypeof
-end)() end,
-    [57] = function()local wax,script,require=ImportGlobals(57)local ImportGlobals return (function(...)local MathModule = {}
-local JaroWSCheck = false
-local ModuleClasses = {
-	"Value",
-	"Chance",
-	"Sequence",
-	"String",
-	"Convert",
-	"Check",
-	"Notation",
-	"Random",
-	"Matrix",
-	"Special"
-}
-for i = 1, #ModuleClasses, 1 do
-	MathModule[ModuleClasses[i]] = {}
-end
---[[
-CLASS Value
-]]
-function MathModule.Value:EulersNumber()
-	return math.exp(1)
-end
-function MathModule.Value:EulersConstant()
-	return 0.577215664901
-end
-function MathModule.Value:GammaCoeff()
-	return -0.65587807152056
-end
-function MathModule.Value:GammaQuad()
-	return -0.042002635033944
-end
-function MathModule.Value:GammaQui()
-	return 0.16653861138228
-end
-function MathModule.Value:GammaSet()
-	return -0.042197734555571
-end
-function MathModule.Value:GoldenRatio()
-	return (1 + math.sqrt(5)) / 2
-end
-function MathModule.Value:Tau()
-	return math.pi * 2
-end
-function MathModule.Value:AperysConstant()
-	return 423203577229 / 352066176000
-end
-function MathModule.Value:BelphegorsPrimeNumber()
-	return 1000000000000066600000000000001
-end
---[[
-CLASS Chance
-]]
-function MathModule.Chance:Mean(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	local Sum = 0
-	for i = 1, #Table, 1 do
-		Sum += Table[i]
-	end
-	return Sum / #Table
-end
-function MathModule.Chance:Median(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	if #Table ~= 1 and #Table ~= 2 then
-		repeat wait()
-			table.remove(Table, 1)
-			table.remove(Table, #Table)
-		until #Table == 1 or #Table == 2
-	end
-	if #Table == 2 then
-		local Difference = Table[#Table] - Table[1]
-		return Table[1] + (Difference / 2)
-	else
-		return Table[#Table]
-	end
-end
-function MathModule.Chance:Mode(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	table.sort(Table)
-	local ModeTable1 = {}
-	local ModeTable2 = {}
-	local ModeCount = 0
-	for i, v in pairs(Table) do
-		ModeTable1[v] = ModeTable1[v] and ModeTable1[v] + 1 or 1
-	end
-	for i, v in pairs(ModeTable1) do
-		if v > ModeCount then
-			ModeCount = v
-			ModeTable2 = {i}
-		elseif v == ModeCount then
-			table.insert(ModeTable2, i)
-		end
-	end
-	return ModeTable2, ModeCount
-end
-function MathModule.Chance:Range(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	return Table[#Table] - Table[1]
-end
-function MathModule.Chance:MidRange(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	return (Table[#Table] + Table[1]) / 2
-end
-function MathModule.Chance:FirstQuartile(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	if #Table % 2 == 0 then
-		for i = 1, #Table / 2, 1 do
-			table.remove(Table, #Table)
-		end
-	else
-		for i = 1, ((#Table - 1) / 2) + 1, 1 do
-			table.remove(Table, #Table)
-		end
-	end
-	return MathModule.Chance:Median(Table)
-end
-function MathModule.Chance:ThirdQuartile(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	if #Table % 2 == 0 then
-		for i = 1, #Table / 2, 1 do
-			table.remove(Table, 1)
-		end
-	else
-		for i = 1, ((#Table - 1) / 2) + 1, 1 do
-			table.remove(Table, 1)
-		end
-	end
-	return MathModule.Chance:Median(Table)
-end
-function MathModule.Chance:InterquartileRange(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	local Table1 = {}
-	local Table2 = {}
-	for i = 1, #Table, 1 do
-		table.insert(Table1, Table[i])
-		table.insert(Table2, Table[i])
-	end
-	return MathModule.Chance:ThirdQuartile(Table1) - MathModule.Chance:FirstQuartile(Table2)
-end
-function MathModule.Chance:StandardDeviation(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	table.sort(Table)
-	local Mean = MathModule.Chance:Mean(Table)
-	for i = 1, #Table, 1 do
-		Table[i] = (Table[i] - Mean)^2
-	end
-	return math.sqrt(MathModule.Chance:Mean(Table))
-end
-function MathModule.Chance:ZScore(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Table1 = {}
-	local Table2 = {}
-	for i = 1, #Table, 1 do
-		table.insert(Table1, Table[i])
-		table.insert(Table2, Table[i])
-	end
-	table.sort(Table1)
-	table.sort(Table2)
-	local Mean = MathModule.Chance:Mean(Table1)
-	local StandardDeviation = MathModule.Chance:StandardDeviation(Table2)
-	for i = 1, #Table, 1 do
-		Table[i] = (Table[i] - Mean) / StandardDeviation
-	end
-	return Table
-end
-function MathModule.Chance:Permutation(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local n = Table[1]
-	local r = Table[2]
-	return MathModule.Special:Factorial(n) / MathModule.Special:Factorial(n - r)
-end
-function MathModule.Chance:Combination(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local n = Table[1]
-	local r = Table[2]
-	return MathModule.Special:Factorial(n) / (MathModule.Special:Factorial(r) * MathModule.Special:Factorial(n - r))
-end
---[[
-CLASS Sequence
-]]
-function MathModule.Sequence:ThueMorse(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n % 1 == 0 and math.abs(n) + n ~= 0 then else return warn("number has to be a positive whole number") end
-	local Morse = "0"
-	for i = 1, n, 1 do
-		local String = ""
-		for Character in Morse:gmatch(".") do
-			String ..= math.abs(tonumber(Character) - 1)
-		end
-		Morse ..= String
-	end
-	return Morse
-end
-function MathModule.Sequence:Integer(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	local Total = {}
-	if Min > Max then return warn("min can't be greater than max") end
-	if Min % 1 ~= 0 or Max % 1 ~= 0 then return warn("min and max have to be whole numbers") end
-	if Min <= 0 or Max <= 0 then return warn("min or max can't be lower than or equal to 0") end
-	table.insert(Total, "0")
-	for i = 1, Max - 1, 1 do
-		if i >= Min then
-			table.insert(Total, "±"..i)
-		end
-	end
-	return Total
-end
-function MathModule.Sequence:Prime(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	local Total = {}
-	if Min > Max then return warn("min can't be greater than max") end
-	if Min % 1 ~= 0 or Max % 1 ~= 0 then return warn("min and max have to be whole numbers") end
-	if Min <= 0 or Max <= 0 then return warn("min or max can't be lower than or equal to 0") end
-	local Count = 2
-	while true do wait()
-		if #Total == Max then
-			break
-		end
-		if MathModule.Check:Prime(Count) then
-			table.insert(Total, Count)
-		end
-		if Count == 2 then
-			Count += 1
-		else
-			Count += 2
-		end
-	end
-	for i = 1, Min - 1, 1 do
-		table.remove(Total, 1)
-	end
-	return Total
-end
-function MathModule.Sequence:Unprimeable(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	local Total = {}
-	if Min > Max then return warn("min can't be greater than max") end
-	if Min % 1 ~= 0 or Max % 1 ~= 0 then return warn("min and max have to be whole numbers") end
-	if Min <= 0 or Max <= 0 then return warn("min or max can't be lower than or equal to 0") end
-	local Count = 200
-	while true do wait()
-		if #Total == Max then
-			break
-		end
-		if MathModule.Check:Unprimeable(Count) then
-			table.insert(Total, Count)
-		end
-		Count += 1
-	end
-	for i = 1, Min - 1, 1 do
-		table.remove(Total, 1)
-	end
-	return Total
-end
---[[
-CLASS String
-]]
-function MathModule.String:JaroSimilarity(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "string" then else return warn("only strings are allowed in the table") end
-	end
-	local JWSC = false
-	if JaroWSCheck == true then
-		JaroWSCheck = false
-		JWSC = true
-	end
-	local String1 = Table[1]
-	local String2 = Table[2]
-	local Length1 = string.len(String1)
-	local Length2 = string.len(String2)
-	local Table1 = {}
-	local Table2 = {}
-	local Table3 = {}
-	local Table4 = {}
-	local Table5 = {}
-	local Table6 = {}
-	if Length1 == 0 and Length2 == 0 then return 1 end
-	if Length1 == 0 or Length2 == 0 then return 0 end
-	local Matches = 0
-	local Transposition = 0
-	for Character in String1:gmatch(".") do
-		if not table.find(Table1, Character) then
-			table.insert(Table1, Character)
-		else
-			local AddCharacter = 0
-			while true do wait()
-				AddCharacter += 1
-				if not table.find(Table1, Character..AddCharacter) then
-					table.insert(Table1, Character..AddCharacter)
-					break					
-				end
-			end
-		end
-	end
-	for Character in String2:gmatch(".") do
-		if not table.find(Table2, Character) then
-			table.insert(Table2, Character)
-		else
-			local AddCharacter = 0
-			while true do wait()
-				AddCharacter += 1
-				if not table.find(Table2, Character..AddCharacter) then
-					table.insert(Table2, Character..AddCharacter)
-					break					
-				end
-			end
-		end
-	end
-	for i, v in pairs(Table1) do
-		for ii, vv in pairs(Table2) do
-			if Table1[i] == Table2[ii] then
-				table.insert(Table3, Table1[i])
-				table.insert(Table4, Table2[ii])
-				Matches += 1
-				break
-			end
-		end
-	end
-	if Matches == 0 then return 0 end
-	for i = 1, #Table1, 1 do
-		if table.find(Table3, Table1[i]) then
-			table.insert(Table5, Table1[i])
-		end
-	end
-	for i = 1, #Table2, 1 do
-		if table.find(Table4, Table2[i]) then
-			table.insert(Table6, Table2[i])
-		end
-	end
-	for i = 1, #Table1 or #Table2, 1 do
-		if Table1[i] ~= Table2[i] then
-			if JWSC == true then
-				return i - 1
-			end
-		end
-	end
-	for i = 1, #Table5 or #Table6, 1 do
-		if Table5[i] ~= Table6[i] then
-			Transposition += 0.5
-		end
-	end
-	return ((Matches / Length1) + (Matches / Length2) + ((Matches - Transposition) / Matches)) / 3
-end
-function MathModule.String:JaroDistance(Table)
-	return 1 - MathModule.String:JaroSimilarity(Table)
-end
-function MathModule.String:JaroWinklerSimilarity(Table)
-	local JaroS = MathModule.String:JaroSimilarity(Table)
-	JaroWSCheck = true
-	local Prefix = MathModule.String:JaroSimilarity(Table)
-	Prefix = math.min(Prefix, 4)
-	return JaroS + 0.1 * Prefix * (1 - JaroS)
-end
-function MathModule.String:JaroWinklerDistance(Table)
-	return 1 - MathModule.String:JaroWinklerSimilarity(Table)
-end
-function MathModule.String:LevenshteinDistance(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "string" then else return warn("only strings are allowed in the table") end
-	end
-	local String1 = Table[1]
-	local String2 = Table[2]
-	local Length1 = string.len(String1)
-	local Length2 = string.len(String2)
-	if String1 == '' then return Length2 end
-	if String2 == '' then return Length1 end
-	local String1Sub = String1:sub(2, -1)
-	local String2Sub = String2:sub(2, -1)
-	if String1:sub(0, 1) == String2:sub(0, 1) then
-		return MathModule.String:LevenshteinDistance({String1Sub, String2Sub})
-	end
-	return 1 + math.min(MathModule.String:LevenshteinDistance({String1Sub, String2Sub}), MathModule.String:LevenshteinDistance({String1, String2Sub}), MathModule.String:LevenshteinDistance({String1Sub, String2}))
-end
---[[
-CLASS Convert
-]]
-function MathModule.Convert:DecimalToBase(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" and Table[2] % 1 == 0 then else return warn("only numbers are allowed in the table, also bases have to be whole numbers") end
-	end
-	if Table[2] > 36 then return warn("no bases above 36 are allowed") end
-	if Table[2] < 1 then return warn("no bases below 1 are allowed") end
-	if Table[2] == 10 then return warn("base 10 is not allowed") end
-	local Decimal = Table[1]
-	local Base = Table[2]
-	local Fraction = ""
-	local Sign = ""
-	local BaseTable = {}
-	local FractionTable = {}
-	local RepeatTable = {}
-	local Base11To36 = {
-		[10] = "A",
-		[11] = "B",
-		[12] = "C",
-		[13] = "D",
-		[14] = "E",
-		[15] = "F",
-		[16] = "G",
-		[17] = "H",
-		[18] = "I",
-		[19] = "J",
-		[20] = "K",
-		[21] = "L",
-		[22] = "M",
-		[23] = "N",
-		[24] = "O",
-		[25] = "P",
-		[26] = "Q",
-		[27] = "R",
-		[28] = "S",
-		[29] = "T",
-		[30] = "U",
-		[31] = "V",
-		[32] = "W",
-		[33] = "X",
-		[34] = "Y",
-		[35] = "Z"
-	}
-	if math.abs(Decimal) + Decimal == 0 and Decimal ~= 0 then
-		Decimal = math.abs(Decimal)
-		Sign = "-"
-	end
-	if Decimal % 1 ~= 0 then
-		local DF = math.floor(Decimal - (Decimal % 1))
-		Fraction = DF
-		local Digits = 0
-		while true do wait()
-			Digits += 1
-			if (Decimal * (10^Digits)) % 1 == 0 then
-				break
-			end
-		end
-		Fraction = tonumber(string.format("%."..(Digits or 0).."f", Decimal - Fraction))
-		Decimal = DF
-		local MaxPlace = 10^-math.log10(Fraction)
-		Fraction *= MaxPlace
-		repeat wait()
-			if table.find(RepeatTable, Fraction) then
-				break
-			end
-			table.insert(RepeatTable, Fraction)
-			Fraction *= Base
-			local TableData = math.floor(Fraction / MaxPlace)
-			if TableData >= 10 then
-				for i, v in pairs(Base11To36) do
-					if i == TableData then
-						TableData = v
-					end
-				end
-			end
-			table.insert(FractionTable, TableData)
-			if TableData >= 1 and not (Fraction == MaxPlace) then
-				Fraction -= (TableData * MaxPlace)
-			end
-		until Fraction == MaxPlace
-		if DF == 0 then
-			Fraction = "0."
-		else
-			Fraction = "."
-		end
-		for i = 1, #FractionTable, 1 do
-			Fraction ..= FractionTable[i]
-		end
-		if DF == 0 then
-			return Sign..Fraction
-		end
-	end
-	repeat wait()
-		local TableData = Decimal % Base
-		if TableData >= 10 then
-			for i, v in pairs(Base11To36) do
-				if i == TableData then
-					TableData = v
-				end
-			end
-		end
-		table.insert(BaseTable, TableData)
-		Decimal = math.floor(Decimal / Base)
-	until Decimal / Base == 0
-	for i = 1, math.floor(#BaseTable / 2), 1 do
-		local v = #BaseTable - i + 1
-		BaseTable[i], BaseTable[v] = BaseTable[v], BaseTable[i]
-	end
-	Base = ""
-	for i = 1, #BaseTable, 1 do
-		Base ..= BaseTable[i]
-	end
-	return Sign..Base..Fraction
-end
-function MathModule.Convert:BaseToDecimal(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if Table[2] % 1 == 0 then else return warn("bases have to be whole numbers") end
-	end
-	if Table[2] > 36 then return warn("no bases above 36 are allowed") end
-	if Table[2] < 1 then return warn("no bases below 1 are allowed") end
-	if Table[2] == 10 then return warn("base 10 is not allowed") end
-	local BaseValue = Table[1]
-	local Base = Table[2]
-	local Fraction = ""
-	local Sign = ""
-	local UnlockFraction = false
-	local BaseValueTable = {}
-	local Base1To36 = {
-		[0] = "0",
-		[1] = "1",
-		[2] = "2",
-		[3] = "3",
-		[4] = "4",
-		[5] = "5",
-		[6] = "6",
-		[7] = "7",
-		[8] = "8",
-		[9] = "9",
-		[10] = "A",
-		[11] = "B",
-		[12] = "C",
-		[13] = "D",
-		[14] = "E",
-		[15] = "F",
-		[16] = "G",
-		[17] = "H",
-		[18] = "I",
-		[19] = "J",
-		[20] = "K",
-		[21] = "L",
-		[22] = "M",
-		[23] = "N",
-		[24] = "O",
-		[25] = "P",
-		[26] = "Q",
-		[27] = "R",
-		[28] = "S",
-		[29] = "T",
-		[30] = "U",
-		[31] = "V",
-		[32] = "W",
-		[33] = "X",
-		[34] = "Y",
-		[35] = "Z"
-	}
-	if math.abs(BaseValue) + BaseValue == 0 and BaseValue ~= 0 then
-		BaseValue = math.abs(BaseValue)
-		Sign = "-"
-	end
-	for Character in tostring(BaseValue):gmatch(".") do
-		if UnlockFraction == true then
-			table.insert(BaseValueTable, Character)
-		end
-		if Character == "." then
-			UnlockFraction = true
-		end
-		for i = 1, #Base1To36, 1 do
-			if table.find(Base1To36, Character, i) and i >= Base then return warn("make sure your base value is in order with your base") end
-		end
-	end
-	for i = 1, math.floor(#BaseValueTable / 2), 1 do
-		local v = #BaseValueTable - i + 1
-		BaseValueTable[i], BaseValueTable[v] = BaseValueTable[v], BaseValueTable[i]
-	end
-	local DF = math.floor(BaseValue - (BaseValue % 1))
-	local FractionCheck = BaseValue % 1 ~= 0
-	Fraction = DF
-	local Digits = 0
-	while true do wait()
-		Digits += 1
-		if (BaseValue * (10^Digits)) % 1 == 0 then
-			break
-		end
-	end
-	Fraction = tonumber(string.format("%."..(Digits or 0).."f", BaseValue - Fraction))
-	BaseValue = DF
-	if FractionCheck then
-		for i = 1, #BaseValueTable, 1 do
-			local Data = BaseValueTable[i]
-			for ii = 1, #Base1To36, 1 do
-				if table.find(Base1To36, Data, ii) then
-					Data = Base1To36[ii]
-				end
-			end
-			if i == 1 then
-				Fraction = (Data + 0) / Base
-			else
-				Fraction = (Data + Fraction) / Base
-			end
-		end
-		if DF == 0 then
-			return Sign..Fraction
-		end
-	end
-	Base = tonumber(BaseValue, Base)
-	return Sign..Base + Fraction
-end
-function MathModule.Convert:BaseToBase(Table)
-	if type(Table) == "table" and Table[3] then else return warn("only tables are allowed in this function") end
-	if Table[4] then return warn("you can't have four table values") end
-	for i = 1, #Table, 1 do
-		if Table[2] % 1 == 0 and Table[3] % 1 == 0 then else return warn("bases have to be whole numbers") end
-	end
-	if Table[2] > 36 or Table[3] > 36 then return warn("no bases above 36 are allowed") end
-	if Table[2] < 1 or Table[3] < 1 then return warn("no bases below 1 are allowed") end
-	local BaseValue = Table[1]
-	local Base1 = Table[2]
-	local Base2 = Table[3]
-	local Base1To36 = {
-		[0] = "0",
-		[1] = "1",
-		[2] = "2",
-		[3] = "3",
-		[4] = "4",
-		[5] = "5",
-		[6] = "6",
-		[7] = "7",
-		[8] = "8",
-		[9] = "9",
-		[10] = "A",
-		[11] = "B",
-		[12] = "C",
-		[13] = "D",
-		[14] = "E",
-		[15] = "F",
-		[16] = "G",
-		[17] = "H",
-		[18] = "I",
-		[19] = "J",
-		[20] = "K",
-		[21] = "L",
-		[22] = "M",
-		[23] = "N",
-		[24] = "O",
-		[25] = "P",
-		[26] = "Q",
-		[27] = "R",
-		[28] = "S",
-		[29] = "T",
-		[30] = "U",
-		[31] = "V",
-		[32] = "W",
-		[33] = "X",
-		[34] = "Y",
-		[35] = "Z"
-	}
-	for Character in tostring(BaseValue):gmatch(".") do
-		for i = 1, #Base1To36, 1 do
-			if table.find(Base1To36, Character, i) and i >= Base1 then return warn("make sure your base value is in order with your base") end
-		end
-	end
-	return MathModule.Convert:DecimalToBase({tonumber(MathModule.Convert:BaseToDecimal({BaseValue, Base1})), Base2})
-end
-function MathModule.Convert:DecimalToRomanNumeral(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n == 0 then return warn("number can't be 0") end
-	local RomanNumerals = ""
-	local RomanTable = {
-		{1000, "M"},
-		{900, "CM"},
-		{500, "D"},
-		{400, "CD"},
-		{100, "C"},
-		{90, "XC"},
-		{50, "L"},
-		{40, "XL"},
-		{10, "X"},
-		{9, "IX"},
-		{5, "V"},
-		{4, "IV"},
-		{1, "I"}
-	}
-	for i, v in pairs(RomanTable) do
-		local ii, vv = unpack(v)
-		while n >= ii do
-			n -= ii
-			RomanNumerals ..= vv
-		end
-	end
-	return RomanNumerals
-end
-function MathModule.Convert:RomanNumeralToDecimal(s)
-	if typeof(s) == "string" then else return warn("only roman numerals are allowed") end
-	local Decimal = 0
-	local i = 1
-	local RomanNumeralLength = string.len(s)
-	local RomanTable = {
-		["M"] = 1000,
-		["D"] = 500,
-		["C"] = 100,
-		["L"] = 50,
-		["X"] = 10,
-		["V"] = 5,
-		["I"] = 1
-	}
-	for Character in tostring(s):gmatch(".") do
-		local StringCheck = false
-		for i, v in pairs(RomanTable) do
-			if Character == i then StringCheck = true end
-		end
-		if StringCheck == false then return warn("make sure your Roman Numerals are using the correct letters") end
-	end
-	while i < RomanNumeralLength do
-		local Z1 = RomanTable[string.sub(s, i, i)]
-		local Z2 = RomanTable[string.sub(s, i + 1, i + 1)]
-		if Z1 < Z2 then
-			Decimal += (Z2 - Z1)
-			i += 2
-		else
-			Decimal += Z1
-			i += 1
-		end
-	end
-	if i <= RomanNumeralLength then
-		Decimal += RomanTable[string.sub(s, i, i)]
-	end
-	return Decimal
-end
-function MathModule.Convert:FahrenheitToCelsius(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	return (n - 32) * (5 / 9)
-end
-function MathModule.Convert:CelsiusToFahrenheit(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	return (n * (9 / 5)) + 32
-end
---[[
-CLASS Check
-]]
-function MathModule.Check:Integer(n)
-	if typeof(n) == "number" then else return false end
-	if n % 1 == 0 then
-		return true
-	else
-		return false
-	end
-end
-function MathModule.Check:NonInteger(n)
-	if typeof(n) == "number" then else return false end
-	if n % 1 ~= 0 then
-		return true
-	else
-		return false
-	end
-end
-function MathModule.Check:Prime(n)
-	if typeof(n) == "number" then else return false end
-	if n < 1 then return false end
-	if n % 1 ~= 0 then return false end
-	if n > 2 and n % 2 == 0 then return false end
-	for i = 2, n^(1 / 2) do
-		if (n % i) == 0 then
-			return false
-		end
-	end
-	return true
-end
-function MathModule.Check:Unprimeable(n)
-	if typeof(n) == "number" then else return false end
-	if MathModule.Check:Prime(n) == true then return false end
-	if n % 1 ~= 0 then return false end
-	local StringN1 = tostring(n)
-	local StringN2 = tostring(n)
-	local Digits = string.len(StringN1)
-	local PastDigit = 0
-	for i = 1, Digits * 10, 1 do
-		local Digit = math.ceil(i / 10)
-		if Digit > PastDigit then
-			StringN1 = StringN2
-		end
-		PastDigit = Digit
-		local DigitReplace = i - (9 * (Digit - 1)) - Digit
-		StringN1 = table.concat{StringN1:sub(1, Digit - 1), DigitReplace, StringN1:sub(Digit + 1)}
-		if MathModule.Check:Prime(tonumber(StringN1)) == true then return false end
-	end
-	return true
-end
---[[
-CLASS Notation
-]]
-function MathModule.Notation:Scientific(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n == 0 then return warn("number can't be 0") end
-	local Repeat = 0
-	if math.abs(n) >= 10 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n /= 10
-			until n > -10
-			return n.." * 10^"..Repeat
-		else
-			repeat
-				Repeat += 1
-				n /= 10
-			until n < 10
-			return n.." * 10^"..Repeat
-		end
-	elseif math.abs(n) < 1 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n *= 10
-			until n <= -1
-			return n.." * 10^"..-Repeat
-		else
-			repeat
-				Repeat += 1
-				n *= 10
-			until n >= 1
-			return n.." * 10^"..-Repeat
-		end
-	end
-end
-function MathModule.Notation:E(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n == 0 then return warn("number can't be 0") end
-	local Repeat = 0
-	if math.abs(n) >= 10 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n /= 10
-			until n > -10
-			return n.."e+"..Repeat
-		else
-			repeat
-				Repeat += 1
-				n /= 10
-			until n < 10
-			return n.."e+"..Repeat
-		end
-	elseif math.abs(n) < 1 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n *= 10
-			until n <= -1
-			return n.."e"..-Repeat
-		else
-			repeat
-				Repeat += 1
-				n *= 10
-			until n >= 1
-			return n.."e"..-Repeat
-		end
-	end
-end
-function MathModule.Notation:Engineering(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n == 0 then return warn("number can't be 0") end
-	local Repeat = 0
-	if math.abs(n) >= 10 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n /= 10
-			until n > -10
-		else
-			repeat
-				Repeat += 1
-				n /= 10
-			until n < 10
-		end
-		if Repeat % 3 == 0 or Repeat == 0 then
-			return n.." * 10^"..Repeat
-		else
-			repeat
-				Repeat -= 1
-				n *= 10
-			until Repeat % 3 == 0 or Repeat == 0
-			return n.." * 10^"..Repeat
-		end
-	elseif math.abs(n) < 1 then
-		if string.match(n, "^-") then
-			repeat
-				Repeat += 1
-				n *= 10
-			until n <= -1
-		else
-			repeat
-				Repeat += 1
-				n *= 10
-			until n >= 1
-		end
-		if Repeat % 3 == 0 or Repeat == 0 then
-			return n.." * 10^"..-Repeat
-		else
-			repeat
-				Repeat += 1
-				n *= 10
-			until Repeat % 3 == 0 or Repeat == 0
-			return n.." * 10^"..Repeat
-		end
-	end
-end
---[[
-CLASS Random
-]]
-function MathModule.Random:Addition(Table)
-	if type(Table) == "table" and Table[4] then else return warn("only tables are allowed in this function") end
-	if Table[5] then return warn("you can't have five table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	local EndProduct = Table[3]
-	local RepeatN = Table[4]
-	if RepeatN % 1 ~= 0 or RepeatN == 0 then return warn("The total numbers have to be a whole number above 0") end
-	if Max * RepeatN >= EndProduct then else return warn("End Product has to be less than or equal to the max number possible") end
-	if Min <= EndProduct / Max then else return warn("Minimum has to be less than or equal to the min divider possible") end
-	if Min > Max then return warn("min can't be greater than max") end
-	local RandomTable = {}
-	if RepeatN % 2 == 0 then
-		local SplitN = RepeatN / 2
-		local DividN = EndProduct / SplitN
-		local RangeN = (2 - (DividN / Max)) * Max
-		for i = 1, SplitN, 1 do
-			local SplitProduct = DividN
-			for i = 1, 2, 1 do
-				if i ~= 2 then
-					local RandomNumber = Random.new():NextNumber(Max - RangeN, Max)
-					table.insert(RandomTable, RandomNumber)
-					SplitProduct -= RandomNumber
-				else
-					table.insert(RandomTable, SplitProduct)
-					SplitProduct -= SplitProduct
-				end
-			end
-		end
-	else
-		if RepeatN ~= 1 then
-			local RN = Random.new():NextNumber(Min, Max)
-			table.insert(RandomTable, RN)
-			local SplitN = (RepeatN - 1) / 2
-			local DividN = (EndProduct - RN) / SplitN
-			local RangeN = (2 - (DividN / Max)) * Max
-			for i = 1, SplitN, 1 do
-				local SplitProduct = DividN
-				for i = 1, 2, 1 do
-					if i ~= 2 then
-						local RandomNumber = Random.new():NextNumber(Max - RangeN, Max)
-						table.insert(RandomTable, RandomNumber)
-						SplitProduct -= RandomNumber
-					else
-						table.insert(RandomTable, SplitProduct)
-						SplitProduct -= SplitProduct
-					end
-				end
-			end
-		else
-			table.insert(RandomTable, Max)
-		end
-	end
-	return RandomTable
-end
-function MathModule.Random:Multiplication(Table)
-	if type(Table) == "table" and Table[4] then else return warn("only tables are allowed in this function") end
-	if Table[5] then return warn("you can't have five table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	local EndProduct = Table[3]
-	local RepeatN = Table[4]
-	if RepeatN % 1 ~= 0 or RepeatN == 0 then return warn("The total numbers have to be a whole number above 0") end
-	if Max^RepeatN >= EndProduct then else return warn("End Product has to be less than or equal to the max number possible") end
-	if Min <= RepeatN * math.sqrt(Max) then else return warn("Minimum has to be less than or equal to the min divider possible") end
-	if Min > Max then return warn("min can't be greater than max") end
-	local RandomTable = {}
-	local function SNToDN(EP, SN)
-		local DN = EP
-		for i = 1, SN - 1, 1 do
-			DN = math.sqrt(DN)
-		end
-		return DN
-	end
-	if RepeatN % 2 == 0 then
-		local SplitN = RepeatN / 2
-		local DividN = SNToDN(EndProduct, SplitN)
-		local RangeN = EndProduct / Max
-		for i = 1, SplitN, 1 do
-			local SplitProduct = DividN
-			for i = 1, 2, 1 do
-				if i ~= 2 then
-					local RandomNumber = Random.new():NextNumber(RangeN, Max)
-					table.insert(RandomTable, RandomNumber)
-					SplitProduct /= RandomNumber
-				else
-					table.insert(RandomTable, SplitProduct)
-					SplitProduct -= SplitProduct
-				end
-			end
-		end
-	else
-		if RepeatN ~= 1 then
-			local RN = Random.new():NextNumber(Min, Max)
-			table.insert(RandomTable, RN)
-			local SplitN = (RepeatN - 1) / 2
-			local DividN = SNToDN(EndProduct / RN, SplitN)
-			local RangeN = (EndProduct / RN) / Max
-			for i = 1, SplitN, 1 do
-				local SplitProduct = DividN
-				for i = 1, 2, 1 do
-					if i ~= 2 then
-						local RandomNumber = Random.new():NextNumber(RangeN, Max)
-						table.insert(RandomTable, RandomNumber)
-						SplitProduct /= RandomNumber
-					else
-						table.insert(RandomTable, SplitProduct)
-						SplitProduct -= SplitProduct
-					end
-				end
-			end
-		else
-			table.insert(RandomTable, Max)
-		end
-	end
-	return RandomTable
-end
-function MathModule.Random:Integer(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have five table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	if Min > Max then return warn("min can't be greater than max") end
-	return Random.new():NextInteger(Min, Max)
-end
-function MathModule.Random:NonInteger(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have five table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Min = Table[1]
-	local Max = Table[2]
-	if Min > Max then return warn("min can't be greater than max") end
-	return Random.new():NextNumber(Min, Max)
-end
---[[
-CLASS Matrix
-]]
-function MathModule.Matrix:Multiplication(Table)
-	local Table1 = Table[1]
-	local Table2 = Table[2]
-	local Table3 = Table[3]
-	if type(Table1) == "table" and Table1[1] then else return warn("only tables are allowed in this function") end
-	if type(Table2) == "table" and Table2[1] then else return warn("only tables are allowed in this function") end
-	if Table3 then return warn("you can't enter more then two tables into the function") end
-	for i = 1, #Table1, 1 do
-		if typeof(Table1[i]) == "table" then
-			for ii = 1, #Table1[i], 1 do
-				if typeof(Table1[i][ii]) == "number" then else return warn("only numbers are allowed in the table") end
-			end
-		else
-			return warn("only matrices are allowed in this function")
-		end
-	end
-	for i = 1, #Table2, 1 do
-		if typeof(Table2[i]) == "table" then
-			for ii = 1, #Table2[i], 1 do
-				if typeof(Table2[i][ii]) == "number" then else return warn("only numbers are allowed in the table") end
-			end
-		else
-			return warn("only matrices are allowed in this function")
-		end
-	end
-	if #Table1 > #Table2 then
-		for i = 1, #Table2, 1 do
-			if #Table2[i] ~= #Table1 then
-				return warn("inner matrix dimensions have to agree")
-			end			
-		end
-	elseif #Table1 < #Table2 or #Table1 == #Table2 then
-		for i = 1, #Table1, 1 do
-			if #Table1[i] ~= #Table2 then
-				return warn("inner matrix dimensions have to agree")
-			end			
-		end
-	end
-	local Matrix = {}
-	for i = 1, #Table1, 1 do
-		Matrix[i] = {}
-		for j = 1, #Table2[1], 1 do
-			Matrix[i][j] = 0
-			for k = 1, #Table2, 1 do
-				Matrix[i][j] = Matrix[i][j] + Table1[i][k] * Table2[k][j]
-			end
-		end
-	end
-	return Matrix
-end
-function MathModule.Matrix:DotProduct(Table)
-	local Table1 = Table[1]
-	local Table2 = Table[2]
-	local Table3 = Table[3]
-	if type(Table1) == "table" then else return warn("only tables are allowed in this function") end
-	if type(Table2) == "table" then else return warn("only tables are allowed in this function") end
-	if Table3 then return warn("you can't have three tables") end
-	if #Table1 ~= #Table2 then return warn("both tables need the same amount of values inside") end
-	if #Table1 == 3 and #Table2 == 3 then else return warn("both tables need 3 values each") end
-	for i = 1, #Table1, 1 do
-		if typeof(Table1[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	for i = 1, #Table2, 1 do
-		if typeof(Table2[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Product = 0
-	for i = 1, #Table1 do
-		Product += Table1[i] * Table2[i]
-	end
-	return Product
-end
-function MathModule.Matrix:CrossProduct(Table)
-	local Table1 = Table[1]
-	local Table2 = Table[2]
-	local Table3 = Table[3]
-	if type(Table1) == "table" then else return warn("only tables are allowed in this function") end
-	if type(Table2) == "table" then else return warn("only tables are allowed in this function") end
-	if Table3 then return warn("you can't have three tables") end
-	if #Table1 ~= #Table2 then return warn("both tables need the same amount of values inside") end
-	if #Table1 == 3 and #Table2 == 3 then else return warn("both tables need 3 values each") end
-	for i = 1, #Table1, 1 do
-		if typeof(Table1[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	for i = 1, #Table2, 1 do
-		if typeof(Table2[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local TableX = Table1[2] * Table2[3] - Table1[3] * Table2[2]
-	local TableY = Table1[3] * Table2[1] - Table1[1] * Table2[3]
-	local TableZ = Table1[1] * Table2[2] - Table1[2] * Table2[1]
-	return {TableX, TableY, TableZ}
-end
-function MathModule.Matrix:TensorProduct(Table)
-	local Table1 = Table[1]
-	local Table2 = Table[2]
-	local Table3 = Table[3]
-	if type(Table1) == "table" and Table1[1] then else return warn("only tables are allowed in this function") end
-	if type(Table2) == "table" and Table2[1] then else return warn("only tables are allowed in this function") end
-	if Table3 then return warn("you can't enter more then two tables into the function") end
-	for i = 1, #Table1, 1 do
-		if typeof(Table1[i]) == "table" then
-			for ii = 1, #Table1[i], 1 do
-				if typeof(Table1[i][ii]) == "number" then else return warn("only numbers are allowed in the table") end
-			end
-		else
-			return warn("only matrices are allowed in this function")
-		end
-	end
-	for i = 1, #Table2, 1 do
-		if typeof(Table2[i]) == "table" then
-			for ii = 1, #Table2[i], 1 do
-				if typeof(Table2[i][ii]) == "number" then else return warn("only numbers are allowed in the table") end
-			end
-		else
-			return warn("only matrices are allowed in this function")
-		end
-	end
-	local Matrix = {}
-	for m = 1, #Table1, 1 do
-		for p = 1, #Table2, 1 do
-			local Array = {}
-			for n = 1, #Table1[m], 1 do
-				for q = 1, #Table2[p], 1 do
-					table.insert(Array, string.format("%3d ", Table1[m][n] * Table2[p][q]))
-				end
-			end
-			table.insert(Matrix, Array)
-		end
-	end
-	return Matrix
-end
-function MathModule.Matrix:Transposition(Table)
-	if type(Table) == "table" and Table[1] then else return warn("only tables are allowed in this function") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "table" then
-			for ii = 1, #Table[i], 1 do
-				if typeof(Table[i][ii]) == "number" then else return warn("only numbers are allowed in the table") end
-			end
-		else
-			return warn("only matrices are allowed in this function")
-		end
-	end
-	local Tranposition = {}
-	for i = 1, #Table[1], 1 do
-		Tranposition[i] = {}
-		for j = 1, #Table, 1 do
-			Tranposition[i][j] = Table[j][i]
-		end
-	end
-	return Tranposition
-end
-function MathModule.Matrix:ZigZag(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	if n % 1 == 0 and n >= 2 then else return warn("number has to be a whole number and can't be smaller than 2") end
-	local ZigZagMatrix = {}
-	local i = 0
-	local j = 0
-	for j = 1, n do
-		ZigZagMatrix[j] = {}
-		for i = 1, n do
-			ZigZagMatrix[j][i] = 0
-		end
-	end
-	i = 1
-	j = 1
-	local di = 0
-	local dj = 0
-	local k = 0
-	while k < n * n do
-		ZigZagMatrix[j][i] = k
-		k = k + 1
-		if i == n then
-			j += 1
-			ZigZagMatrix[j][i] = k
-			k += 1
-			di = -1
-			dj = 1
-		end
-		if j == 1 then
-			i += 1
-			ZigZagMatrix[j][i] = k
-			k += 1
-			di = -1
-			dj = 1
-		end
-		if j == n then
-			i += 1
-			ZigZagMatrix[j][i] = k
-			k += 1
-			di = 1
-			dj = -1
-		end
-		if i == 1 then
-			j += 1
-			ZigZagMatrix[j][i] = k
-			k += 1
-			di = 1
-			dj = -1
-		end
-		i += di
-		j += dj
-	end
-	return ZigZagMatrix
-end
---[[
-CLASS Special
-]]
-function MathModule.Special:Factorial(n)
-	if typeof(n) == "number" then else return warn("only numbers are allowed") end
-	local function gammafunction(z)
-		local gamma = MathModule.Value:EulersConstant()
-		local coeff = MathModule.Value:GammaCoeff()
-		local quad = MathModule.Value:GammaQuad()
-		local qui = MathModule.Value:GammaQui()
-		local set = MathModule.Value:GammaSet()
-		local function recigamma(rz)
-			return rz + gamma * rz^2 + coeff * rz^3 + quad * rz^4 + qui * rz^5 + set * rz^6
-		end
-		if z == 1 then
-			return 1
-		elseif math.abs(z) <= 0.5 then
-			return 1 / recigamma(z)
-		else
-			return (z - 1) * gammafunction(z - 1)
-		end
-	end
-	if math.abs(n) + n == 0 and n ~= 0 then
-		n *= -1
-		local N = gammafunction(n + 1)
-		N *= -1
-		return N
-	else
-		return gammafunction(n + 1)
-	end
-end
-function MathModule.Special:NthRoot(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only whole numbers are allowed in the table") end
-	end
-	local Number = Table[1]
-	local NthRoot = Table[2]
-	local FractionCheck = false
-	if NthRoot % 1 ~= 0 then
-		FractionCheck = true
-	end
-	if math.abs(Number) + Number == 0 and Number ~= 0 then
-		local EvenCheck = 2
-		if FractionCheck == true then
-			EvenCheck = -2
-		end
-		if NthRoot % EvenCheck == 0 then
-			return ((-Number)^(1 / NthRoot)).."i"
-		else
-			return -((-Number)^(1 / NthRoot))
-		end
-	end
-	return Number^(1 / NthRoot)
-end
-function MathModule.Special:PerNth(Table)
-	if type(Table) == "table" and Table[2] then else return warn("only tables are allowed in this function") end
-	if Table[3] then return warn("you can't have three table values") end
-	for i = 1, #Table, 1 do
-		if typeof(Table[i]) == "number" then else return warn("only numbers are allowed in the table") end
-	end
-	local Number = Table[1]
-	local NthValue = Table[2]
-	local Answer = Number / NthValue
-	return Answer.." or "..(Answer * 100).."%"
-end
-
-return MathModule
-end)() end,
-    [68] = function()local wax,script,require=ImportGlobals(68)local ImportGlobals return (function(...)local randomString = require(script.Parent.Parent.utilities.randomString)
-local customFunctions = require(script.Parent.Parent.utilities.customFunctions)
-local fusion = require(script.Parent.Fusion)
-local value = fusion.Value
-
-local data
-if customFunctions.getgenv then
-    customFunctions.getgenv().data = customFunctions.getgenv().data or {}
-    data = customFunctions.getgenv().data
-else
-    _G.data = _G.data or {}
-    data = _G.data
-end
-local dataFunctions = {}
-
-type uid = string
-type tag = string
-
-function dataFunctions.update(uid:string, index:string, new:string)
-    if index ~= "uid" and dataFunctions.find(uid) and dataFunctions.find(uid)[index] then
-        local dataToEdit = dataFunctions.find(uid)
-        dataToEdit[index]:set(new)
-    elseif not dataFunctions.find(uid) then
-        error("couldn't find uid: "..uid)
-    elseif index == "uid" or index == "tag" then
-        error("cannot edit property "..index)
-    elseif not dataFunctions.find(uid)[index] then
-        error("index returned nil")
-    else
-        error("how?")
-    end
-end
-function dataFunctions.find(identifier:uid | tag):table
-    local returnData = nil
-    for i=1, #data do
-        if data[i].uid == identifier or data[i].tag == identifier then
-            returnData = data[i]
-        end
-    end
-    if not returnData then
-        warn("no data found by identifier: "..tostring(identifier))
-        return returnData
-    end
-    return returnData
-end
-function dataFunctions.delete(uid:string)
-    local dataToDelete = dataFunctions.find(uid)
-    local index = table.find(data, dataToDelete)
-    local newData = {}
-    for i=1, #data do
-        if i ~= index then
-            table.insert(newData, data[i])
-        end
-    end
-    data = newData
-    newData =  nil
-end
-function dataFunctions.add(newData:table, tag:string):table
-    for i,v in newData do
-        newData[i] = value(v)
-    end
-    newData.tag = tag or nil
-    newData.uid = randomString(16)
-    setmetatable(newData, {
-        __index = {
-            ["update"] = function(tbl, dataType, info)
-                dataFunctions.update(tbl.uid, dataType, info)
-            end,
-            ["delete"] = function()
-                dataFunctions.delete(newData.uid)
-            end
-        }
-    })
-    table.insert(data, newData)
-    return dataFunctions.find(newData.uid)
-end
-
-return dataFunctions
-
-end)() end,
-    [69] = function()local wax,script,require=ImportGlobals(69)local ImportGlobals return (function(...)return {
-    ['lock'] = "rbxassetid://10723434711",
-    ['dropdown'] = "rbxassetid://15555233897",
-    ['chevron'] = "rbxassetid://10709790948",
-    ['emptyBox'] = "rbxassetid://15555208034",
-    ['filledBox'] = "rbxassetid://15555206993",
-    ['maximize'] = "rbxassetid://15556636376",
-    ['minimize'] = "rbxassetid://15556637715",
-    ['close'] = "rbxassetid://10747384394"
-}
-end)() end,
-    [70] = function()local wax,script,require=ImportGlobals(70)local ImportGlobals return (function(...)local cF = require(script.Parent.Parent.utilities.customFunctions)
-local cloneref = cF.cloneref
-
-local services = {}
-
-services.UserInputService = cloneref(game:GetService("UserInputService"))
-services.RunService = cloneref(game:GetService("RunService"))
-services.TextService = cloneref(game:GetService("TextService"))
-services.ContextActionService = cloneref(game:GetService("ContextActionService"))
-
-return services
-end)() end,
-    [71] = function()local wax,script,require=ImportGlobals(71)local ImportGlobals return (function(...)local themeSystem = {}
-local fusion = require(script.Parent.Fusion)
-local default = require(script.default)
-local value = fusion.Value
-local observe = fusion.Observer
-
-local get = require(script.Parent.Parent.utilities.get)
-local animate = require(script.Parent.Parent.utilities.animate)
-local preservedConfig = require(script.Parent.Parent.preservedConfig)
-local functionsOnChange = {}
-
-local currentTheme = value({})
-observe(currentTheme):onChange(function()
-    for _,func in ipairs(functionsOnChange) do
-        task.spawn(func)
-    end
-end)
-
-local paletteCheck = {
-    defaultTab = "Color3",
-	background = "Color3",
-	secondaryBackground = "Color3",
-	tertiaryBackground = "Color3",
-	text = "Color3",
-	image = "Color3",
-	placeholder = "Color3",
-	close = "Color3"
-}
-
-function themeSystem.create(palette)
-    for i,_ in paletteCheck do
-        if palette[i] == nil then
-            palette[i] = preservedConfig[i]
-        end
-        if typeof(palette[i]) ~= "Color3" then
-            error(i.." isn't type Color3")
-        end
-    end
-    for i,_ in palette do
-        if paletteCheck[i] == nil then
-            warn('Incorrect value removed "'..tostring(i)..'"')
-            palette[i] = nil
-        end
-    end
-    currentTheme:set(palette)
-end
-
-function themeSystem.get(name:string, animation:boolean)
-    local theme = get(currentTheme)
-    if theme[name] then
-        if animation then
-            return animate(function()
-                return get(currentTheme)[name]
-            end,40,1)
-        else
-            return theme[name]
-        end
-    else
-        error(name.." isn't a theme element")
-    end
-end
-currentTheme:set(default)
-function themeSystem.onChange(func)
-    table.insert(functionsOnChange, func)
-end
-
-return themeSystem
-end)() end,
-    [72] = function()local wax,script,require=ImportGlobals(72)local ImportGlobals return (function(...)return {
-    defaultTab = Color3.fromHex("#a49ae6"),
-	background = Color3.fromRGB(40, 44, 50),
-	secondaryBackground = Color3.fromRGB(49, 56, 66),
-	tertiaryBackground = Color3.fromRGB(57, 63, 75),
-	text = Color3.fromRGB(220,221,225),
-	image = Color3.fromRGB(220,221,225),
-	placeholder = Color3.fromRGB(165,166,169),
-	close = Color3.fromRGB(190, 100, 105)
-}
-end)() end,
-    [74] = function()local wax,script,require=ImportGlobals(74)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(buttonProperty)
-	assert(buttonProperty.Name, ":Button missing property Name")
-	assert(typeof(buttonProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(buttonProperty.Name)))
-	assert(buttonProperty.Callback, ":Button missing property Callback")
-	assert(typeof(buttonProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(buttonProperty.Callback)))
-
-	local name = value(buttonProperty.Name)
-	local callback = value(buttonProperty.Callback)
-
-	local tabColor = buttonProperty.tabColor or nil
-
-	local isDown = value(false)
-	local isLocked = value(false)
-	local lockReason = value("")
-
-	local newButton = new "TextButton" {
-		Parent = buttonProperty.Parent,
-		ZIndex = 2,
-		Size = UDim2.new(1,0,0,40),
-		AutoButtonColor = false,
-		Interactable = computed(function()
-			return not get(isLocked)
-		end),
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-
-		[onevent "MouseButton1Down"] = function()
-			isDown:set(true)
-		end,
-		[onevent "MouseButton1Up"] = function()
-			isDown:set(false)
-		end,
-		[onevent "MouseLeave"] = function()
-			isDown:set(false)
-		end,
-		[onevent "Activated"] = function()
-			task.spawn(get(callback))
-		end,
-
-
-		[children] = {
-			new "UICorner" {
-				CornerRadius = UDim.new(0,6)
-			},
-			{ -- Lock
-				new "Frame" {
-					ZIndex = 3,
-					Size = UDim2.fromScale(1,1),
-					BackgroundTransparency = 0.1,
-					BackgroundColor3 = animate(function()
-						return theme.get("tertiaryBackground")
-					end,40,1),
-					Visible = computed(function()
-						return get(isLocked)
-					end),
-
-					[children] = {
-						new "ImageLabel" {
-							AnchorPoint = Vector2.new(0,0.5),
-							Size = UDim2.fromOffset(24,24),
-							Position = UDim2.new(0,10,0.5),
-							BackgroundTransparency = 1,
-							Image = icons['lock'],
-							ImageColor3 = animate(function()
-								return theme.get("image")
-							end,40,1)
-						},
-						new "TextLabel" {
-							Text = computed(function()
-								return get(lockReason)
-							end),
-							AnchorPoint = Vector2.new(0,0.5),
-							Position = UDim2.new(0,44,0.5,0),
-							Size = UDim2.new(1,-54,0,16),
-							Font = Enum.Font.GothamBold,
-							BackgroundTransparency = 1,
-							TextSize = 16,
-							TextScaled = true,
-							TextXAlignment = Enum.TextXAlignment.Left,
-							TextColor3 = animate(function()
-								return theme.get("text")
-							end,40,1),
-
-							[children] = {
-								new "UITextSizeConstraint" {
-									MinTextSize = 1,
-									MaxTextSize = 16
-								}
-							}
-						},
-						new "UICorner" {CornerRadius = UDim.new(0,6)},
-					}
-				}
-			},
-			new "Frame" { -- Background
-				ZIndex = 2,
-				Size = UDim2.new(1,0,1,0),
-				AnchorPoint = Vector2.new(0.5,0.5),
-				Position = UDim2.new(0.5,0,0.5,0),
-				BackgroundColor3 = animate(function()
-					return tabColor or theme.get("defaultTab")
-				end,40,1),
-				BackgroundTransparency = animate(function()
-					if get(isDown) then
-						return 0.95
-					end
-					return 0.85
-				end,50,1),
-
-				[children] = {
-					new "UICorner" {
-						CornerRadius = UDim.new(0,6)
-					}
-				}
-			},
-			new "TextLabel" { -- Name
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1,-20,0,14),
-				AnchorPoint = Vector2.new(0,0.5),
-				Position = UDim2.new(0,10,0.5,0),
-				Font = Enum.Font.Gotham,
-				TextScaled = true,
-				TextSize = 14,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				Text = computed(function()
-					return get(name)
-				end),
-				TextTransparency = animate(function()
-					if get(isDown) then
-						return 0.35
-					end
-					return 0
-				end,50,1),
-
-				[children] = {
-					new "UITextSizeConstraint"{
-						MinTextSize = 1,
-						MaxTextSize = 14
-					}
-				}
-			}
-		}
-	}
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newButton:Destroy()
-	end
-	function returnFunctions:SetName(newText)
-		if typeof(newText) == "string" then
-			name:set(newText)
-		else
-			error("You didnt give "..get(name).." a string for SetName")
-		end
-	end
-	function returnFunctions:SetCallback(newFunction)
-		if typeof(newFunction) == "function" then
-			callback:set(newFunction)
-		else
-			error("You didnt give "..get(name).." a function for SetCallback")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-	return returnFunctions
-end
-end)() end,
-    [75] = function()local wax,script,require=ImportGlobals(75)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local services = require(project.Bundles.services)
-local UserInputService = services.UserInputService
-local RunSerivce = services.RunService
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(colorpickerProperty)
-    assert(colorpickerProperty.Name, ":ColorPicker missing property Name")
-	assert(typeof(colorpickerProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(colorpickerProperty.Name)))
-	assert(colorpickerProperty.Callback, ":ColorPicker missing property Callback")
-	assert(typeof(colorpickerProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(colorpickerProperty.Callback)))
-    assert(colorpickerProperty.Color, ":ColorPicker missing property Color")
-    assert(typeof(colorpickerProperty.Color) == "Color3", ("Color accepts type Color3 got %s"):format(typeof(colorpickerProperty.Color)))
-
-    local name = value(colorpickerProperty.Name)
-    local color = value(colorpickerProperty.Color)
-    local callback = value(colorpickerProperty.Callback)
-
-    local tabColor = colorpickerProperty.tabColor or nil
-
-    local isLocked = value(false)
-	local lockReason = value("")
-
-    local colorAsTable = {get(color):ToHSV()}
-    local hueValue = value(colorAsTable[1])
-    local saturationValue = value(colorAsTable[2])
-    local valueValue = value(colorAsTable[3])
-
-    local function generateColor()
-        return Color3.fromHSV(get(hueValue),get(saturationValue),get(valueValue))
-    end
-    local function setCreatedColor(...)
-        local args = {...}
-        local hueToSet,saturationToSet,valueToSet
-        if typeof(args[1]) == "Color3" then
-            hueToSet,saturationToSet,valueToSet = args[1]:ToHSV()
-        else
-            hueToSet,saturationToSet,valueToSet = Color3.new(...):ToHSV()
-        end
-        hueValue:set(hueToSet)
-        saturationValue:set(saturationToSet)
-        valueValue:set(valueToSet)
-    end
-    local function roundTo(decimal, number)
-        local point = 1
-        for _=1,decimal do
-            point = point*10
-        end
-        return math.round(number*point)/point
-    end
-
-    local isDropped = value(false)
-    local SVFrameDown = value(false)
-    local SVFrameConnection
-    local HFrameDown = value(false)
-    local HFrameConnection
-
-    local colorPicker
-    colorPicker = new "TextButton" {
-        ClipsDescendants = true,
-        Interactable = computed(function()
-			return not get(isLocked)
-		end),
-		ZIndex = 2,
-		Parent = colorpickerProperty.Parent,
-		Size = animate(function()
-			if get(isDropped) then
-				return UDim2.new(1,0,0,160)
-			end
-			return UDim2.new(1,0,0,40)
-		end,50,1),
-        BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-
-        [onevent "Activated"] = function()
-            isDropped:set(not get(isDropped))
-        end,
-        [onevent "Destroying"] = function()
-            if SVFrameConnection then
-                SVFrameConnection:Disconnect()
-            end
-        end,
-
-        [children] = {
-            { -- No clue whats in here
-                { -- Lock
-				new "Frame" {
-					ZIndex = 4,
-					Visible = computed(function()
-						return get(isLocked)
-					end),
-					Size = UDim2.fromScale(1,1),
-					BackgroundTransparency = 0.1,
-					BackgroundColor3 = animate(function()
-						return theme.get("tertiaryBackground")
-					end,40,1),
-
-					[children] = {
-						new "ImageLabel" {
-							AnchorPoint = Vector2.new(0,0.5),
-							Size = UDim2.fromOffset(24,24),
-							Position = UDim2.new(0,10,0.5),
-							BackgroundTransparency = 1,
-							ImageColor3 = animate(function()
-								return theme.get("image")
-							end,40,1),
-							Image = icons['lock']
-						},
-						new "TextLabel" {
-							Text = computed(function()
-								return get(lockReason)
-							end),
-							AnchorPoint = Vector2.new(0,0.5),
-							Position = UDim2.new(0,44,0.5,0),
-							Size = UDim2.new(1,-54,0,16),
-							Font = Enum.Font.GothamBold,
-							BackgroundTransparency = 1,
-							TextColor3 = animate(function()
-								return theme.get("text")
-							end,40,1),
-							TextSize = 16,
-							TextScaled = true,
-							TextXAlignment = Enum.TextXAlignment.Left,
-
-							[children] = {
-								new "UITextSizeConstraint" {
-									MinTextSize = 1,
-									MaxTextSize = 16
-								}
-							}
-						},
-						new "UICorner" {CornerRadius = UDim.new(0,6)},
-					}
-				}
-                },
-                new "UICorner" {
-                    CornerRadius = UDim.new(0,6)
-                },
-                new "Frame" { -- Background
-                    ZIndex = 2,
-                    Size = UDim2.new(1,0,1,0),
-                    AnchorPoint = Vector2.new(0.5,0.5),
-                    Position = UDim2.new(0.5,0,0.5,0),
-
-                    BackgroundColor3 = animate(function()
-                        return tabColor or theme.get("defaultTab")
-                    end,40,1),
-                    BackgroundTransparency = 0.85,
-
-                    [children] = {
-                        new "UICorner" {
-                            CornerRadius = UDim.new(0,6)
-                        }
-                    }
-                },
-                new "TextLabel" { -- Name
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1,-45,0,14),
-                    AnchorPoint = Vector2.new(0,0),
-                    Position = UDim2.new(0,10,0,13),
-                    Font = Enum.Font.Gotham,
-                    TextScaled = true,
-                    TextSize = 14,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextTransparency = 0,
-
-                    TextColor3 = animate(function()
-                        return theme.get("text")
-                    end,40,1),
-                    Text = get(name),
-
-                    [children] = {
-                        new "UITextSizeConstraint" {
-                            MinTextSize = 1,
-                            MaxTextSize = 14
-                        }
-                    }
-                },
-                new "ImageLabel" {-- Icon
-                    ZIndex = 3,
-                    AnchorPoint = Vector2.new(1,0),
-                    Position = UDim2.new(1,-7,0,8),
-                    Size = UDim2.fromOffset(24,24),
-                    BackgroundTransparency = 1,
-                    Image = "rbxassetid://16898730641",
-                    ImageRectOffset = Vector2.new(257,257),
-                    ImageRectSize = Vector2.new(256,256),
-                    ImageColor3 = computed(function()
-                        return Color3.fromHSV(get(hueValue),get(saturationValue),get(valueValue))
-                    end)
-                },
-            },
-            new "Frame" { -- ColorPicker
-                ClipsDescendants = true,
-                Position = UDim2.fromOffset(10,40),
-                Size = UDim2.new(1,-20,0,110),
-                BackgroundTransparency = 1,
-                ZIndex = 3,
-
-                [children] = {
-                    new "UIListLayout" {
-                        Padding = UDim.new(0,10),
-                        SortOrder = Enum.SortOrder.LayoutOrder,
-                        FillDirection = Enum.FillDirection.Horizontal,
-                        HorizontalAlignment = Enum.HorizontalAlignment.Right,
-                        VerticalAlignment = Enum.VerticalAlignment.Center
-                    },
-                    new "TextBox" { -- HexTextBox
-                        Name = "HexTextBox",
-                        Size = UDim2.fromOffset(145,110),
-                        BackgroundColor3 = animate(function()
-                            return theme.get("background")
-                        end,40,1),
-                        BackgroundTransparency = 0.3,
-                        Text = computed(function()
-                            return "#"..generateColor():ToHex()
-                        end),
-                        TextColor3 = animate(function()
-                            return generateColor()
-                        end,40,1),
-                        TextSize = 20,
-                        Font = Enum.Font.GothamMedium,
-
-                        [onevent "FocusLost"] = function()
-                            local HexTextBox = colorPicker:FindFirstChild("HexTextBox", true).Text:gsub("[^%w#]", "")
-                            if not string.find(HexTextBox, "#") then
-                                HexTextBox = "#"..HexTextBox
-                            end
-                            if string.len(HexTextBox) ~= 7 then
-                                warn("Hex code malformed", HexTextBox)
-                                colorPicker:FindFirstChild("HexTextBox", true).Text = "#"..generateColor():ToHex()
-                            else
-                                local s,e = pcall(function()
-                                    return Color3.fromHex(HexTextBox)
-                                end)
-                                if tostring(e) == "Unable to convert characters to hex value" then
-                                    warn("Hex code malformed", HexTextBox)
-                                    colorPicker:FindFirstChild("HexTextBox", true).Text = "#"..generateColor():ToHex()
-                                else
-                                    setCreatedColor(Color3.fromHex(HexTextBox))
-                                end
-                            end
-                        end,
-
-                        [children] = {
-                            new "UICorner" {
-                                CornerRadius = UDim.new(0,4)
-                            }
-                        }
-                    },
-                    new "Frame" { -- HSVTextBoxes
-                        Name = "HSVTextBoxes",
-                        Size = UDim2.fromOffset(55,110),
-                        BackgroundColor3 = animate(function()
-                            return theme.get("background")
-                        end,40,1),
-                        BackgroundTransparency = 0.3,
-                        [children] = {
-                            new "UICorner" {
-                                CornerRadius = UDim.new(0,4)
-                            },
-                            new "UIListLayout" {
-                                Padding = UDim.new(0,5),
-                                SortOrder = Enum.SortOrder.LayoutOrder,
-                                FillDirection = Enum.FillDirection.Vertical,
-                                HorizontalAlignment = Enum.HorizontalAlignment.Center,
-                            },
-                            new "TextLabel" {
-                                Text = "H",
-                                TextColor3 = animate(function()
-                                    return tabColor or theme.get("defaultTab")
-                                end,40,1),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "HText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(roundTo(2,get(hueValue)))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "Changed"] = function(hueTextChange)
-                                    local newHue = tonumber(colorPicker:FindFirstChild("HText", true).Text)
-                                    if hueTextChange:lower() == "text" then
-                                        if newHue then
-                                            newHue = math.clamp(newHue, 0,1)
-                                            if roundTo(2,get(hueValue)) ~= newHue then
-                                                hueValue:set(newHue)
-                                            end
-                                        end
-                                        colorPicker:FindFirstChild("HText", true).Text = tostring(roundTo(2,get(hueValue)))
-                                    end
-                                end
-                            },
-                            new "TextLabel" {
-                                Text = "S",
-                                TextColor3 = animate(function()
-                                    return tabColor or theme.get("defaultTab")
-                                end,40,1),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "SText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(roundTo(2,get(saturationValue)))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "Changed"] = function(saturationTextChange)
-                                    local newSaturation = tonumber(colorPicker:FindFirstChild("SText", true).Text)
-                                    if saturationTextChange:lower() == "text" then
-                                        if newSaturation then
-                                            newSaturation = math.clamp(newSaturation, 0,1)
-                                            if roundTo(2,get(saturationValue)) ~= newSaturation then
-                                                saturationValue:set(newSaturation)
-                                            end
-                                        end
-                                        colorPicker:FindFirstChild("SText", true).Text = tostring(roundTo(2,get(saturationValue)))
-                                    end
-                                end
-                            },
-                            new "TextLabel" {
-                                Text = "V",
-                                TextColor3 = animate(function()
-                                    return tabColor or theme.get("defaultTab")
-                                end,40,1),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "VText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(roundTo(2,get(valueValue)))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "Changed"] = function(valuePropertyChange)
-                                    local newValue = tonumber(colorPicker:FindFirstChild("VText", true).Text)
-                                    if valuePropertyChange:lower() == "text" then
-                                        if newValue then
-                                            newValue = math.clamp(newValue, 0,1)
-                                            if roundTo(2,get(valueValue)) ~= newValue then
-                                                valueValue:set(newValue)
-                                            end
-                                        end
-                                        colorPicker:FindFirstChild("VText", true).Text = tostring(roundTo(2,get(valueValue)))
-                                    end
-                                end
-                            }
-                        }
-                    },
-                    new "Frame" { -- RGBTextBoxes
-                        Name = "RGBTextBoxes",
-                        Size = UDim2.fromOffset(55,110),
-                        BackgroundColor3 = animate(function()
-                            return theme.get("background")
-                        end,40,1),
-                        BackgroundTransparency = 0.3,
-                        [children] = {
-                            new "UICorner" {
-                                CornerRadius = UDim.new(0,4)
-                            },
-                            new "UIListLayout" {
-                                Padding = UDim.new(0,5),
-                                SortOrder = Enum.SortOrder.LayoutOrder,
-                                FillDirection = Enum.FillDirection.Vertical,
-                                HorizontalAlignment = Enum.HorizontalAlignment.Center,
-                            },
-                            new "TextLabel" {
-                                Text = "R",
-                                TextColor3 = Color3.fromRGB(200,0,0),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "RText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(math.round(generateColor().R*255))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "FocusLost"] = function()
-                                    local newR = tonumber(colorPicker:FindFirstChild("RText", true).Text)
-                                    local oldColor = generateColor()
-                                    if newR then
-                                        if math.clamp(math.round(oldColor.R*255),0,255) ~= newR then
-                                            setCreatedColor(math.clamp(newR,0,255)/255,oldColor.G,oldColor.B)
-                                        end
-                                    else
-                                        colorPicker:FindFirstChild("RText", true).Text = tostring(math.round(oldColor.R*255))
-                                    end
-                                end
-                            },
-                            new "TextLabel" {
-                                Text = "G",
-                                TextColor3 = Color3.fromRGB(0,200,0),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "GText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(math.round(generateColor().G*255))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "FocusLost"] = function()
-                                    local newG = tonumber(colorPicker:FindFirstChild("GText", true).Text)
-                                    local oldColor = generateColor()
-                                    if newG then
-                                        if math.clamp(math.round(oldColor.G*255),0,255) ~= newG then
-                                            setCreatedColor(oldColor.R,math.clamp(newG,0,255)/255,oldColor.B)
-                                        end
-                                    else
-                                        colorPicker:FindFirstChild("GText", true).Text = tostring(math.round(oldColor.G*255))
-                                    end
-                                end
-                            },
-                            new "TextLabel" {
-                                Text = "B",
-                                TextColor3 = Color3.fromRGB(0,0,125),
-                                Font = Enum.Font.GothamMedium,
-                                BackgroundTransparency = 1,
-                                Size = UDim2.fromOffset(55,14)
-                            },
-                            new "TextBox" {
-                                Name = "BText",
-                                TextColor3 = animate(function()
-                                    return theme.get("text")
-                                end,40,1),
-                                Font = Enum.Font.Gotham,
-                                BackgroundTransparency = 1,
-                                Text = computed(function()
-                                    return tostring(math.round(generateColor().B*255))
-                                end),
-                                Size = UDim2.fromOffset(55,14),
-
-                                [onevent "FocusLost"] = function()
-                                    local newB = tonumber(colorPicker:FindFirstChild("BText", true).Text)
-                                    local oldColor = generateColor()
-                                    if newB then
-                                        if math.clamp(math.round(oldColor.B*255),0,255) ~= newB then
-                                            setCreatedColor(oldColor.R,oldColor.G,math.clamp(newB,0,255)/255)
-                                        end
-                                    else
-                                        print("B needs to be a number")
-                                        colorPicker:FindFirstChild("BText", true).Text = tostring(math.round(oldColor.B*255))
-                                    end
-                                end
-                            }
-                        }
-                    },
-                    new "TextButton" { -- SVPicker
-                        ZIndex = 2,
-                        Name = "SVPicker",
-                        ClipsDescendants = true,
-                        Size = UDim2.fromOffset(110,110),
-
-                        [onevent "InputBegan"] = function(input)
-                            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                                SVFrameDown:set(true)
-                                local connection
-                                connection = input.Changed:Connect(function()
-                                    if input.UserInputState == Enum.UserInputState.End then
-                                        SVFrameDown:set(false)
-                                        connection:Disconnect()
-                                    end
-                                end)
-                            end
-                        end,
-
-                        [children] = {
-                            new "UIGradient" {
-                                Color = computed(function()
-                                    return ColorSequence.new({
-                                        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-                                        ColorSequenceKeypoint.new(1, Color3.fromHSV(get(hueValue),1,1)),
-                                      })
-                                end)
-                            },
-                            new "ImageLabel" {
-                                AnchorPoint = Vector2.new(0.5,0.5),
-                                Position = UDim2.fromScale(0.5,0),
-                                Size = UDim2.fromScale(1,2),
-                                BackgroundTransparency = 1,
-                                Image = "rbxassetid://13611892279"
-                            },
-                            new "Frame" {
-                                ZIndex = 2,
-                                Name = "dot",
-                                AnchorPoint = Vector2.new(0.5,0.5),
-                                BackgroundColor3 = computed(function()
-                                    local h
-                                    if get(hueValue) > 0.95 or get(hueValue) <= 0.05 then
-                                        h = 0.5
-                                    elseif get(hueValue) < 0.56 and get(hueValue) > 0.45 then
-                                        h = 1
-                                    else
-                                        if get(hueValue) + 1 > 1 then
-                                            h = 1 - get(hueValue)
-                                        else
-                                            h = 1 + get(hueValue)
-                                        end
-                                    end
-                                    return Color3.fromHSV(h,1,1)
-                                end),
-                                Size = UDim2.fromOffset(4,4),
-                                Position = computed(function()
-                                    return UDim2.fromScale(get(saturationValue), 1-get(valueValue))
-                                end)
-                            }
-                        }
-                    },
-                    new "TextButton" { -- HPicker
-                        ZIndex = 2,
-                        Name = "HPicker",
-                        Size = UDim2.fromOffset(55,110),
-
-                        [onevent "InputBegan"] = function(input)
-                            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                                HFrameDown:set(true)
-                                local connection
-                                connection = input.Changed:Connect(function()
-                                    if input.UserInputState == Enum.UserInputState.End then
-                                        HFrameDown:set(false)
-                                        connection:Disconnect()
-                                    end
-                                end)
-                            end
-                        end,
-
-                        [children] = {
-                            new "UIGradient" {
-                                Rotation = 90,
-                                Color = ColorSequence.new({
-                                    ColorSequenceKeypoint.new(0, Color3.fromHSV(1, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.1, Color3.fromHSV(0.9, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.2, Color3.fromHSV(0.8, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.3, Color3.fromHSV(0.7, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.4, Color3.fromHSV(0.6, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0.5, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.6, Color3.fromHSV(0.4, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.7, Color3.fromHSV(0.3, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.8, Color3.fromHSV(0.2, 1, 1)),
-                                    ColorSequenceKeypoint.new(0.9, Color3.fromHSV(0.1, 1, 1)),
-                                    ColorSequenceKeypoint.new(1, Color3.fromHSV(0, 1, 1)),
-                                })
-                            },
-                            new "Frame" {
-                                Name = "slide",
-                                AnchorPoint = Vector2.new(0,0.5),
-                                Size = UDim2.new(1,0,0,2),
-                                Position = computed(function()
-                                    return UDim2.fromScale(0,1-get(hueValue))
-                                end)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    observe(SVFrameDown):onChange(function()
-        if get(SVFrameDown) then
-            SVFrameConnection = RunSerivce.Heartbeat:Connect(function()
-                local SatuarationValue = (UserInputService:GetMouseLocation() - colorPicker:FindFirstChild("SVPicker", true).AbsolutePosition)
-                SatuarationValue = Vector2.new(math.clamp(SatuarationValue.X, 0, 110), math.clamp(SatuarationValue.Y, 0, 110))
-                saturationValue:set(SatuarationValue.X/110)
-                valueValue:set((110-SatuarationValue.Y)/110)
-            end)
-        else
-            if SVFrameConnection then
-                SVFrameConnection:Disconnect()
-            end
-        end
-    end)
-    observe(HFrameDown):onChange(function()
-        if get(HFrameDown) then
-            HFrameConnection = RunSerivce.Heartbeat:Connect(function()
-                local Hue = (UserInputService:GetMouseLocation() - colorPicker:FindFirstChild("HPicker", true).AbsolutePosition)
-                Hue = Vector2.new(Hue.X, math.clamp(Hue.Y, 0, 110))
-                hueValue:set((110-Hue.Y)/110)
-            end)
-        else
-            if HFrameConnection then
-                HFrameConnection:Disconnect()
-            end
-        end
-    end)
-    observe(hueValue):onChange(function()
-        task.spawn(get(callback), generateColor())
-    end)
-    observe(saturationValue):onChange(function()
-        task.spawn(get(callback), generateColor())
-    end)
-    observe(valueValue):onChange(function()
-        task.spawn(get(callback), generateColor())
-    end)
-
-    local returnFunctions = {}
-    function returnFunctions:Lock(reason)
-		isLocked:set(true)
-        isDropped:set(false)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-    function returnFunctions:Remove()
-        colorPicker:Destroy()
-    end
-    function returnFunctions:SetColor(newColor)
-        setCreatedColor(newColor)
-    end
-    return returnFunctions
-end
-end)() end,
-    [76] = function()local wax,script,require=ImportGlobals(76)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local ref = Fusion.Ref
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-local mathModule = require(project.Bundles.betterMathModule)
-
-return function(dropdownProperty)
-	assert(dropdownProperty.Name, ":Dropdown missing property Name")
-	assert(typeof(dropdownProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(dropdownProperty.Name)))
-	assert(dropdownProperty.Callback, ":Dropdown missing property Callback")
-	assert(typeof(dropdownProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(dropdownProperty.Callback)))
-	assert(dropdownProperty.Items, ":Dropdown missing property Items")
-	assert(typeof(dropdownProperty.Items) == "table" or typeof(dropdownProperty.Items) == "Instance", ("Callback accepts type table got %s"):format(typeof(dropdownProperty.Items)))
-	if dropdownProperty.Multiselect then
-		assert(typeof(dropdownProperty.Multiselect) == "boolean", ("Multiselect accepts type boolean got %s"):format(typeof(dropdownProperty.Multiselect)))
-	end
-	if dropdownProperty.Default then
-		assert((typeof(dropdownProperty.Default) == "string" or typeof(dropdownProperty.Default) == "table"), ("Default accepts type string or table got %s"):format(typeof(dropdownProperty.Default)))
-	end
-
-	local defaultSelected = value(dropdownProperty.Default)
-	local dropdownName = value(dropdownProperty.Name)
-	local items
-	if typeof(dropdownProperty.Items) == "table" then
-		items = value(dropdownProperty.Items)
-	else
-		items = dropdownProperty.Items
-	end
-	local callback = value(dropdownProperty.Callback)
-	local multiselect = value(dropdownProperty.Multiselect or false)
-
-	local tabColor = dropdownProperty.tabColor or nil
-
-	local itemTable = value({})
-	local multiTable = {}
-	local defaultName = value(get(dropdownName))
-
-	local selectedAmount = value(0)
-	local selectedItem = value("")
-
-	local itemsRef,searchBoxRef = value(), value()
-	local down = value(false)
-	local open = value(false)
-	local searchText = value("")
-	local itemsWithFunctions = {}
-	local isLocked = value(false)
-	local lockReason = value("")
-	local oldOpen = value(false)
-
-	local newDropdown = new "Frame" {
-		ClipsDescendants = true,
-
-		Parent = dropdownProperty.Parent,
-		Name = get(defaultName),
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-		Size = animate(function()
-			if get(open) then
-				return UDim2.new(1,0,0,174)
-			end
-			return UDim2.new(1,0,0,40)
-		end,50,1),
-
-		[children] = {
-			{ -- Lock
-				new "UICorner" {CornerRadius = UDim.new(0,6)},
-				new "Frame" {
-					ZIndex = 2,
-					Size = UDim2.fromScale(1,1),
-					AnchorPoint = Vector2.new(0.5,0),
-					Position = UDim2.fromScale(0.5,0),
-
-					BackgroundColor3 = animate(function()
-						return tabColor or theme.get("defaultTab")
-					end,40,1),
-					BackgroundTransparency = animate(function()
-						if get(down) then
-							return 0.95
-						end
-						return 0.85
-					end,50,1),
-
-					[children] = {
-						new "UICorner" {CornerRadius = UDim.new(0,6)}
-					}
-				},
-				new "TextLabel" {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1,-45,0,14),
-					AnchorPoint = Vector2.new(0,0),
-					Position = UDim2.new(0,10,0,13),
-					Font = Enum.Font.Gotham,
-					TextScaled = true,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-
-					Text = computed(function()
-						return get(dropdownName)
-					end),
-					TextColor3 = animate(function()
-						return theme.get("text")
-					end,40,1),
-					TextTransparency = animate(function()
-						if get(down) then
-							return 0.35
-						end
-						return 0
-					end,50,1),
-
-					[children] = {
-						new "UITextSizeConstraint" {
-							MinTextSize = 1,
-							MaxTextSize = 14
-						}
-					}
-				},
-				new "ImageLabel" {
-					Name = "icon",
-					AnchorPoint = Vector2.new(1,0),
-					Position = UDim2.new(1,-5,0,6),
-					Size = UDim2.fromOffset(28,28),
-					BackgroundTransparency = 1,
-					Image = icons['dropdown'],
-
-					ImageColor3 = animate(function()
-						return theme.get("image")
-					end,40,1),
-					ImageTransparency = animate(function()
-						if get(down) then
-							return 0.35
-						end
-						return 0
-					end,50,1),
-				},
-				{ -- Lock
-					new "Frame" {
-						ZIndex = 3,
-						Visible = computed(function()
-							return get(isLocked)
-						end),
-						Size = UDim2.fromScale(1,1),
-						BackgroundTransparency = 0.1,
-						BackgroundColor3 = animate(function()
-							return theme.get("tertiaryBackground")
-						end,40,1),
-	
-						[children] = {
-							new "ImageLabel" {
-								AnchorPoint = Vector2.new(0,0.5),
-								Size = UDim2.fromOffset(24,24),
-								Position = UDim2.new(0,10,0.5),
-								BackgroundTransparency = 1,
-								ImageColor3 = animate(function()
-									return theme.get("image")
-								end,40,1),
-								Image = icons['lock']
-							},
-							new "TextLabel" {
-								Text = computed(function()
-									return get(lockReason)
-								end),
-								AnchorPoint = Vector2.new(0,0.5),
-								Position = UDim2.new(0,44,0.5,0),
-								Size = UDim2.new(1,-54,0,16),
-								Font = Enum.Font.GothamBold,
-								BackgroundTransparency = 1,
-								TextColor3 = animate(function()
-									return theme.get("text")
-								end,40,1),
-								TextSize = 16,
-								TextScaled = true,
-								TextXAlignment = Enum.TextXAlignment.Left,
-	
-								[children] = {
-									new "UITextSizeConstraint" {
-										MinTextSize = 1,
-										MaxTextSize = 16
-									}
-								}
-							},
-							new "UICorner" {CornerRadius = UDim.new(0,6)},
-						}
-					}
-				}
-			},
-			new "TextButton" { -- Button
-				Interactable = computed(function()
-					return not get(isLocked)
-				end),
-				Size = UDim2.new(1,0,0,40),
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(0.5,0),
-				Position = UDim2.fromScale(0.5,0),
-
-				[onevent "MouseButton1Down"] = function()
-					down:set(true)
-				end,
-				[onevent "MouseButton1Up"] = function()
-					down:set(false)
-				end,
-				[onevent "MouseLeave"] = function()
-					down:set(false)
-				end,
-				[onevent "Activated"] = function()
-					open:set(not get(open))
-				end,
-			},
-			new "TextBox" { -- Search
-				Name = "searchBox",
-				Size = UDim2.new(1,-16,0,28),
-				Position = UDim2.new(0.5,0,0,40),
-				Text = "",
-				AnchorPoint = Vector2.new(0.5,0),
-				PlaceholderText = "Search",
-				Font = Enum.Font.GothamMedium,
-				TextSize = 16,
-				TextXAlignment = Enum.TextXAlignment.Left,
-
-				BackgroundColor3 = animate(function()
-					return tabColor or theme.get("defaultTab")
-				end,40,1),
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				PlaceholderColor3 = animate(function()
-					return theme.get("placeholder")
-				end,40,1),
-				BackgroundTransparency = animate(function()
-					if get(down) then
-						return 0.95
-					end
-					return 0.8
-				end,50,1),
-				TextTransparency = animate(function()
-					if get(down) then
-						return 0.35
-					end
-					return 0
-				end,50,1),
-
-				[onevent "Changed"] = function(dropdownPropertyerty)
-					if dropdownPropertyerty == "Text" then
-						local searchBox = get(searchBoxRef)
-						local items = get(itemsRef)
-						searchText:set(string.lower(searchBox.Text))
-
-						if get(searchText) ~= "" then
-							for _,item in ipairs(items:GetChildren()) do
-								if get(searchText) == "" then break end
-								if item:IsA("TextButton") then
-									local result = mathModule.String:JaroWinklerDistance({get(searchText), item.Name})
-									if result < 0.45 then
-										item.Visible = true
-									else
-										item.Visible = false
-									end
-								end
-								task.wait()
-							end
-						else
-							for _,item in ipairs(items:GetChildren()) do
-								if item:IsA("TextButton") then
-									item.Visible = true
-								end
-							end
-						end
-					end
-				end,
-
-				[ref] = searchBoxRef,
-
-				[children] = {
-					{
-						new "UICorner" {
-							CornerRadius = UDim.new(0,4)
-						},
-						new "UIPadding" {
-							PaddingLeft = UDim.new(0,10)
-						}
-					}
-				}
-			},
-			new "ScrollingFrame" { -- Items
-				Name = "Items",
-				Size = UDim2.new(1,0,0,94),
-				BackgroundTransparency = 1,
-				ScrollBarThickness = 2,
-				Position = UDim2.new(0.5,0,0,72),
-				AnchorPoint = Vector2.new(0.5,0),
-				CanvasSize = UDim2.new(0,0,0,0),
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-				ScrollBarImageColor3 = animate(function()
-					return tabColor or theme.get("defaultTab")
-				end,40,1),
-
-				[ref] = itemsRef,
-
-				[children] = {
-					new "UIListLayout" {
-						Padding = UDim.new(0,2),
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						SortOrder = Enum.SortOrder.LayoutOrder
-					}
-				}
-			}
-		}
-	}
-	observe(items):onChange(function()
-		for _,c in ipairs(get(itemsRef):GetChildren()) do
-			if c:IsA("TextButton") then
-				c:Destroy()
-			end
-		end
-		itemTable:set(get(items))
-		multiTable = {}
-		itemsWithFunctions = {}
-		selectedItem:set("")
-		dropdownName:set(get(defaultName))
-	end)
-
-	observe(itemTable):onChange(function()
-		local tableToSet = {}
-		dropdownName:set(get(defaultName))
-		selectedAmount:set(0)
-
-		for _,item in ipairs(get(itemTable)) do
-			local hover = value(false)
-			local isSelected = value(false)
-			observe(isSelected):onChange(function()
-				if get(multiselect) then
-					if get(isSelected) then
-						selectedAmount:set(get(selectedAmount) + 1)
-					else
-						selectedAmount:set(get(selectedAmount) - 1)
-					end
-					dropdownName:set(get(defaultName)..": "..tostring(get(selectedAmount)).."/"..tostring(#get(items)))
-				else
-					dropdownName:set(get(defaultName)..": "..get(selectedItem))
-				end
-			end)
-			observe(selectedItem):onChange(function()
-				if not get(multiselect) then
-					if get(selectedItem) == item then
-						isSelected:set(true)
-					else
-						isSelected:set(false)
-					end
-				end
-			end)
-
-			local itemComponent = new "TextButton" {
-				Size = UDim2.new(0.95,0,0,30),
-
-				Name = item,
-				Parent = get(itemsRef),
-				BackgroundColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				BackgroundTransparency = animate(function()
-					if get(hover) then
-						return 0.95
-					end
-					return 1
-				end,50,1),
-
-				[onevent "MouseEnter"] = function()
-					hover:set(true)
-				end,
-				[onevent "MouseLeave"] = function()
-					hover:set(false)
-				end,
-				[onevent "Activated"] = function()
-					if get(multiselect) then
-						if get(isSelected) then
-							isSelected:set(false)
-							table.remove(multiTable,table.find(multiTable,item))
-						else
-							isSelected:set(true)
-							table.insert(multiTable,item)
-						end
-						task.spawn(get(callback), multiTable)
-					else
-						open:set(false)
-						selectedItem:set(item)
-						task.spawn(get(callback), get(selectedItem))
-					end
-				end,
-				[children] = {
-					new "UICorner" {CornerRadius = UDim.new(0,6)},
-					new "TextLabel" {
-						Size = UDim2.new(1,0,0,12),
-						BackgroundTransparency = 1,
-						Position = UDim2.fromScale(0.5,0.5),
-						AnchorPoint = Vector2.new(0.5,0.5),
-						Font = Enum.Font.Gotham,
-						TextSize = 12,
-						TextXAlignment = Enum.TextXAlignment.Left,
-
-						Text = item,
-						TextColor3 = animate(function()
-							if get(multiselect) then
-								if get(isSelected) and not get(hover) then
-									return Color3.fromRGB(85, 220, 135)
-								elseif get(isSelected) and get(hover) then
-									return Color3.fromRGB(190, 100, 105)
-								else
-									return theme.get("text")
-								end
-							end
-							return theme.get("text")
-						end,30,1),
-						TextTransparency = animate(function()
-							if get(down) then
-								return 0.35
-							end
-							return 0
-						end,50,1),
-
-						[children] = {
-							new "UIPadding" {PaddingLeft = UDim.new(0,20)},
-						}
-					}
-				}
-			}
-
-			if typeof(get(defaultSelected)) == "table" and get(multiselect) then
-				for _,s in ipairs(get(defaultSelected)) do
-					if s == item then
-						isSelected:set(true)
-						table.insert(multiTable,item)
-					end
-				end
-			elseif typeof(get(defaultSelected)) == "string" then
-				if get(defaultSelected) == item then
-					if get(multiselect) then
-						isSelected:set(true)
-						table.insert(multiTable,item)
-					else
-						selectedItem:set(get(defaultSelected))
-						task.spawn(get(callback), get(selectedItem))
-					end
-				end
-			end
-			itemsWithFunctions[item] = function(selectValue)
-				isSelected:set(selectValue)
-			end
-		end
-		if get(multiselect) and  #multiTable > 0 then
-			task.spawn(get(callback), multiTable)
-		end
-	end)
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newDropdown:Destroy()
-	end
-	function returnFunctions:SetItems(newTable)
-		if typeof(newTable) == "table" then
-			itemTable:set(newTable)
-		else
-			error("You didn't give "..get(defaultName).." a table for SetItems")
-		end
-	end
-	function returnFunctions:SelectItem(item)
-		if not get(multiselect) then
-			if typeof(item) == "string" then
-				local isInTable = false
-				for _,v in ipairs(get(itemTable)) do
-					if v == item then
-						isInTable = true
-					end
-				end
-				if isInTable then
-					selectedItem:set(item)
-					for _,v in ipairs(itemsWithFunctions) do
-						v(false)
-					end
-					itemsWithFunctions[item](true)
-					task.spawn(get(callback), get(selectedItem))
-				else
-					error(item.." isn't in your Item table")
-				end
-			else
-				error("You tried to pass a "..typeof(item).." as a string for SelectItem")
-			end
-		else
-			error(get(defaultName).." is multiselectable. Use SelectItems")
-		end
-	end
-	function returnFunctions:SelectItems(newSelecteds)
-		if get(multiselect) then
-			if typeof(newSelecteds) == "table" then
-				local areInTable = {}
-				for _,v in ipairs(newSelecteds) do
-					if table.find(get(itemTable), v) then
-						table.insert(areInTable, v)
-					else
-						warn(v.." isn't in the Items table")
-					end
-				end
-				task.wait()
-				for _,v in ipairs(areInTable) do
-					itemsWithFunctions[v](true)
-				end
-				task.spawn(get(callback), areInTable)
-				multiTable = areInTable
-			else
-				error("You tried to pass a "..typeof(newSelecteds).." as a table for SelectItems")
-			end
-		else
-			error(get(defaultName).." isn't multiselectable. Use SelectItems")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		oldOpen:set(get(open))
-		lockReason:set(reason or "Locked")
-		open:set(false)
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-		open:set(get(oldOpen))
-	end
-	return returnFunctions
-end
-end)() end,
-    [77] = function()local wax,script,require=ImportGlobals(77)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(groupProperty)
-    assert(groupProperty.Name, ":Group missing property Name")
-	assert(typeof(groupProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(groupProperty.Name)))
-    if groupProperty.Icon then
-        assert(typeof(groupProperty.Icon) == "string", ("Icon accepts type string got %s"):format(typeof(groupProperty.Icon)))
-    end
-
-    local name = value(groupProperty.Name)
-    local icon = value(groupProperty.Icon or "")
-
-    local tabColor = groupProperty.tabColor or nil
-
-    local size = value(40)
-    local isClosed = value(false)
-    local isLocked = value(false)
-    local oldisClosed = value(false)
-    local lockReason = value("")
-    local hasImage = value(false)
-
-    local newGroup = new "TextButton" {
-        ZIndex = 2,
-        Parent = groupProperty.Parent,
-        ClipsDescendants = true,
-        Size = computed(function()
-            if get(isClosed) then
-                return UDim2.new(1,0,0,40)
-            end
-            return UDim2.new(1,0,0,get(size))
-        end),
-        BackgroundTransparency = animate(function()
-            if get(isClosed) then
-                return 0
-            end
-            return 1
-        end,30,1),
-        BackgroundColor3 = animate(function()
-            if get(isClosed) then
-                return theme.get("secondaryBackground")
-            end
-            return theme.get("background")
-        end,30,1),
-
-        [onevent "Activated"] = function()
-            isClosed:set(not get(isClosed))
-        end,
-
-        [children] = {
-            { -- Lock
-				new "Frame" {
-					ZIndex = 3,
-                    Name = "Lock",
-					Visible = computed(function()
-						return get(isLocked)
-					end),
-					Size = UDim2.fromScale(1,1),
-					BackgroundTransparency = 0.1,
-					BackgroundColor3 = animate(function()
-						return theme.get("tertiaryBackground")
-					end,40,1),
-
-					[children] = {
-						new "ImageLabel" {
-							AnchorPoint = Vector2.new(0,0.5),
-							Size = UDim2.fromOffset(24,24),
-							Position = UDim2.new(0,10,0.5),
-							BackgroundTransparency = 1,
-							ImageColor3 = animate(function()
-								return theme.get("image")
-							end,40,1),
-							Image = icons['lock']
-						},
-						new "TextLabel" {
-							Text = computed(function()
-								return get(lockReason)
-							end),
-							AnchorPoint = Vector2.new(0,0.5),
-							Position = UDim2.new(0,44,0.5,0),
-							Size = UDim2.new(1,-54,0,16),
-							Font = Enum.Font.GothamBold,
-							BackgroundTransparency = 1,
-							TextColor3 = animate(function()
-								return theme.get("text")
-							end,40,1),
-							TextSize = 16,
-							TextScaled = true,
-							TextXAlignment = Enum.TextXAlignment.Left,
-
-							[children] = {
-								new "UITextSizeConstraint" {
-									MinTextSize = 1,
-									MaxTextSize = 16
-								}
-							}
-						},
-						new "UICorner" {CornerRadius = UDim.new(0,6)},
-					}
-				}
-			},
-            new "UICorner" {CornerRadius = UDim.new(0,4)},
-            new "TextLabel" {
-                Text =  computed(function()
-                    return get(name)
-                end),
-                TextColor3 = animate(function()
-                    if get(isClosed) then
-                        return theme.get("text")
-                    end
-                    return tabColor or theme.get("defaultTab")
-                end,40,1),
-                BackgroundTransparency = 1,
-                Font = Enum.Font.GothamMedium,
-                Size = computed(function()
-                    if get(hasImage) then
-                        return UDim2.new(1,-54,0,16)
-                    end
-                    return UDim2.new(1,-20,0,16)
-                end),
-                TextSize = 16,
-                Position = computed(function()
-                    if get(hasImage) then
-                        return UDim2.fromOffset(44,12)
-                    end
-                    return UDim2.fromOffset(10,12)
-                end),
-                AnchorPoint = Vector2.new(0,0),
-                TextXAlignment = Enum.TextXAlignment.Left
-            },
-            new "ImageLabel" {
-                Visible = computed(function()
-                    if get(hasImage) then
-                        return true
-                    end
-                    return false
-                end),
-                BackgroundTransparency = 1,
-                ImageColor3 = animate(function()
-                    return theme.get("image")
-                end,40,1),
-                Image = computed(function()
-                    if get(hasImage) then
-                        return get(icon)
-                    end
-                    return ""
-                end),
-                Size = UDim2.fromOffset(24,24),
-                Position = UDim2.fromOffset(10,8)
-            },
-            new "Frame" {
-                BackgroundTransparency = 1,
-                Size = UDim2.fromOffset(24,24),
-                Position = UDim2.new(1,-34,0,8),
-
-                [children] = {
-                    new "ImageLabel" {
-                        AnchorPoint = Vector2.new(0.5,0.5),
-                        BackgroundTransparency = 1,
-                        Size = UDim2.fromScale(1,1),
-                        Position = UDim2.fromScale(0.5,0.5),
-                        ImageColor3 = animate(function()
-                            if get(isClosed) then
-                                return theme.get("image")
-                            end
-                            return tabColor or theme.get("defaultTab")
-                        end,40,1),
-                        Image = icons['chevron'],
-                        Rotation = animate(function()
-                            if get(isClosed) then
-                                return 0
-                            end
-                            return 180
-                        end,30,1)
-                    }
-                }
-            },
-            new "Frame" {
-                Name = "componentHolder",
-                Size = computed(function()
-                    return UDim2.new(1,0,0,get(size) - 40)
-                end),
-                Position = UDim2.fromOffset(0,40),
-                BackgroundTransparency = 1,
-
-                [onevent "ChildAdded"] = function(child)
-                    if typeof(child) == "Instance" and not child:IsA("UIListLayout") then
-                        local oldY = child.AbsoluteSize.Y
-                        size:set(get(size) + child.AbsoluteSize.Y + 5)
-                        --print(get(size), child.Name)
-
-                        child.Changed:Connect(function(groupPropertyerty)
-                            if groupPropertyerty:lower() == "absolutesize" then
-                                if oldY ~= math.round(child.AbsoluteSize.Y) then
-                                    size:set(get(size) - oldY + math.round(child.AbsoluteSize.Y))
-                                    oldY = math.round(child.AbsoluteSize.Y)
-                                end
-                            end
-                        end)
-                    end
-                end,
-
-                [children] = {
-                    new "UIListLayout" {
-                        Padding = UDim.new(0,5),
-                        SortOrder = Enum.SortOrder.LayoutOrder,
-                        FillDirection = Enum.FillDirection.Vertical,
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
-                        VerticalAlignment = Enum.VerticalAlignment.Top
-                    },
-                    new "UIPadding" {
-                        PaddingLeft = UDim.new(0,5),
-                        PaddingRight = UDim.new(0,5),
-                    }
-                }
-            }
-        }
-    }
-    if get(icon) ~= "" then
-        hasImage:set(true)
-    end
-
-    local returnFunctions = {}
-    function returnFunctions:SetName(n)
-        if typeof(n) == "string" then
-            name:set(n)
-        else
-            error("You entered a "..typeof(n).." instead of a string")
-        end
-    end
-    function returnFunctions:SetIcon(n)
-        if typeof(n) == "string" then
-            icon:set(n)
-        else
-            error("You entered a "..typeof(n).." instead of a string")
-        end
-    end
-    function returnFunctions:Lock(reason)
-		isLocked:set(true)
-        oldisClosed:set(get(isClosed))
-        isClosed:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-        isClosed:set(get(oldisClosed))
-	end
-    return newGroup.componentHolder,returnFunctions
-end
-end)() end,
-    [78] = function()local wax,script,require=ImportGlobals(78)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local services = require(project.Bundles.services)
-local UserInputService = services.UserInputService
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local ref = Fusion.Ref
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-local connections = require(project.utilities.connections)
-
-return function(keybindProperty)
-	assert(keybindProperty.Name, ":Keybind missing property Name")
-	assert(typeof(keybindProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(keybindProperty.Name)))
-	assert(keybindProperty.Callback, ":Keybind missing property Callback")
-	assert(typeof(keybindProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(keybindProperty.Callback)))
-	assert(keybindProperty.Default, ":Keybind missing property Default")
-	assert(typeof(keybindProperty.Default) == "string", ("Default accepts type string got %s"):format(typeof(keybindProperty.Default)))
-
-	local name = value(keybindProperty.Name)
-	local callback = value(keybindProperty.Callback)
-	local bind = value(string.upper(keybindProperty.Default))
-
-	local tabColor = keybindProperty.tabColor or nil
-
-	local textRef = value()
-	local focused = value(false)
-	local isLocked = value(false)
-	local lockReason = value("")
-
-	local returnFunctions = {}
-
-	local newKeybind = new "TextButton" {
-		Interactable = computed(function()
-			return not get(isLocked)
-		end),
-		Size = UDim2.new(1,0,0,40),
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-		Parent = keybindProperty.Parent,
-
-		[onevent "MouseButton1Click"] = function()
-			local textBox = get(textRef)
-			textBox:CaptureFocus()
-		end,
-
-		[children] = {
-			{
-				{ -- Lock
-					new "Frame" {
-						ZIndex = 4,
-						Visible = computed(function()
-							return get(isLocked)
-						end),
-						Size = UDim2.fromScale(1,1),
-						BackgroundTransparency = 0.1,
-						BackgroundColor3 = animate(function()
-							return theme.get("tertiaryBackground")
-						end,40,1),
-
-						[children] = {
-							new "ImageLabel" {
-								AnchorPoint = Vector2.new(0,0.5),
-								Size = UDim2.fromOffset(24,24),
-								Position = UDim2.new(0,10,0.5),
-								BackgroundTransparency = 1,
-								ImageColor3 = animate(function()
-									return theme.get("image")
-								end,40,1),
-								Image = icons['lock']
-							},
-							new "TextLabel" {
-								Text = computed(function()
-									return get(lockReason)
-								end),
-								AnchorPoint = Vector2.new(0,0.5),
-								Position = UDim2.new(0,44,0.5,0),
-								Size = UDim2.new(1,-54,0,16),
-								Font = Enum.Font.GothamBold,
-								BackgroundTransparency = 1,
-								TextColor3 = animate(function()
-									return theme.get("text")
-								end,40,1),
-								TextSize = 16,
-								TextScaled = true,
-								TextXAlignment = Enum.TextXAlignment.Left,
-
-								[children] = {
-									new "UITextSizeConstraint" {
-										MinTextSize = 1,
-										MaxTextSize = 16
-									}
-								}
-							},
-							new "UICorner" {CornerRadius = UDim.new(0,6)},
-						}
-					}
-				},
-				new "UICorner" {CornerRadius = UDim.new(0,6)},
-				new "Frame" {
-					ZIndex = 2,
-					Size = UDim2.new(1,0,1,0),
-					AnchorPoint = Vector2.new(0.5,0.5),
-					Position = UDim2.new(0.5,0,0.5,0),
-					BackgroundTransparency = 0.85,
-
-					BackgroundColor3 = animate(function()
-						return tabColor or theme.get("defaultTab")
-					end,40,1),
-
-					[children] = {
-						new "UICorner" {
-							CornerRadius = UDim.new(0,6)
-						}
-					}
-				},
-				new "TextLabel" {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1,-60,0,14),
-					AnchorPoint = Vector2.new(0,0.5),
-					Position = UDim2.new(0,10,0.5,0),
-					Font = Enum.Font.Gotham,
-					TextScaled = true,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTransparency = 0,
-
-					Text = get(name),
-					TextColor3 = animate(function()
-						return theme.get("text")
-					end,40,1),
-
-					[children] = {
-						new "UITextSizeConstraint" {
-							MinTextSize = 1,
-							MaxTextSize = 14
-						},
-					}
-				},
-				new "Frame" {
-					ZIndex = 3,
-					Size = UDim2.new(0,30,0,24),
-					AnchorPoint = Vector2.new(1,0.5),
-					Position = UDim2.new(1,-10,0.5,0),
-					BackgroundTransparency = 0.25,
-
-					BackgroundColor3 = animate(function()
-						return theme.get("secondaryBackground")
-					end,40,1),
-
-					[children] = {
-						new "UICorner" {
-							CornerRadius = UDim.new(0,6)
-						},
-					}
-				}
-			},
-			new "TextBox" {
-				Interactable = computed(function()
-					return not get(isLocked)
-				end),
-				ZIndex = 3,
-				AnchorPoint = Vector2.new(1,0.5),
-				Position = UDim2.new(1,-10,0.5,0),
-				Size = UDim2.new(0,30,0,12),
-				BackgroundTransparency = 1,
-				TextXAlignment = Enum.TextXAlignment.Center,
-				PlaceholderText = ". . .",
-				Font = Enum.Font.Gotham,
-				TextSize = 12,
-
-				PlaceholderColor3 = animate(function()
-					return theme.get("placeholder")
-				end,40,1),
-				TextColor3 = animate(function()
-					if get(focused) then
-						return theme.get("text")
-					end
-					return tabColor or theme.get("defaultTab")
-				end,50,1),
-				Text = computed(function()
-					return get(bind)
-				end),
-
-				[onevent "Focused"] = function()
-					focused:set(true)
-					bind:set("")
-				end,
-				[onevent "FocusLost"] = function()
-					focused:set(false)
-				end,
-
-				[ref] = textRef
-			}
-		}
-	}
-	local connectedFunction = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if get(focused) then
-			if input.KeyCode ~= Enum.KeyCode.Unknown then
-				local tmp = string.split(tostring(input.KeyCode), ".")
-				bind:set(tmp[3])
-				get(textRef):ReleaseFocus()
-			end
-		elseif not gameProcessed and (get(bind) ~= "") and (input.KeyCode == Enum.KeyCode[get(bind)]) and newKeybind then
-			if not get(isLocked) then
-				task.spawn(get(callback))
-			end
-		end
-	end)
-	connections.add(connectedFunction)
-
-	function returnFunctions:Remove()
-		newKeybind:Destroy()
-		connectedFunction:Disconnect()
-	end
-	function returnFunctions:SetBind(newBind: string)
-		if typeof(newBind) == "string" then
-			bind:set(string.upper(newBind))
-		else
-			error("you didnt give "..get(name).." a string for SetBind!")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-	return returnFunctions
-end
-end)() end,
-    [79] = function()local wax,script,require=ImportGlobals(79)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local animate = require(project.utilities.animate)
-local theme = require(project.Bundles.themeSystem)
-local lerpColor = require(project.utilities.lerpColor)
-
-return function(labelProperty)
-	assert(labelProperty.Text, "Label missing property Text")
-
-	local textValue
-	if typeof(labelProperty.Text) == "string" then
-		textValue = value(labelProperty.Text)
-	else
-		textValue = labelProperty.Text
-	end
-
-	local tabColor = labelProperty.tabColor or nil
-
-	local newTextLabel = new "Frame" {
-		Size = UDim2.new(1,0,0,30),
-		Parent = labelProperty.Parent,
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-
-		[children] = {
-			new "UICorner" {CornerRadius = UDim.new(0,4)},
-			new "TextLabel" {
-				ZIndex = 2,
-				Font = Enum.Font.GothamMedium,
-				TextSize = 14,
-				RichText = true,
-				TextScaled = true,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1,-20,0,14),
-				Position = UDim2.new(0,10,0.5,0),
-				AnchorPoint = Vector2.new(0,0.5),
-				TextXAlignment = Enum.TextXAlignment.Left,
-
-				TextColor3 = animate(function()
-					return lerpColor(tabColor or theme.get("defaultTab"), "white", 0.5)
-				end,40,1),
-				Text = computed(function()
-					return get(textValue)
-				end),
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MinTextSize = 1,
-						MaxTextSize = 14
-					}
-				}
-			}
-		}
-	}
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newTextLabel:Destroy()
-	end
-	function returnFunctions:SetText(newText)
-		if typeof(newText) == "string" then
-			textValue:set(newText)
-		else
-			error("you didnt give "..get(textValue).." a string for SetText!")
-		end
-	end
-
-	return returnFunctions
-end
-end)() end,
-    [80] = function()local wax,script,require=ImportGlobals(80)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local tween = require(project.utilities.tween)
-local getStringBounds = require(project.utilities.getStringBounds)
-
-local function roundTo(decimal, number)
-    local point = 1
-    for i=1,decimal do
-        point = point*10
-    end
-    local stringed = tostring(math.round(number*point)/point)
-    local tstringed = string.split(stringed, ".")
-    if #tstringed == 1 then
-        local zeros = ""
-        for i=1,decimal do
-            zeros = zeros.."0"
-        end
-        stringed = stringed.."."..zeros
-    end
-    return stringed
-end
-
-return function(notificationProperty)
-    assert(notificationProperty.Title, "Notify needs a Title")
-	assert(typeof(notificationProperty.Title) == "string", ("Title accepts type string got %s"):format(typeof(notificationProperty.Title)))
-    assert(notificationProperty.Body, "Notfiy needs a Body")
-    assert(typeof(notificationProperty.Body) == "string", ("Body accepts type string got %s"):format(typeof(notificationProperty.Body)))
-    assert(notificationProperty.Duration, "Notify needs a Duration")
-    assert(typeof(notificationProperty.Duration) == "number", ("Duration accepts type number got %s"):format(typeof(notificationProperty.Duration)))
-
-    local parent = value(notificationProperty.Parent)
-
-    local title = value(notificationProperty.Title)
-    local body = value(notificationProperty.Body)
-    local duration = value(notificationProperty.Duration)
-    local bodySize = value(getStringBounds(notificationProperty.Body, {
-        TextSize = 13,
-        Font = Enum.Font.Gotham,
-        VectorSize = Vector2.new(230,1000)
-    }).Y)
-    local loaded = value(false)
-    local resized = value(false)
-    local tickText = value("")
-
-    local newNotification
-
-    newNotification = new "Frame" {
-        AnchorPoint = Vector2.new(0,0.5),
-        BackgroundTransparency = 1,
-
-        Parent = get(parent),
-        Size = animate(function()
-            if get(loaded) then
-                task.delay(0.4,function()
-                    resized:set(true)
-                end)
-                return UDim2.fromOffset(230,25 + get(bodySize) + 15)
-            end
-            return UDim2.fromOffset(230,0)
-        end,20,1),
-
-        [children] = {
-            new "TextButton" {
-                AnchorPoint = Vector2.new(0,0.5),
-                BackgroundTransparency = 0,
-
-                BackgroundColor3 = animate(function()
-                    return theme.get("background")
-                end,40,1),
-                Size = computed(function()
-                    return UDim2.fromOffset(230,25 + get(bodySize) + 15)
-                end),
-                Position = animate(function()
-                    if get(resized) then
-                        return UDim2.fromScale(0,0.5)
-                    end
-                    return UDim2.fromScale(1.2,0.5)
-                end,30,1),
-
-                [onevent "Activated"] = function()
-                    resized:set(false)
-                    task.wait(0.4)
-                    loaded:set(false)
-                    task.wait(2)
-                    newNotification:Destroy()
-                end,
-
-                [children] = {
-                    new "UICorner" {CornerRadius = UDim.new(0,4)},
-                    new "TextLabel" {
-                        Name = "Title",
-                        Size = UDim2.new(1,-5,0,18),
-                        Position = UDim2.new(0,5,0,5),
-                        BackgroundTransparency = 1,
-                        Font = Enum.Font.GothamMedium,
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        TextSize = 18,
-
-                        TextColor3 = animate(function()
-                            return theme.get("text")
-                        end,40,1),
-                        Text = get(title)
-                    },
-                    new "TextLabel" {
-                        Name = "Body",
-                        Size = UDim2.new(1,-8,0,get(bodySize)),
-                        Position = UDim2.fromOffset(8,25),
-                        BackgroundTransparency = 1,
-                        Font = Enum.Font.Gotham,
-                        TextSize = 13,
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        TextYAlignment = Enum.TextYAlignment.Top,
-                        TextTransparency = 0.2,
-                        TextWrapped = true,
-
-                        TextColor3 = animate(function()
-                            return theme.get("text")
-                        end,40,1),
-                        Text = get(body)
-                    },
-                    new "TextLabel" {
-                        Size = UDim2.fromOffset(100,10),
-                        AnchorPoint = Vector2.new(1,1),
-                        Position = UDim2.new(1,-5,1,-5),
-                        Text = computed(function()
-                            return get(tickText)
-                        end),
-                        TextColor3 = animate(function()
-                            return theme.get("text")
-                        end,40,1),
-                        BackgroundTransparency = 1,
-                        TextXAlignment = Enum.TextXAlignment.Right
-                    },
-                    new "Frame" {
-                        Name = "timer",
-                        ZIndex = 0,
-                        AnchorPoint = Vector2.new(0,1),
-                        Position = UDim2.fromScale(0,1),
-
-                        BackgroundColor3 = animate(function()
-                            return theme.get("text")
-                        end,40,1),
-                        Size = tween(function()
-                            if get(resized) then
-                                return UDim2.new(1,0,0,10)
-                            end
-                            return UDim2.new(0,0,0,10)
-                        end,TweenInfo.new(get(duration), Enum.EasingStyle.Linear)),
-
-                        [children] = {
-                            new "UICorner" {CornerRadius = UDim.new(0,4)},
-                            new "Frame" {
-                                AnchorPoint = Vector2.new(0.5,0),
-                                Size = UDim2.fromScale(1,0.6),
-                                Position = UDim2.fromScale(0.5,0),
-                                BackgroundColor3 = animate(function()
-                                    return theme.get("background")
-                                end,40,1)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    task.spawn(function()
-        repeat task.wait() until get(resized)
-        local startTick = tick()
-        local endTick
-        repeat
-            endTick = tick() - startTick
-            tickText:set(roundTo(1,math.clamp(endTick,0,get(duration))))
-            task.wait()
-        until endTick > get(duration)
-    end)
-    task.spawn(function()
-        task.wait()
-        loaded:set(true)
-        repeat task.wait() until get(resized)
-        task.wait(get(duration))
-        resized:set(false)
-        task.wait(0.4)
-        loaded:set(false)
-        task.wait(2)
-        newNotification:Destroy()
-    end)
-end
-end)() end,
-    [81] = function()local wax,script,require=ImportGlobals(81)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local getStringBounds = require(project.utilities.getStringBounds)
-local lerpColor = require(project.utilities.lerpColor)
-
-return function(paragraphProperty)
-	assert(paragraphProperty.Title, ":Paragraph missing property Title")
-	assert(typeof(paragraphProperty.Title) == "string", ("Title accepts type string got %s"):format(typeof(paragraphProperty.Title)))
-	assert(paragraphProperty.Body, ":Paragraph missing property Body")
-	assert(typeof(paragraphProperty.Body) == "string", ("Body accepts type string got %s"):format(typeof(paragraphProperty.Body)))
-
-	local titleValue = value(paragraphProperty.Title)
-	local bodyValue = value(paragraphProperty.Body)
-	local ySize = value(getStringBounds(get(bodyValue),{
-		Font = Enum.Font.Gotham,
-		VectorSize = Vector2.new(math.round(paragraphProperty.Parent.AbsoluteSize.X),1000),
-		TextSize = 12
-	}).Y)
-	paragraphProperty.Parent.Changed:Connect(function(paragraphPropertyerty)
-		if paragraphPropertyerty:lower() == "absolutesize" then
-			ySize:set(getStringBounds(get(bodyValue),{
-				Font = Enum.Font.Gotham,
-				VectorSize = Vector2.new(math.round(paragraphProperty.Parent.AbsoluteSize.X),1000),
-				TextSize = 12
-			}).Y)
-		end
-	end)
-	observe(bodyValue):onChange(function()
-		ySize:set(getStringBounds(get(bodyValue),{
-			Font = Enum.Font.Gotham,
-			VectorSize = Vector2.new(math.round(paragraphProperty.Parent.AbsoluteSize.X),1000),
-			TextSize = 12
-		}).Y)
-	end)
-
-	local newParagraph = new "Frame" {
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-		Parent = paragraphProperty.Parent,
-		Size = computed(function()
-			return UDim2.new(1,0,0,36 + get(ySize))
-		end),
-
-		[children] = {
-			new "UICorner" {
-				CornerRadius = UDim.new(0,4)
-			},
-			new "UIPadding" {
-				PaddingTop = UDim.new(0,10),
-				PaddingLeft = UDim.new(0,10),
-				PaddingRight = UDim.new(0,10)
-			},
-			new "TextLabel" {
-				Name = "Title",
-				RichText = true,
-				Position = UDim2.fromScale(0,0),
-				Size = UDim2.new(1,0,0,16),
-				BackgroundTransparency = 1,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				TextScaled = true,
-				TextSize = 16,
-				Font = Enum.Font.GothamMedium,
-
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				Text = computed(function()
-					return get(titleValue)
-				end),
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MinTextSize = 1,
-						MaxTextSize = 16
-					}
-				}
-			},
-			new "TextLabel" {
-				Name = "Body",
-				TextWrapped = true,
-				RichText = true,
-				Position = UDim2.fromOffset(4,16),
-				BackgroundTransparency = 1,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				TextSize = 12,
-				Font = Enum.Font.Gotham,
-
-				TextColor3 = animate(function()
-					return lerpColor(theme.get("text"),"black",0.1)
-				end,40,1),
-				Text = computed(function()
-					return get(bodyValue)
-				end),
-				Size = computed(function()
-					return UDim2.new(1,-4,0,get(ySize))
-				end),
-			}
-		}
-	}
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newParagraph:Destroy()
-	end
-	function returnFunctions:SetBody(newBody)
-		if typeof(newBody) == "string" then
-			bodyValue:set(newBody)
-		else
-			error("you didnt give "..get(titleValue).." a string for SetBody!")
-		end
-	end
-	function returnFunctions:SetTitle(newTitle)
-		if typeof(newTitle) == "string" then
-			titleValue:set(newTitle)
-		else
-			error("you didnt give "..get(titleValue).." a string for SetTitle!")
-		end
-	end
-	return returnFunctions
-end
-end)() end,
-    [82] = function()local wax,script,require=ImportGlobals(82)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local animate = require(project.utilities.animate)
-local theme = require(project.Bundles.themeSystem)
-
-return function(sectionProperty)
-	assert(sectionProperty.Text, "Section just put a string")
-	assert(typeof(sectionProperty.Text) == "string", "Section needs to literally be a string")
-
-	local textValue = value(sectionProperty.Text)
-	local returnFunctions = {}
-
-	local newSection = new "Frame" {
-		Size = UDim2.new(1,0,0,30),
-		BackgroundTransparency = 1,
-		Parent = sectionProperty.Parent,
-
-		[children] = {
-			new "TextLabel" {
-				Size = UDim2.new(1,0,0,15),
-				AnchorPoint = Vector2.new(0,0.5),
-				Position = UDim2.new(0,5,0.5,0),
-				BackgroundTransparency = 1,
-				TextScaled = true,
-				Font = Enum.Font.GothamMedium,
-				TextXAlignment = Enum.TextXAlignment.Left,
-
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				Text = computed(function()
-					return get(textValue)
-				end),
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MaxTextSize = 15,
-						MinTextSize = 1
-					},
-				}
-			}
-		}
-	}
-
-	function returnFunctions:Remove()
-		newSection:Destroy()
-	end
-	function returnFunctions:SetText(newText)
-		if typeof(newText) == "string" then
-			textValue:set(newText)
-		else
-			error("you didnt give "..get(textValue).." a string for SetText!")
-		end
-	end
-	return returnFunctions
-end
-end)() end,
-    [83] = function()local wax,script,require=ImportGlobals(83)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local services = require(project.Bundles.services)
-local RunService = services.RunService
-local UserInputService = services.UserInputService
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local ref = Fusion.Ref
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(sliderProperty)
-	assert(sliderProperty.Name, ":Slider needs a Name")
-	assert(typeof(sliderProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(sliderProperty.Name)))
-	assert(sliderProperty.Max, ":Slider needs a Max")
-	assert(typeof(sliderProperty.Max) == "number", ("Max accepts type number got %s"):format(typeof(sliderProperty.Max)))
-	assert(sliderProperty.Min, ":Slider needs a Min")
-	assert(typeof(sliderProperty.Min) == "number", ("Min accepts type number got %s"):format(typeof(sliderProperty.Min)))
-	assert(sliderProperty.Callback, ":Slider needs a Callback")
-	assert(typeof(sliderProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(sliderProperty.Callback)))
-	if sliderProperty.Placement then
-		assert(typeof(sliderProperty.Placement) == "number", ("Placement accepts type number got %s"):format(typeof(sliderProperty.Placement)))
-	end
-	if sliderProperty.InitialValue then
-		assert(typeof(sliderProperty.InitialValue) == "number", ("InitialValue accepts type number got %s"):format(typeof(sliderProperty.InitialValue)))
-	end
-
-	local name = value(sliderProperty.Name)
-	local callback = value(sliderProperty.Callback)
-	local max = value(sliderProperty.Max)
-	local min = value(sliderProperty.Min)
-	local roundTo = value(sliderProperty.Placement or 0)
-	local initialValue = value(sliderProperty.InitialValue or get(min))
-
-	local tabColor = sliderProperty.tabColor or nil
-
-	local sliderRef = value()
-	local buttonRef = value()
-
-	local mouseEntered = value(false)
-	local button1Down = value(false)
-	local isLocked = value(false)
-	local lockReason = value("")
-
-	local function Round(Value)
-		if get(roundTo) == 0 then
-			return math.floor(Value)
-		end
-		return tonumber(string.format('%.' .. get(roundTo) .. 'f', Value))
-	end
-	local function mapValue(Value, MinA, MaxA, MinB, MaxB)
-		return (1 - ((Value - MinA) / (MaxA - MinA))) * MinB + ((Value - MinA) / (MaxA - MinA)) * MaxB
-	end
-	local function GetValueFromXOffset(X)
-		return Round(mapValue(X, 0, 180, get(min), get(max)))
-	end
-
-	local percentage = value(0)
-	local percentageOf = value(get(min))
-	observe(percentageOf):onChange(function()
-		percentage:set(mapValue(get(percentageOf), get(min), get(max), 0, 1))
-		if not get(isLocked) then
-			task.spawn(get(callback), get(percentageOf))
-		end
-	end)
-
-	if get(initialValue) < get(min) or get(initialValue) > get(max) then
-		warn("InitialValue for "..get(name).." is either too big or too small! InitialValue = "..tostring(get(min)))
-		initialValue:set(get(min))
-	end
-
-	UserInputService.InputEnded:Connect(function(input)
-		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and get(button1Down) then
-			button1Down:set(false)
-		end
-	end)
-
-	local newSlider = new "Frame" {
-		Size = UDim2.new(1,0,0,40),
-		ClipsDescendants = true,
-
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-		Parent = sliderProperty.Parent,
-
-		[onevent "MouseEnter"] = function()
-			mouseEntered:set(true)
-		end,
-		[onevent "MouseLeave"] = function()
-			mouseEntered:set(false)
-		end,
-
-		[children] = {
-			{
-				{ -- Lock
-					new "Frame" {
-						ZIndex = 4,
-						Visible = computed(function()
-							return get(isLocked)
-						end),
-						Size = UDim2.fromScale(1,1),
-						BackgroundTransparency = 0.1,
-						BackgroundColor3 = animate(function()
-							return theme.get("tertiaryBackground")
-						end,40,1),
-
-						[children] = {
-							new "ImageLabel" {
-								AnchorPoint = Vector2.new(0,0.5),
-								Size = UDim2.fromOffset(24,24),
-								Position = UDim2.new(0,10,0.5),
-								BackgroundTransparency = 1,
-								ImageColor3 = animate(function()
-									return theme.get("image")
-								end,40,1),
-								Image = icons['lock']
-							},
-							new "TextLabel" {
-								Text = computed(function()
-									return get(lockReason)
-								end),
-								AnchorPoint = Vector2.new(0,0.5),
-								Position = UDim2.new(0,44,0.5,0),
-								Size = UDim2.new(1,-54,0,16),
-								Font = Enum.Font.GothamBold,
-								BackgroundTransparency = 1,
-								TextColor3 = animate(function()
-									return theme.get("text")
-								end,40,1),
-								TextSize = 16,
-								TextScaled = true,
-								TextXAlignment = Enum.TextXAlignment.Left,
-
-								[children] = {
-									new "UITextSizeConstraint" {
-										MinTextSize = 1,
-										MaxTextSize = 16
-									}
-								}
-							},
-							new "UICorner" {CornerRadius = UDim.new(0,6)},
-						}
-					}
-				},
-				new "UICorner" {
-					CornerRadius = UDim.new(0,6)
-				},
-				new "Frame" {
-					ZIndex = 2,
-					Size = UDim2.fromScale(1,1),
-					AnchorPoint = Vector2.new(0.5,0),
-					Position = UDim2.fromScale(0.5,0),
-					BackgroundTransparency = 0.85,
-
-					BackgroundColor3 = animate(function()
-						return tabColor or theme.get("defaultTab")
-					end,40,1),
-
-					[children] = {
-						new "UICorner" {
-							CornerRadius = UDim.new(0,6)
-						}
-					}
-				},
-				new "TextLabel" {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1,-220,0,14),
-					AnchorPoint = Vector2.new(0,0.5),
-					Position = UDim2.new(0,10,0.5,0),
-					Font = Enum.Font.Gotham,
-					TextScaled = true,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTransparency = 0,
-
-					TextColor3 = animate(function()
-						return theme.get("text")
-					end,40,1),
-					Text = get(name),
-
-					[children] = {
-						new "UITextSizeConstraint" {
-							MinTextSize = 1,
-							MaxTextSize = 14
-						}
-					}
-				}
-			},
-			new "CanvasGroup" {
-				AnchorPoint = Vector2.new(1,0.5),
-				Position = UDim2.new(1,-10,0.5,0),
-
-				BackgroundColor3 = animate(function()
-					return theme.get("image")
-				end,40,1),
-				Size = animate(function()
-					if get(mouseEntered) and not get(isLocked) then
-						return UDim2.fromOffset(180,16)
-					end
-					return UDim2.fromOffset(180,4)
-				end,40,1),
-
-				[children] = {
-					new "UICorner" {
-						CornerRadius = animate(function()
-							if get(mouseEntered) then
-								return UDim.new(0,4)
-							end
-							return UDim.new(0,6)
-						end,40,1),
-					},
-					new "TextButton" {
-						Interactable = computed(function()
-							return not get(isLocked)
-						end),
-						AnchorPoint = Vector2.new(0.5,0.5),
-						Size = UDim2.fromScale(1,1),
-						Position = UDim2.fromScale(0.5,0.5),
-						BackgroundTransparency = 1,
-
-						[onevent "MouseButton1Down"] = function()
-							button1Down:set(true)
-						end,
-						[onevent "TouchLongPress"] = function()
-							button1Down:set(true)
-						end,
-						[onevent "InputBegan"] = function(input)
-							if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-								local mPos = UserInputService:GetMouseLocation().X
-								local gPos = get(sliderRef).Size.X.Offset
-								local Diff = mPos - (get(sliderRef).AbsolutePosition.X + gPos)
-
-								while get(button1Down) and not get(isLocked) and task.wait() do
-									local nMPos = UserInputService:GetMouseLocation().X
-                    				local nX = math.clamp(gPos + (nMPos - mPos) + Diff, 0, 180)
-									
-									percentageOf:set(GetValueFromXOffset(nX))
-									RunService.RenderStepped:Wait()
-								end
-							end
-						end,
-
-						[ref] = buttonRef,
-						[children] = {
-							new "Frame" {
-								Name = "ChangeThing",
-								AnchorPoint = Vector2.new(0,0.5),
-								Position = UDim2.fromScale(0,0.5),
-
-								BackgroundColor3 = animate(function()
-									return tabColor or theme.get("defaultTab")
-								end,40,1),
-								Size = animate(function()
-									return UDim2.fromScale(get(percentage),1)
-								end,60,1),
-
-								[ref] = sliderRef
-							}
-						}
-					},
-				}
-			},
-			new "TextLabel" {
-				AnchorPoint = Vector2.new(1,0.5),
-				Size = UDim2.fromOffset(20,14),
-				Position = UDim2.new(1,-195,0.5,0),
-				BackgroundTransparency = 1,
-				Text = computed(function()
-					return tostring(get(percentageOf))
-				end),
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				Font = Enum.Font.Gotham,
-				TextSize = 14,
-				TextXAlignment = Enum.TextXAlignment.Right,
-				TextScaled = true,
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MinTextSize = 1,
-						MaxTextSize = 14
-					}
-				}
-			}
-		}
-	}
-
-	percentageOf:set(get(initialValue))
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newSlider:Destroy()
-	end
-	function returnFunctions:SetValue(newValue)
-		if typeof(newValue) == "number" and (newValue <= get(max)) and (newValue >= get(min)) then
-
-			percentageOf:set(newValue)
-		elseif typeof(newValue) ~= "number" then
-			error("You didn't give "..get(name).." a number for SetValue")
-		else
-			error("Your SetValue for "..get(name).." is great or smaller than the maximum or minimum")
-		end
-	end
-	function returnFunctions:SetMin(newMin)
-		if typeof(newMin) == "number" and (newMin < get(max)) then
-			min:set(newMin)
-			local button = get(buttonRef)
-			button.ChangeThing.ZIndex = 2
-			button.ChangeThing.ZIndex = 1
-		elseif typeof(newMin) ~= "number" then
-			error("You didn't give "..get(name).." a number for SetMin")
-		else
-			error("Your SetMin for "..get(name).." is great than the maximum")
-		end
-	end
-	function returnFunctions:SetMax(newMax)
-		if typeof(newMax) == "number" and (newMax < get(min)) then
-			max:set(newMax)
-			local button = get(buttonRef)
-			button.ChangeThing.ZIndex = 2
-			button.ChangeThing.ZIndex = 1
-		elseif typeof(newMax) ~= "number" then
-			error("You didn't give "..get(name).." a number for SetMax")
-		else
-			error("Your SetMax for "..get(name).." is smaller than the minimum")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-	return returnFunctions
-end
-end)() end,
-    [84] = function()local wax,script,require=ImportGlobals(84)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local data = require(project.Bundles.data)
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value,ref = Fusion.Value,Fusion.Ref
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local getStringBounds = require(project.utilities.getStringBounds)
-local animate = require(project.utilities.animate)
-local randomString = require(project.utilities.randomString)
-
-return function(tbl)
-	local tabProperty = get(tbl.tab_data.data)
-	tabProperty.Parent = tbl.Parent
-
-	local selectedTab = data.find("selectedTab")
-	local selectedFirst = data.find("selectedFirst")
-
-	local name = value(tabProperty.Name)
-	local tabColor = tabProperty.tabColor or nil
-
-	local isTabSelected = value(false)
-	observe(selectedTab.data):onChange(function()
-		if get(selectedTab.data).uid == tabProperty.uid then
-			isTabSelected:set(true)
-		else
-			isTabSelected:set(false)
-		end
-	end)
-
-	local hover = value(false)
-	local xSize = value(0)
-	local textRef = value()
-
-	do
-		local xySize = getStringBounds(get(name), {
-			TextSize = 14,
-			Font = Enum.Font.GothamMedium,
-			VectorSize = Vector2.new(10000,14)
-		})
-		if xySize.X < 449 then
-			xSize:set(math.abs(xySize.X))
-		else
-			for i=1,14 do
-				local tmpXY = getStringBounds(get(name), {
-					TextSize = 14-i,
-					Font = Enum.Font.GothamMedium,
-					VectorSize = Vector2.new(450,40)
-				})
-				if tmpXY.X < 450 and tmpXY.Y < 14 then
-					xSize:set(math.abs(tmpXY.X+1))
-					break
-				end
-			end
-		end
-	end
-
-	new "TextButton" {
-		ZIndex = 5,
-		Name = randomString(16),
-		Parent = tabProperty.Parent,
-		AnchorPoint = Vector2.new(0,0.5),
-		Position = UDim2.fromOffset(30,30),
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-		ClipsDescendants = true,
-		Text = "",
-		Size = animate(function()
-			if get(hover) then
-				return UDim2.fromOffset(get(xSize) +50,40)
-			else
-				return UDim2.fromOffset(40,40)
-			end
-		end,20,1),
-
-		[onevent "MouseEnter"] = function()
-			hover:set(true)
-		end,
-		[onevent "MouseLeave"] = function()
-			hover:set(false)
-		end,
-		[onevent "Activated"] = function()
-			selectedTab:update("data", get(tbl.tab_data.data))
-		end,
-
-		[children] = {
-			new "UICorner" {
-				CornerRadius = animate(function()
-					if get(hover) then
-						return UDim.new(0,10)
-					else
-						return UDim.new(1,0)
-					end
-				end,30,1),
-			},
-			new "ImageLabel" {
-				ZIndex = 5,
-				Name = "icon",
-				AnchorPoint = Vector2.new(0,0.5),
-				Position = UDim2.new(0,6,0.5,0),
-				Size = UDim2.fromOffset(28,28),
-				BackgroundTransparency = 1,
-				Image = tabProperty.Image,
-				ImageColor3 = animate(function()
-					if get(hover) and not get(isTabSelected) then
-						return tabColor or theme.get("defaultTab")
-					elseif not get(hover) and not get(isTabSelected) then
-						return theme.get("image")
-					else
-						return tabColor or theme.get("defaultTab")
-					end
-				end,30,1),
-			},
-			new "TextLabel" {
-				ZIndex = 5,
-				AnchorPoint = Vector2.new(0,0.5),
-				Position = UDim2.new(0,40,0.5,0),
-				Size = UDim2.new(0,get(xSize),0,14),
-				BackgroundTransparency = 1,
-				Text = tabProperty.Name,
-				TextScaled = true,
-				TextTransparency = animate(function()
-					if get(hover) then
-						return 0
-					end
-					return 1
-				end,20,1),
-				Font = Enum.Font.GothamMedium,
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				TextXAlignment = Enum.TextXAlignment.Left,
-
-				[ref] = textRef,
-				[children] = {
-					new "UITextSizeConstraint" {
-						MaxTextSize = 14,
-						MinTextSize = 1
-					}
-				}
-			}
-		}
-	}
-	if not get(selectedFirst.boolean) then
-		selectedFirst:update("boolean", true)
-		selectedTab:update("data", get(tbl.tab_data.data))
-	end
-end
-end)() end,
-    [85] = function()local wax,script,require=ImportGlobals(85)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local ref = Fusion.Ref
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(textboxProperty)
-	assert(textboxProperty.Name, ":TextBox missing property Name")
-	assert(typeof(textboxProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(textboxProperty.Name)))
-	assert(textboxProperty.Callback, ":TextBox missing property Callback")
-	assert(typeof(textboxProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(textboxProperty.Callback)))
-	if textboxProperty.Default then
-		assert((typeof(textboxProperty.Default) == "string" or typeof(textboxProperty.Default) == "number"), ("Default accepts type string or number got %s"):format(typeof(textboxProperty.Default)))
-	end
-	if textboxProperty.PlaceHolderText then
-		assert(typeof(textboxProperty.PlaceHolderText) == "string", ("PlaceHolderText accepts type string got %s"):format(typeof(textboxProperty.PlaceHolderText)))
-	end
-	if textboxProperty.OnlyNumbers then
-		assert(typeof(textboxProperty.OnlyNumbers) == "boolean", ("OnlyNumbers accepts type boolean got %s"):format(typeof(textboxProperty.OnlyNumbers)))
-	end
-	if textboxProperty.OnLeave then
-		assert(typeof(textboxProperty.OnLeave) == "boolean", ("OnLeave accepts type boolean got %s"):format(typeof(textboxProperty.OnLeave)))
-	end
-
-	local name = value(textboxProperty.Name)
-	local callback = value(textboxProperty.Callback)
-	local defaultText = value(textboxProperty.Default or "")
-	local numbersOnly = value(textboxProperty.OnlyNumbers or false)
-	local onLeave = value(textboxProperty.OnLeave or false)
-
-	local tabColor = textboxProperty.tabColor or nil
-
-	local textRef = value()
-	local updatedText = value("")
-	local focused = value(false)
-	local isLocked = value(false)
-	local lockReason = value("")
-
-	local lastCorrectText = value(get(updatedText))
-	observe(updatedText):onChange(function()
-		if get(numbersOnly) then
-			if tonumber(get(updatedText)) or get(updatedText) == "" then
-				lastCorrectText:set(get(updatedText))
-			end
-		else
-			lastCorrectText:set(get(updatedText))
-		end
-		local textBox = get(textRef)
-		if textBox and textBox.Text then
-			textBox.Text = get(lastCorrectText)
-		end
-	end)
-
-
-	if get(onLeave) then
-		observe(focused):onChange(function()
-			if not get(focused) then
-				if get(numbersOnly) then
-					if tonumber(get(updatedText)) then
-						task.spawn(get(callback), get(updatedText))
-					end
-				else
-					task.spawn(get(callback), get(updatedText))
-				end
-			end
-		end)
-	else
-		observe(updatedText):onChange(function()
-			if get(numbersOnly) then
-				if tonumber(get(updatedText)) then
-					task.spawn(get(callback), get(updatedText))
-				end
-			else
-				task.spawn(get(callback), get(updatedText))
-			end
-		end)
-	end
-
-	if get(defaultText) ~= "" then
-		updatedText:set(get(defaultText))
-	end
-
-	local newTextBox = new "TextButton" {
-		Parent = textboxProperty.Parent,
-		Interactable = computed(function()
-			return not get(isLocked)
-		end),
-		Size = UDim2.new(1,0,0,40),
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-
-		[onevent "MouseButton1Click"] = function()
-			local text = get(textRef)
-			text:CaptureFocus()
-		end,
-
-		[children] = {
-			{
-				{ -- Lock
-					new "Frame" {
-						ZIndex = 4,
-						Visible = computed(function()
-							return get(isLocked)
-						end),
-						Size = UDim2.fromScale(1,1),
-						BackgroundTransparency = 0.1,
-						BackgroundColor3 = animate(function()
-							return theme.get("tertiaryBackground")
-						end,40,1),
-
-						[children] = {
-							new "ImageLabel" {
-								AnchorPoint = Vector2.new(0,0.5),
-								Size = UDim2.fromOffset(24,24),
-								Position = UDim2.new(0,10,0.5),
-								BackgroundTransparency = 1,
-								ImageColor3 = animate(function()
-									return theme.get("image")
-								end,40,1),
-								Image = icons['lock']
-							},
-							new "TextLabel" {
-								Text = computed(function()
-									return get(lockReason)
-								end),
-								AnchorPoint = Vector2.new(0,0.5),
-								Position = UDim2.new(0,44,0.5,0),
-								Size = UDim2.new(1,-54,0,16),
-								Font = Enum.Font.GothamBold,
-								BackgroundTransparency = 1,
-								TextColor3 = animate(function()
-									return theme.get("text")
-								end,40,1),
-								TextSize = 16,
-								TextScaled = true,
-								TextXAlignment = Enum.TextXAlignment.Left,
-
-								[children] = {
-									new "UITextSizeConstraint" {
-										MinTextSize = 1,
-										MaxTextSize = 16
-									}
-								}
-							},
-							new "UICorner" {CornerRadius = UDim.new(0,6)},
-						}
-					}
-				},
-				new "UICorner" {
-					CornerRadius = UDim.new(0,6)
-				},
-				new "Frame" {
-					ZIndex = 2,
-					Size = UDim2.new(1,0,1,0),
-					AnchorPoint = Vector2.new(0.5,0.5),
-					Position = UDim2.new(0.5,0,0.5,0),
-					BackgroundTransparency = 0.85,
-
-					BackgroundColor3 = animate(function()
-						return tabColor or theme.get("defaultTab")
-					end,40,1),
-
-					[children] = {
-						new "UICorner" {
-							CornerRadius = UDim.new(0,6)
-						}
-					}
-				},
-				new "TextLabel" {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1,-185,0,14),
-					AnchorPoint = Vector2.new(0,0.5),
-					Position = UDim2.new(0,10,0.5,0),
-					Font = Enum.Font.Gotham,
-					TextScaled = true,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTransparency = 0,
-
-					Text = get(name),
-					TextColor3 = animate(function()
-						return theme.get("text")
-					end,40,1),
-
-					[children] = {
-						new "UITextSizeConstraint" {
-							MinTextSize = 1,
-							MaxTextSize = 14
-						},
-					}
-				},
-				new "Frame" {
-					ZIndex = 3,
-					Size = UDim2.new(0,160,0,24),
-					AnchorPoint = Vector2.new(1,0.5),
-					Position = UDim2.new(1,-10,0.5,0),
-					BackgroundTransparency = 0.25,
-
-					BackgroundColor3 = animate(function()
-						return theme.get("secondaryBackground")
-					end,40,1),
-
-					[children] = {
-						new "UICorner" {
-							CornerRadius = UDim.new(0,6)
-						},
-					}
-				}
-			},
-			new "TextBox" {
-				Interactable = computed(function()
-					return not get(isLocked)
-				end),
-				ZIndex = 3,
-				AnchorPoint = Vector2.new(1,0.5),
-				Position = UDim2.new(1,-10,0.5,0),
-				Size = UDim2.new(0,160,0,24),
-				BackgroundTransparency = 1,
-				TextScaled = true,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				PlaceholderText = "Input Here",
-				Font = Enum.Font.Gotham,
-				TextSize = 12,
-
-				PlaceholderColor3 = animate(function()
-					return theme.get("placeholder")
-				end,40,1),
-				Text = computed(function()
-					if get(defaultText) ~= "" then
-						return get(defaultText)
-					end
-					return ""
-				end),
-				TextColor3 = animate(function()
-					if get(focused) then
-						return theme.get("text")
-					else
-						return tabColor or theme.get("defaultTab")
-					end
-				end,50,1),
-
-				[onevent "Focused"] = function()
-					focused:set(true)
-				end,
-				[onevent "FocusLost"] = function()
-					focused:set(false)
-				end,
-
-				[onevent "Changed"] = function(textboxPropertyerty)
-					if textboxPropertyerty == "Text" then
-						local textBox = get(textRef)
-						updatedText:set(textBox.Text)
-					end
-				end,
-
-				[ref] = textRef,
-
-				[children] = {
-					new "UIPadding" {
-						PaddingLeft = UDim.new(0,5),
-						PaddingRight = UDim.new(0,5)
-					},
-					new "UITextSizeConstraint" {
-						MaxTextSize = 12,
-						MinTextSize = 1
-					}
-				}
-			}
-		}
-	}
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newTextBox:Destroy()
-	end
-	function returnFunctions:SetInput(newInput)
-		if typeof(newInput) == "string" then
-			get(textRef).Text = newInput
-		else
-			error("You didn't give "..get(name).." a string for setInput")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-	return returnFunctions
-end
-end)() end,
-    [86] = function()local wax,script,require=ImportGlobals(86)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local computed = Fusion.Computed
-local observe = Fusion.Observer
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local icons = require(project.Bundles.icons)
-
-return function(toggleProperty)
-	assert(toggleProperty.Name, ":Toggle missing property Name")
-	assert(typeof(toggleProperty.Name) == "string", ("Name accepts type string got %s"):format(typeof(toggleProperty.Name)))
-	assert(toggleProperty.Callback, ":Toggle missing property Callback")
-	assert(typeof(toggleProperty.Callback) == "function", ("Callback accepts type function got %s"):format(typeof(toggleProperty.Callback)))
-	if toggleProperty.Default then
-		assert(typeof(toggleProperty.Default) == "boolean", ("Default accepts type boolean got %s"):format(typeof(toggleProperty.Default)))
-
-	end
-
-	local name = value(toggleProperty.Name)
-	local callback = value(toggleProperty.Callback)
-	local default = value(toggleProperty.Default or false)
-
-	local tabColor = toggleProperty.tabColor or nil
-
-	local toggled = value(false)
-	local isLocked = value(false)
-	local lockReason = value("")
-	observe(toggled):onChange(function()
-		if not get(isLocked) then
-			task.spawn(get(callback), get(toggled))
-		end
-	end)
-
-	local newToggle = new "TextButton" {
-		Parent = toggleProperty.Parent,
-		Interactable = computed(function()
-			return not get(isLocked)
-		end),
-		Size = UDim2.new(1,0,0,40),
-		AutoButtonColor = false,
-
-		BackgroundColor3 = animate(function()
-			return theme.get("secondaryBackground")
-		end,40,1),
-
-		[onevent "Activated"] = function()
-			toggled:set(not get(toggled))
-		end,
-
-		[children] = {
-			{ -- Lock
-				new "Frame" {
-					ZIndex = 3,
-					Visible = computed(function()
-						return get(isLocked)
-					end),
-					Size = UDim2.fromScale(1,1),
-					BackgroundTransparency = 0.1,
-					BackgroundColor3 = animate(function()
-						return theme.get("tertiaryBackground")
-					end,40,1),
-
-					[children] = {
-						new "ImageLabel" {
-							AnchorPoint = Vector2.new(0,0.5),
-							Size = UDim2.fromOffset(24,24),
-							Position = UDim2.new(0,10,0.5),
-							BackgroundTransparency = 1,
-							ImageColor3 = animate(function()
-								return theme.get("image")
-							end,40,1),
-							Image = icons['lock']
-						},
-						new "TextLabel" {
-							Text = computed(function()
-								return get(lockReason)
-							end),
-							AnchorPoint = Vector2.new(0,0.5),
-							Position = UDim2.new(0,44,0.5,0),
-							Size = UDim2.new(1,-54,0,16),
-							Font = Enum.Font.GothamBold,
-							BackgroundTransparency = 1,
-							TextColor3 = animate(function()
-								return theme.get("text")
-							end,40,1),
-							TextSize = 16,
-							TextScaled = true,
-							TextXAlignment = Enum.TextXAlignment.Left,
-
-							[children] = {
-								new "UITextSizeConstraint" {
-									MinTextSize = 1,
-									MaxTextSize = 16
-								}
-							}
-						},
-						new "UICorner" {CornerRadius = UDim.new(0,6)},
-					}
-				}
-			},
-			new "UICorner" {
-				CornerRadius = UDim.new(0,6)
-			},
-			new "Frame" {
-				ZIndex = 2,
-				Size = UDim2.new(1,0,1,0),
-				AnchorPoint = Vector2.new(0.5,0.5),
-				Position = UDim2.new(0.5,0,0.5,0),
-				BackgroundTransparency = 0.85,
-
-				BackgroundColor3 = animate(function()
-					return tabColor or theme.get("defaultTab")
-				end,40,1),
-
-				[children] = {
-					new "UICorner" {
-						CornerRadius = UDim.new(0,6)
-					}
-				}
-			},
-			new "TextLabel" {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1,-45,0,14),
-				AnchorPoint = Vector2.new(0,0.5),
-				Position = UDim2.new(0,10,0.5,0),
-				Font = Enum.Font.Gotham,
-				TextScaled = true,
-				TextSize = 14,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTransparency = 0,
-
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-				Text = get(name),
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MinTextSize = 1,
-						MaxTextSize = 14
-					}
-				}
-			},
-			new "ImageLabel" {
-				AnchorPoint = Vector2.new(1,0),
-				Position = UDim2.new(1,-5,0,6),
-				Size = UDim2.fromOffset(28,28),
-				BackgroundTransparency = 1,
-				Image = icons['emptyBox'],
-				
-				ImageColor3 = animate(function()
-					return theme.get("image")
-				end,40,1),
-
-				[children] = {
-					new "UICorner" {
-						CornerRadius = UDim.new(1,0)
-					},
-					new "ImageLabel" {
-						AnchorPoint = Vector2.new(0.5,0.5),
-						Position = UDim2.fromScale(0.5,0.5),
-						Size = UDim2.new(1,0,1,0),
-						BackgroundTransparency = 1,
-						Image = icons['filledBox'],
-						
-						ImageColor3 = animate(function()
-							return theme.get("image")
-						end,40,1),
-						ImageTransparency = animate(function()
-							if get(toggled) then
-								return 0
-							end
-							return 1
-						end,30,1),
-
-						[children] = {
-							new "UICorner" {
-								CornerRadius = UDim.new(1,0)
-							}
-						}
-					}
-				}
-
-			}
-		}
-	}
-
-	toggled:set(get(default))
-
-	local returnFunctions = {}
-	function returnFunctions:Remove()
-		newToggle:Destroy()
-	end
-	function returnFunctions:SetValue(newValue)
-		if typeof(newValue) == "boolean" then
-			toggled:set(newValue)
-		else
-			error("You didn't give "..get(name).." a boolean for SetValue")
-		end
-	end
-	function returnFunctions:Lock(reason)
-		isLocked:set(true)
-		lockReason:set(reason or "Locked")
-	end
-	function returnFunctions:Unlock()
-		isLocked:set(false)
-	end
-	return returnFunctions
-end
-end)() end,
-    [87] = function()local wax,script,require=ImportGlobals(87)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local children = Fusion.Children
-
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local randomString = require(project.utilities.randomString)
-
-return function(windowProperty)
-    return new "ScrollingFrame" {
-		Name = randomString(16),
-		Parent = windowProperty.Parent,
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1,1),
-		ScrollBarThickness = 0,
-		CanvasSize = UDim2.new(0,0,0,0),
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-		[children] = {
-			new "UIListLayout" {
-				Padding = UDim.new(0,5),
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			},
-			new "TextLabel" {
-				Size = UDim2.new(1,0,0,20),
-				Text = windowProperty.Name,
-				BackgroundTransparency = 1,
-				TextScaled = true,
-				Font = Enum.Font.GothamMedium,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTransparency = 0.75,
-
-				TextColor3 = animate(function()
-					return theme.get("text")
-				end,40,1),
-
-				[children] = {
-					new "UITextSizeConstraint" {
-						MaxTextSize = 12,
-						MinTextSize = 1
-					},
-					new "UIPadding" {
-						PaddingLeft = UDim.new(0,5)
-					}
-				}
-			}
-		}
-	}
-end
-end)() end,
-    [89] = function()local wax,script,require=ImportGlobals(89)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local data = require(project.Bundles.data)
-local services = require(project.Bundles.services)
-local UserInputService = services.UserInputService
-local RunService = services.RunService
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local ref = Fusion.Ref
-local observe = Fusion.Observer
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local animate = require(project.utilities.animate)
-local references = require(project.utilities.references)
-local theme = require(project.Bundles.themeSystem)
-local icons = require(project.Bundles.icons)
-local drag = require(project.utilities.drag)
-
-return function(windowProperty)
-    local computerQuake
-
-	local selectedTab = data.find("selectedTab")
-
-	local keyCode = data.find("keyCode")
-    local draggingFrameRef = value()
-    local isClosed = value(false)
-	local isToggled = data.find("isToggled")
-	local isResizing = value(false)
-	local containerX = value(windowProperty.Size.X)
-	local containerY = value(windowProperty.Size.Y)
-	local heartbeat = nil
-	observe(isResizing):onChange(function()
-		if not get(isResizing) and heartbeat ~= nil then
-			heartbeat:Disconnect()
-			heartbeat = nil
-		end
-	end)
-	local sideBarRef = value()
-	references.add(sideBarRef)
-	local windowsRef = value()
-	references.add(windowsRef)
-	local uipagelayoutRef = value()
-	references.add(uipagelayoutRef)
-	local notificationListRef = value()
-	references.add(notificationListRef)
-	local resizerREF = value()
-
-	observe(selectedTab.data):onChange(function()
-		local tab_data = get(selectedTab.data)
-		local uipagelayout = get(uipagelayoutRef)
-		uipagelayout:JumpTo(tab_data.tabPage)
-	end)
-
-	local isToggledConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if not gameProcessed and input.KeyCode and input.KeyCode == get(keyCode.EnumItem) then
-			isToggled:update("boolean", not get(isToggled.boolean))
-		end
-	end)
-
-	computerQuake = new "ScreenGui" {
-		Name = windowProperty.Title,
-		Parent = windowProperty.Parent,
-		IgnoreGuiInset = true,
-		ResetOnSpawn = false,
-		Enabled = computed(function()
-			return get(isToggled.boolean)
-		end),
-
-		[onevent "Destroying"] = function()
-			isToggledConnection:Disconnect()
-			heartbeat:Disconnect()
-		end,
-
-		[children] = {
-			new "Frame" {
-                Name = "container",
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(0,0),
-				Position = UDim2.new(0.5,-get(containerX)/2,0.5,-get(containerY)/2),
-				Size = computed(function()
-					return UDim2.fromOffset(get(containerX),45)
-				end),
-
-				[ref] = draggingFrameRef,
-
-				[children] = {
-					new "Frame" {
-						AnchorPoint = Vector2.new(0,0),
-						Position = UDim2.fromScale(0,0),
-						ClipsDescendants = true,
-
-						BackgroundColor3 = animate(function()
-							return theme.get("background")
-						end,40,1),
-						Size = animate(function()
-							if get(isClosed) then
-								return UDim2.fromOffset(get(containerX),45)
-							end
-							return UDim2.fromOffset(get(containerX),get(containerY))
-						end,20,1),
-
-						[children] = {
-							new "UICorner" {CornerRadius = UDim.new(0,6)},
-							new "Frame" { -- sideBar
-								ZIndex = 5,
-								AnchorPoint = Vector2.new(0,0),
-								Position = UDim2.fromOffset(10,50),
-								Size = UDim2.new(1,0,0,466),
-								ClipsDescendants = true,
-								BackgroundTransparency = 1,
-
-								[children] = {
-									new "ScrollingFrame" {
-										Name = "sideBar",
-										AnchorPoint = Vector2.new(0,0),
-										Position = UDim2.fromScale(0,0),
-										Size = UDim2.new(0,40,1,0),
-										BackgroundTransparency = 1,
-										ScrollBarThickness = 0,
-										ClipsDescendants = false,
-										ZIndex = 0,
-										CanvasSize = UDim2.new(0,0,0,0),
-										AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-										[ref] = sideBarRef,
-										[children] = {
-											new "UIListLayout" {
-												Padding = UDim.new(0,5),
-												SortOrder = Enum.SortOrder.LayoutOrder,
-												FillDirection = Enum.FillDirection.Vertical,
-												HorizontalAlignment = Enum.HorizontalAlignment.Left,
-											},
-										}
-									}
-								}
-							},
-							new "Frame" { -- topBar
-								Name = "topBar",
-								AnchorPoint = Vector2.new(0.5,0),
-								Position = UDim2.new(0.5,0,0,0),
-								Size = UDim2.new(1,0,0,45),
-								BackgroundTransparency = 1,
-
-								[children] = {
-									new "UICorner" {CornerRadius = UDim.new(0,6)},
-									new "Frame" {
-										AnchorPoint = Vector2.new(0.5,1),
-										Position = UDim2.fromScale(0.5,1),
-										Size = UDim2.new(1,0,0,1),
-
-										BackgroundColor3 = animate(function()
-											return theme.get("tertiaryBackground")
-										end,40,1),
-										BackgroundTransparency = animate(function()
-											if get(isClosed) then
-												return 1
-											else
-												return 0
-											end
-										end,20,1)
-									},
-									new "Frame" {
-										Name = "taskManage",
-										BackgroundTransparency = 1,
-										AnchorPoint = Vector2.new(1,0.5),
-										Position = UDim2.new(1,0,0.5,0),
-										Size = UDim2.new(0,70,1,0),
-
-										[children] = {
-											new "UIListLayout"{
-												FillDirection = Enum.FillDirection.Horizontal,
-												HorizontalAlignment = Enum.HorizontalAlignment.Center,
-												VerticalAlignment = Enum.VerticalAlignment.Center
-											},
-											new "Frame" {
-												Size = UDim2.fromOffset(30,30),
-												BackgroundTransparency = 1,
-
-												[children] = {
-													new "TextButton" {
-														Name = "toggleMini",
-														AnchorPoint = Vector2.new(0.5,0.5),
-														BackgroundTransparency = 1,
-														Position = UDim2.fromScale(0.5,0.5),
-														Size = UDim2.fromOffset(30,30),
-
-														[onevent "Activated"] = function()
-															isClosed:set(not get(isClosed))
-														end,
-
-														[children] = {
-															new "ImageLabel" {
-																Name = "maximizeIcon",
-																AnchorPoint = Vector2.new(0.5,0.5),
-																BackgroundTransparency = 1,
-																Position = UDim2.fromScale(0.5,0.5),
-																Size = UDim2.fromOffset(26,26),
-																Image = icons['maximize'],
-
-																ImageColor3 = animate(function()
-																	return theme.get("image")
-																end,40,1),
-																ImageTransparency = animate(function()
-																	if get(isClosed) then
-																		return 0
-																	else
-																		return 1
-																	end
-																end,25,1)
-															},
-															new "ImageLabel" {
-																Name = "minimizeIcon",
-																AnchorPoint = Vector2.new(0.5,0.5),
-																BackgroundTransparency = 1,
-																Position = UDim2.fromScale(0.5,0.5),
-																Size = UDim2.fromOffset(26,26),
-																Image = icons['minimize'],
-
-																ImageColor3 = animate(function()
-																	return theme.get("image")
-																end,40,1),
-																ImageTransparency = animate(function()
-																	if get(isClosed) then
-																		return 1
-																	else
-																		return 0
-																	end
-																end,25,1)
-															}
-														}
-													}
-												}
-											},
-											new "TextButton" {
-												Size = UDim2.fromOffset(30,30),
-												BackgroundTransparency = 1,
-												Text = "",
-
-												[onevent "Activated"] = function()
-													computerQuake:Destroy()
-												end,
-
-												[children] = {
-													new "ImageLabel" {
-														AnchorPoint = Vector2.new(0.5,0.5),
-														Position = UDim2.fromScale(0.5,0.5),
-														Size = UDim2.fromScale(0.95,0.95),
-														BackgroundTransparency = 1,
-														Image = icons['close'],
-														ImageTransparency = 0,
-
-														ImageColor3 = animate(function()
-															return theme.get("close")
-														end,40,1),
-													}
-												}
-											}
-										}
-									},
-									new "TextLabel" {
-										AnchorPoint = Vector2.new(0,0.5),
-										Position = UDim2.fromScale(0,0.55),
-										Size = UDim2.fromOffset(350,25),
-										BackgroundTransparency = 1,
-										Font = Enum.Font.GothamBold,
-										TextScaled = true,
-										TextSize = 25,
-										TextXAlignment = Enum.TextXAlignment.Left,
-
-										Text = windowProperty.Title,
-										TextColor3 = animate(function()
-											return get(selectedTab.data).tabColor or theme.get("defaultTab")
-										end,15,1),
-
-										[children] = {
-											new "UIPadding" {PaddingLeft = UDim.new(0,15)},
-											new "UITextSizeConstraint" {
-												MaxTextSize = 25,
-												MinTextSize = 1
-											}
-										}
-									}
-								}
-							},
-							new "Frame" { -- windowsList
-								Name = "windowsList",
-								AnchorPoint = Vector2.new(0,0),
-								Size = animate(function()
-									return UDim2.new(0,get(containerX) - 70,0,get(containerY) - 60)
-								end, 20, 1),
-								Position = UDim2.new(0,60,0,50),
-								BackgroundTransparency = 1,
-								ClipsDescendants = true,
-
-								[ref] = windowsRef,
-								[children] = {
-									new "UIPageLayout" {
-										EasingDirection = Enum.EasingDirection.In,
-										EasingStyle = Enum.EasingStyle.Sine,
-										TweenTime = 0.2,
-										FillDirection = Enum.FillDirection.Vertical,
-										SortOrder = Enum.SortOrder.LayoutOrder,
-										Padding = UDim.new(0,20),
-
-										[ref] = uipagelayoutRef
-									}
-								}
-							},
-							new "TextButton" {
-								Name = "Resizer",
-								AnchorPoint = Vector2.new(1,1),
-								Position = UDim2.fromScale(1,1),
-								Size = UDim2.fromOffset(10,10),
-								BackgroundTransparency = 1,
-								Interactable = computed(function()
-									return not get(isClosed)
-								end),
-
-								[ref] = resizerREF,
-								[onevent "InputBegan"] = function(input)
-									if not get(isClosed) and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-										local resizer = get(resizerREF)
-										local oldDistance = Vector2.new(9e9,9e9)
-										local oldAbsolutePosition = resizer.AbsolutePosition
-										local startingX = get(containerX)
-										local startingY = get(containerY)
-										if heartbeat == nil then
-											heartbeat = RunService.Heartbeat:Connect(function()
-												if get(isResizing)then
-													local distance = UserInputService:GetMouseLocation() - oldAbsolutePosition
-													if distance ~= oldDistance then
-														oldDistance = distance
-														containerX:set(math.clamp(distance.X + startingX - 10,550,9e9))
-														containerY:set(math.clamp(distance.Y + startingY - 10,400,9e9))
-													end
-												end
-											end)
-										end
-										isResizing:set(true)
-
-										input.Changed:Connect(function()
-											if input.UserInputState == Enum.UserInputState.End then
-												task.wait()
-												isResizing:set(false)
-											end
-										end)
-									end
-								end
-							}
-						}
-					}
-				}
-			},
-			new "ScrollingFrame" {
-				Name = "NotificationList",
-				ZIndex = 0,
-				AnchorPoint = Vector2.new(1,1),
-				Position = UDim2.new(1,-5,1,-10),
-				Size = UDim2.new(0,1,1,-10),
-				BackgroundTransparency = 1,
-				ScrollBarThickness = 0,
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-				ClipsDescendants = false,
-
-				[ref] = notificationListRef,
-
-				[children] = {
-					new "UIListLayout" {
-						Padding = UDim.new(0,5),
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Right,
-						VerticalAlignment = Enum.VerticalAlignment.Bottom
-					}
-				}
-			}
-		}
-	}
-	drag(get(draggingFrameRef),15)
-	return computerQuake
-end
-end)() end,
-    [90] = function()local wax,script,require=ImportGlobals(90)local ImportGlobals return (function(...)local project = script.Parent.Parent
-
-local data = require(project.Bundles.data)
-local services = require(project.Bundles.services)
-local UserInputService = services.UserInputService
-local Fusion = require(project.Bundles.Fusion)
-local new = Fusion.New
-local onevent = Fusion.OnEvent
-local children = Fusion.Children
-local value = Fusion.Value
-local ref = Fusion.Ref
-local observe = Fusion.Observer
-local computed = Fusion.Computed
-
-local get = require(project.utilities.get)
-local theme = require(project.Bundles.themeSystem)
-local animate = require(project.utilities.animate)
-local references = require(project.utilities.references)
-
-return function(windowProperty)
-    local mobileQuake
-
-    local selectedTab = data.find("selectedTab")
-
-    local isOpen = value(false)
-    local isToggled = data.find("isToggled")
-    local keyCode = data.find("keyCode")
-
-	local sideBarRef = value()
-	references.add(sideBarRef)
-	local windowsRef = value()
-	references.add(windowsRef)
-	local uipagelayoutRef = value()
-	references.add(uipagelayoutRef)
-	local notificationListRef = value()
-	references.add(notificationListRef)
-
-    local isToggledConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if not gameProcessed and input.KeyCode and input.KeyCode == get(keyCode.EnumItem) then
-			isToggled:update("boolean", not get(isToggled.boolean))
-		end
-	end)
-
-    observe(selectedTab.data):onChange(function()
-		local tab_data = get(selectedTab.data)
-		local uipagelayout = get(uipagelayoutRef)
-		uipagelayout:JumpTo(tab_data.tabPage)
-	end)
-
-    mobileQuake = new "ScreenGui" {
-        Name = windowProperty.Title,
-        Parent = windowProperty.Parent,
-        IgnoreGuiInset = false,
-		ResetOnSpawn = false,
-        Enabled = computed(function()
-			return get(isToggled.boolean)
-		end),
-
-        [onevent "Destroying"] = function()
-            isToggledConnection:Disconnect()
-        end,
-
-        [children] = {
-            new "Frame" {
-                Name = "container",
-                AnchorPoint = Vector2.new(0,1),
-                Position = UDim2.new(0,5,1,-5),
-                ClipsDescendants = true,
-
-                BackgroundColor3 = animate(function()
-					return theme.get("background")
-				end,40,1),
-                Size = animate(function()
-                    if get(isOpen) then
-                        return UDim2.new(0.75,0,1,-10)
-                    else
-                        return UDim2.fromOffset(40,40)
-                    end
-                end,45,1),
-
-                [children] = {
-                    {
-                        new "UICorner" {
-                            CornerRadius = UDim.new(0,6)
-                        },
-                        new "TextButton" { -- activator
-                            Name = "activator",
-                            ZIndex = 2,
-                            AnchorPoint = Vector2.new(0,1),
-                            Size = UDim2.fromOffset(40,40),
-                            Position = UDim2.fromScale(0,1),
-                            BackgroundTransparency = 1,
-                            ClipsDescendants = true,
-
-                            [onevent "Activated"] = function()
-                                isOpen:set(not get(isOpen))
-                            end,
-
-                            [children] = {
-                                new "UICorner" {
-                                    CornerRadius = UDim.new(0,6)
-                                },
-                                new "ImageLabel" {
-                                    Name = "maximizeIcon",
-                                    AnchorPoint = Vector2.new(0.5,0.5),
-                                    BackgroundTransparency = 1,
-                                    Size = UDim2.fromOffset(30,30),
-                                    Image = "rbxassetid://15556636376",
-
-                                    ImageColor3 = animate(function()
-                                        return theme.get("image")
-                                    end,40,1),
-                                    ImageTransparency = animate(function()
-                                        if get(isOpen) then
-                                            return 1
-                                        else
-                                            return 0
-                                        end
-                                    end,45,1),
-                                    Position = animate(function()
-                                        if get(isOpen) then
-                                            return UDim2.fromScale(0.5,1.5)
-                                        else
-                                            return UDim2.fromScale(0.5,0.5)
-                                        end
-                                    end,25,1),
-                                },
-                                new "ImageLabel" {
-                                    Name = "minimizeIcon",
-                                    AnchorPoint = Vector2.new(0.5,0.5),
-                                    BackgroundTransparency = 1,
-                                    Size = UDim2.fromOffset(30,30),
-                                    Image = "rbxassetid://15556637715",
-
-                                    ImageColor3 = animate(function()
-                                        return theme.get("image")
-                                    end,40,1),
-                                    ImageTransparency = animate(function()
-                                        if get(isOpen) then
-                                            return 0
-                                        else
-                                            return 1
-                                        end
-                                    end,45,1),
-                                    Position = animate(function()
-                                        if get(isOpen) then
-                                            return UDim2.fromScale(0.5,0.5)
-                                        else
-                                            return UDim2.fromScale(0.5,1.5)
-                                        end
-                                    end,25,1),
-                                }
-                            }
-                        },
-                        new "ScrollingFrame" { -- tabsList
-                            Name = "sideBar",
-                            Size = UDim2.new(0,50,1,-80),
-                            Position = UDim2.fromOffset(0,40),
-                            BackgroundTransparency = 1,
-                            ScrollBarThickness = 0,
-                            ClipsDescendants = false,
-                            CanvasSize = UDim2.new(0,0,0,0),
-                            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-                            [ref] = sideBarRef,
-
-                            [children] = {
-                                new "UIListLayout" {
-                                    Padding = UDim.new(0,5),
-                                    SortOrder = Enum.SortOrder.LayoutOrder,
-                                    FillDirection = Enum.FillDirection.Vertical,
-                                    HorizontalAlignment = Enum.HorizontalAlignment.Left,
-                                },
-                                new "UIPadding" {
-                                    PaddingLeft = UDim.new(0,10)
-                                }
-                            }
-                        },
-                        new "Frame" { -- topBar
-                            Name = "topBar",
-                            Size = UDim2.new(1,0,0,40),
-                            BackgroundTransparency = 1,
-                            ZIndex = 0,
-
-                            [children] = {
-                                new "TextLabel" {
-                                    AnchorPoint = Vector2.new(0,0.5),
-                                    Position = UDim2.fromScale(0,0.5),
-                                    Size = UDim2.new(1,-40,0,24),
-                                    BackgroundTransparency = 1,
-                                    Font = Enum.Font.GothamBold,
-                                    TextScaled = true,
-                                    TextSize = 24,
-                                    TextXAlignment = Enum.TextXAlignment.Left,
-
-                                    Text = windowProperty.Title,
-                                    TextColor3 = animate(function()
-                                        return get(selectedTab.data).tabColor or theme.get("defaultTab")
-                                    end,15,1),
-                                    TextTransparency = animate(function()
-                                        if get(isOpen) then
-                                            return 0
-                                        else
-                                            return 1
-                                        end
-                                    end,45,1),
-                                    [children] = {
-                                        new "UIPadding" {PaddingLeft = UDim.new(0,10)},
-                                        new "UITextSizeConstraint" {
-                                            MaxTextSize = 24,
-                                            MinTextSize = 1
-                                        }
-                                    }
-                                },
-                                new "TextButton" {
-                                    AnchorPoint = Vector2.new(1,0.5),
-                                    Position = UDim2.fromScale(1,0.5),
-                                    Size = UDim2.fromOffset(40,40),
-                                    BackgroundTransparency = 1,
-                                    Text = "",
-                                    ZIndex = 0,
-
-                                    [onevent "Activated"] = function()
-                                        mobileQuake:Destroy()
-                                    end,
-
-                                    [children] = {
-                                        new "ImageLabel" {
-                                            AnchorPoint = Vector2.new(0.5,0.5),
-                                            Position = UDim2.fromScale(0.5,0.5),
-                                            Size = UDim2.fromScale(0.9,0.9),
-                                            Rotation = 45,
-                                            BackgroundTransparency = 1,
-                                            Image = "rbxassetid://15556635005",
-
-                                            ImageColor3 = animate(function()
-                                                return theme.get("close")
-                                            end,40,1),
-                                            ImageTransparency = animate(function()
-                                                if get(isOpen) then
-                                                    return 0
-                                                else
-                                                    return 1
-                                                end
-                                            end,45,1),
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        new "Frame" { -- windowsList
-                            Name = "windowsList",
-                            ZIndex = 0,
-                            Position = UDim2.fromOffset(50,40),
-                            Size = UDim2.new(1,-50,1,-40),
-                            BackgroundTransparency = 1,
-                            ClipsDescendants = true,
-
-                            [ref] = windowsRef,
-
-                            [children] = {
-                                new "UIPadding" {
-                                    PaddingLeft = UDim.new(0,5),
-                                    PaddingRight = UDim.new(0,10),
-                                    PaddingTop = UDim.new(0,5),
-                                    PaddingBottom = UDim.new(0,5)
-                                },
-                                new "UIPageLayout" {
-                                    Name = "UIPageLayout",
-                                    EasingDirection = Enum.EasingDirection.In,
-                                    EasingStyle = Enum.EasingStyle.Sine,
-                                    TweenTime = 0.2,
-                                    FillDirection = Enum.FillDirection.Vertical,
-                                    SortOrder = Enum.SortOrder.LayoutOrder,
-                                    Padding = UDim.new(0,20),
-
-                                    [ref] = uipagelayoutRef
-                                },
-                            }
-                        }
-                    }
-                }
-            },
-            new "ScrollingFrame" { -- notifications
-                Name = "notifications",
-				ZIndex = 0,
-				AnchorPoint = Vector2.new(1,1),
-				Position = UDim2.new(1,-5,1,-10),
-				Size = UDim2.new(0,1,1,-10),
-				BackgroundTransparency = 1,
-				ScrollBarThickness = 0,
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-                ClipsDescendants = false,
-
-                [ref] = notificationListRef,
-
-				[children] = {
-					new "UIListLayout" {
-						Padding = UDim.new(0,5),
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Right,
-						VerticalAlignment = Enum.VerticalAlignment.Bottom
-					}
-				}
-			}
-        }
-    }
-
-    return mobileQuake
-end
-end)() end,
-    [91] = function()local wax,script,require=ImportGlobals(91)local ImportGlobals return (function(...)return {
-	defaultTab = Color3.fromHex("#a49ae6"),
-	background = Color3.fromRGB(40, 44, 50),
-	secondaryBackground = Color3.fromRGB(49, 56, 66),
-	tertiaryBackground = Color3.fromRGB(57, 63, 75),
-	text = Color3.fromRGB(220,221,225),
-	image = Color3.fromRGB(220,221,225),
-	placeholder = Color3.fromRGB(165,166,169),
-	close = Color3.fromRGB(190, 100, 105)
-}
-end)() end,
-    [92] = function()local wax,script,require=ImportGlobals(92)local ImportGlobals return (function(...)local project = require(script.Parent)
-
-local themes = {
-    ["Dracula"] = {
-        defaultTab = Color3.fromRGB(254, 126, 92),
-        background = Color3.fromRGB(40, 42, 54),
-        secondaryBackground = Color3.fromRGB(50, 52, 64),
-        tertiaryBackground = Color3.fromRGB(45, 47, 59),
-        text = Color3.fromRGB(204, 204, 204),
-        image = Color3.fromRGB(204, 204, 204),
-        placeholder = Color3.fromRGB(165,166,169),
-        close = Color3.fromRGB(190, 100, 105)
-    },
-    ["Dark"] = {
-        defaultTab = Color3.fromRGB(150, 150, 150),
-        background = Color3.fromRGB(26, 27, 33),
-        secondaryBackground = Color3.fromRGB(34, 35, 39),
-        tertiaryBackground = Color3.fromRGB(22, 22, 22),
-        text = Color3.fromRGB(230, 230, 230),
-        image = Color3.fromRGB(94, 93, 93),
-        placeholder = Color3.fromRGB(79, 79, 79),
-        close = Color3.fromRGB(190, 100, 105)
-    },
-    ["Default"] = {},
-    ["Eyebleed"] = {
-        defaultTab = Color3.fromRGB(255, 67, 211),
-        background = Color3.fromRGB(195, 198, 217),
-        secondaryBackground = Color3.fromRGB(127, 130, 140),
-        tertiaryBackground = Color3.fromRGB(116, 137, 100),
-        text = Color3.fromRGB(116, 57, 108),
-        image = Color3.fromRGB(244, 162, 162),
-        placeholder = Color3.fromRGB(57, 181, 103),
-        close = Color3.fromRGB(181, 177, 67)
-    }
-}
-
-return function(target)
-    local window = project:Window({
-        Title = "Quake Window",
-        Parent = target,
-        isMobile = true,
-
-        --KeyCode = Enum.KeyCode.Q
-    })
-
-    local tab1 = window:Tab({
-        Name = "Quake Tab 1",
-        Image = "rbxassetid://10734908793"
-    })
-    local tab2 = window:Tab({
-        Name = "Quake Tab 2",
-        tabColor = Color3.fromRGB(255,120,222),
-        Image = "rbxassetid://10734919691"
-    })
-    local tab3 = window:Tab({
-        Name = "Quake Tab 3",
-        tabColor = Color3.fromRGB(65,253,123),
-        Image = "rbxassetid://10734950309"
-    })
-
-    tab1:Button({
-        Name = "Quake Button",
-        Callback = function()
-            print("Quake Button")
-        end
-    })
-    tab1:Toggle({
-        Name = "Quake Toggle",
-        Default = false,
-        Callback = function(var)
-            print("Quake Toggle", var)
-        end
-    })
-    tab1:Slider({
-        Name = "Quake Slider",
-        Min = 0,
-        Max = 100,
-        InitialValue = 0,
-        Callback = function(var)
-            print("Quake Slider", var)
-        end
-    })
-    tab1:Dropdown({
-        Name = "Quake Multiselect Dropdown",
-        Items = {"Apple", "Banana", "Carrot","Dingleberry"},
-        Default = "Apple",
-        Multiselect = true,
-        Callback = function(var)
-            print("Quake Dropdown", var)
-        end
-    })
-    tab1:TextBox({
-        Name = "Quake TextBox",
-        Default = "heyy",
-        OnLeave = true,
-        OnlyNumbers = true,
-        Callback = function(var)
-            print("Quake TextBox", var)
-        end
-    })
-    tab1:Keybind({
-        Name = "Quake Keybind",
-        Default = "F",
-        Callback = function()
-            project:ToggleQuake()
-        end
-    })
-    tab1:ColorPicker({
-        Name = "Quake Color Picker",
-        Color = Color3.fromHex("#a49ae6"),
-        Callback = function(var)
-            print("Quake Color Picker", var)
-        end
-    })
+local Button = {}
+Button.__index = Button
+
+function Button.new(options, tab)
+    local self = setmetatable({}, Button)
     
-    tab1:Label("Quake Label")
-    tab1:Section("Quake Section")
-    tab1:Paragraph({
-        Title = "Quake Paragraph",
-        Body = "Quake Paragraph"
-    })
-    tab2:Label("Quake Group Below")
-    local group1 = tab2:Group({
-        Name = "Quake Group",
-        Icon = "rbxassetid://10734950309"
-    })
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "Button"
+    self.Description = options.Description or "" -- Add subtitle support
+    self.HasKeybind = options.Keybind or false -- Keybind support
+    self.Keybind = nil -- Will be set by user
+    self.IsListeningForKeybind = false
+    self.Callback = options.Callback or function() end
+    
+    -- Create the button UI
+    self:Create()
+    
+    -- Setup keybind system if enabled
+    if self.HasKeybind then
+        self:SetupKeybindSystem()
+    end
+    
+    return self
+end
 
-    group1:Button({
-        Name = "Quake Button",
-        Callback = function()
-            print("Quake Button")
-        end
-    })
-    group1:Toggle({
-        Name = "Quake Toggle",
-        Default = false,
-        Callback = function(var)
-            print("Quake Toggle", var)
-        end
-    })
-    group1:Slider({
-        Name = "Quake Slider",
-        Min = 0,
-        Max = 100,
-        Step = 1,
-        InitialValue = 0,
-        Callback = function(var)
-            print("Quake Slider", var)
-        end
-    })
-    group1:Dropdown({
-        Name = "Quake Dropdown",
-        Items = {"Apple", "Banana", "Carrot","Dingleberry"},
-        Multiselect = false,
-        Callback = function(var)
-            print("Quake Dropdown", var)
-        end
-    })
-    group1:TextBox({
-        Name = "Quake TextBox",
-        Default = "",
-        Callback = function(var)
-            print("Quake TextBox", var)
-        end
-    })
-    group1:Keybind({
-        Name = "Quake Keybind",
-        Default = "E",
-        Callback = function()
-            print("Quake Keybind")
-        end
-    })
-    group1:ColorPicker({
-        Name = "Quake Color Picker",
-        Color = Color3.fromHex("#a49ae6"),
-        Callback = function(var)
-            print("Quake Color Picker", var)
-        end
-    })
-    group1:Label("Quake Label")
-    group1:Section("Quake Section")
-    group1:Paragraph({
-        Title = "Quake Paragraph",
-        Body = "Quake Paragraph"
-    })
+function Button:Create()
+    -- Main container with modern styling
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "Button"
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.Tab.Container
+    
+    -- Modern border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.Container
+    
+    -- Button left icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
 
-    tab2:Dropdown({
-        Name = "Switch Theme",
-        Items = {"Dracula","Dark","Default","Eyebleed"},
-        Default = "Default",
-        Callback = function(value)
-            project:SetCustomTheme(themes[value])
-        end
-    })
+    self.ButtonLeftIcon = Instance.new("ImageLabel")
+    self.ButtonLeftIcon.Name = "LeftIcon"
+    self.ButtonLeftIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.ButtonLeftIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 14)
+    self.ButtonLeftIcon.BackgroundTransparency = 1
+    self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
+    self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.ButtonLeftIcon.Parent = self.Container
+    
+    -- Button text
+    self.ButtonText = Instance.new("TextLabel")
+    self.ButtonText.Name = "Text"
+    self.ButtonText.Size = UDim2.new(0, 200, 0, 22)
+    self.ButtonText.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.ButtonText.BackgroundTransparency = 1
+    self.ButtonText.Text = self.Name
+    self.ButtonText.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.ButtonText.TextSize = 15
+    self.ButtonText.Font = Enum.Font.GothamSemibold
+    self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
+    self.ButtonText.Parent = self.Container
+    
+    -- Button description
+    if self.Description ~= "" then
+        self.ButtonDescription = Instance.new("TextLabel")
+        self.ButtonDescription.Name = "Description"
+        self.ButtonDescription.Size = UDim2.new(0, 250, 0, 16)
+        self.ButtonDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.ButtonDescription.BackgroundTransparency = 1
+        self.ButtonDescription.Text = self.Description
+        self.ButtonDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
+        self.ButtonDescription.TextSize = 12
+        self.ButtonDescription.Font = Enum.Font.Gotham
+        self.ButtonDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.ButtonDescription.Parent = self.Container
+    end
+    
+    -- Keybind button (if enabled)
+    if self.HasKeybind then
+        self.KeybindButton = Instance.new("TextButton")
+        self.KeybindButton.Name = "KeybindButton"
+        self.KeybindButton.Size = UDim2.new(0, 38, 0, 30)
+        self.KeybindButton.Position = UDim2.new(1, -50, 0.5, 0)
+        self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
+        self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+        self.KeybindButton.Text = "⌨"
+        self.KeybindButton.TextColor3 = Color3.fromRGB(200, 205, 210)
+        self.KeybindButton.TextSize = 16
+        self.KeybindButton.Font = Enum.Font.GothamBold
+        self.KeybindButton.BorderSizePixel = 0
+        self.KeybindButton.Parent = self.Container
 
-    local slider = tab3:Slider({
-        Name = "Slider To Lock",
-        Max = 150,
-        Min = 37,
-        Callback = function(value)
-        end
-    })
-    tab3:Toggle({
-        Name = "Lock Slider",
-        Default = false,
-        Callback = function(value)
-            if value then
-                slider:Lock("Buy Premium!!")
-            else
-                slider:Unlock()
+        -- Keybind button corner radius
+        local keybindCorner = Instance.new("UICorner")
+        keybindCorner.CornerRadius = UDim.new(0, 6)
+        keybindCorner.Parent = self.KeybindButton
+        
+        -- Keybind button functionality handled by drag detection below
+        -- Stop event propagation to prevent button activation
+        self.KeybindButton.MouseButton1Down:Connect(function()
+            -- This prevents the click from bubbling to the main button
+        end)
+        
+        -- Drag out functionality for all platforms
+        local UserInputService = game:GetService("UserInputService")
+        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+        
+        -- Variables for drag detection
+        local isDragging = false
+        local dragStart = nil
+        local pressTime = 0
+        local hasMovedEnough = false
+        local dragConnection = nil
+        
+        -- Variables for connections
+        local releaseConnection = nil
+        
+        -- Mouse/Touch down
+        self.KeybindButton.MouseButton1Down:Connect(function()
+            isDragging = true
+            dragStart = UserInputService:GetMouseLocation()
+            pressTime = tick()
+            hasMovedEnough = false
+            print("Button keybind drag started") -- Debug
+            
+            -- Clean up any existing connections
+            if dragConnection then
+                dragConnection:Disconnect()
             end
+            if releaseConnection then
+                releaseConnection:Disconnect()
+            end
+            
+            -- Connect to mouse movement
+            dragConnection = UserInputService.InputChanged:Connect(function(input)
+                if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local currentPos = Vector2.new(input.Position.X, input.Position.Y)
+                    local distance = (currentPos - dragStart).Magnitude
+                    if distance > 15 then -- Reduced threshold
+                        hasMovedEnough = true
+                        print("Button keybind moved enough:", distance) -- Debug
+                    end
+                end
+            end)
+            
+            -- Connect to global mouse release
+            releaseConnection = UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
+                    print("Button keybind mouse released") -- Debug
+                    
+                    -- Clean up connections
+                    if releaseConnection then
+                        releaseConnection:Disconnect()
+                        releaseConnection = nil
+                    end
+                    if dragConnection then
+                        dragConnection:Disconnect()
+                        dragConnection = nil
+                    end
+                    
+                    local holdTime = tick() - pressTime
+                    print("Button keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) -- Debug
+                    
+                    -- Create draggable if: moved enough OR held long enough
+                    if hasMovedEnough or holdTime > 0.5 then
+                        print("Creating draggable button keybind") -- Debug
+                        self:CreateDraggableKeybind()
+                    elseif holdTime < 0.3 then
+                        -- Quick click - start keybind listening
+                        print("Starting keybind listening") -- Debug
+                        self:StartKeybindListening()
+                    end
+                    
+                    isDragging = false
+                    dragStart = nil
+                    hasMovedEnough = false
+                end
+            end)
+        end)
+        
+        -- Right click for PC users (alternative method)
+        self.KeybindButton.MouseButton2Click:Connect(function()
+            print("Right click - creating draggable button keybind") -- Debug
+            self:CreateDraggableKeybind()
+        end)
+        
+        -- Keybind button hover effects
+        self.KeybindButton.MouseEnter:Connect(function()
+            if not self.IsListeningForKeybind then
+                self.KeybindButton.BackgroundColor3 = Color3.fromRGB(65, 70, 77)
+            end
+        end)
+        
+        self.KeybindButton.MouseLeave:Connect(function()
+            if not self.IsListeningForKeybind then
+                self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+            end
+        end)
+    end
+    
+    -- Button right icon (fingerprint)
+    self.ButtonIcon = Instance.new("ImageLabel")
+    self.ButtonIcon.Name = "Icon"
+    self.ButtonIcon.Size = UDim2.new(0, 24, 0, 24)
+    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -84 or -34, 0.5, 0) -- Adjust position if keybind exists
+    self.ButtonIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.ButtonIcon.BackgroundTransparency = 1
+    self.ButtonIcon.Image = (success and Lucide and Lucide["fingerprint"]) or "rbxassetid://10723375250" -- fallback fingerprint icon
+    self.ButtonIcon.ImageColor3 = self.Library.Colors.LightText
+    self.ButtonIcon.Parent = self.Container
+    
+    -- Button for interaction (exclude keybind area)
+    self.ButtonInteraction = Instance.new("TextButton")
+    self.ButtonInteraction.Name = "Interaction"
+    self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -50 or 0, 1, 0) -- Exclude keybind button area
+    self.ButtonInteraction.BackgroundTransparency = 1
+    self.ButtonInteraction.Text = ""
+    self.ButtonInteraction.Parent = self.Container
+    
+    -- Click effect
+    local clickEffect = function()
+        -- Create a ripple effect
+        local ripple = Instance.new("Frame")
+        ripple.Name = "Ripple"
+        ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+        ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+        ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ripple.BackgroundTransparency = 0.8
+        ripple.BorderSizePixel = 0
+        ripple.Size = UDim2.new(0, 0, 0, 0)
+        ripple.Parent = self.Container
+        
+        -- Apply corner radius to ripple
+        local rippleCorner = Instance.new("UICorner")
+        rippleCorner.CornerRadius = UDim.new(1, 0)
+        rippleCorner.Parent = ripple
+        
+        -- Animate the ripple
+        local expandTween = TweenService:Create(
+            ripple,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1.5, 0, 1.5, 0), BackgroundTransparency = 1}
+        )
+        expandTween:Play()
+        
+        expandTween.Completed:Connect(function()
+            ripple:Destroy()
+        end)
+    end
+    
+    -- Button click handler
+    self.ButtonInteraction.MouseButton1Click:Connect(function()
+        clickEffect()
+        self.Callback()
+    end)
+    
+    -- Modern hover effects
+    self.ButtonInteraction.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(70, 80, 90)}
+        )
+        borderTween:Play()
+    end)
+    
+    self.ButtonInteraction.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(55, 60, 67)}
+        )
+        borderTween:Play()
+    end)
+    
+    return self
+end
+
+function Button:SetupKeybindSystem()
+    local UserInputService = game:GetService("UserInputService")
+    
+    -- Listen for keybind input
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        
+        if self.IsListeningForKeybind then
+            -- Set new keybind
+            self.Keybind = input.KeyCode
+            self.IsListeningForKeybind = false
+            self:UpdateKeybindDisplay()
+            self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+            return
         end
-    })
-
-    return function()
-        project:Destroy()
-    end
+        
+        -- Check if pressed key matches button keybind
+        if self.Keybind and input.KeyCode == self.Keybind then
+            self.Callback()
+        end
+    end)
 end
 
-end)() end,
-    [94] = function()local wax,script,require=ImportGlobals(94)local ImportGlobals return (function(...)local Fusion = require(script.Parent.Parent.Bundles.Fusion)
-local computed,spring = Fusion.Computed,Fusion.Spring
-
-return function(callback, speed, damping)
-	return spring(computed(callback), speed, damping)
-end
-end)() end,
-    [95] = function()local wax,script,require=ImportGlobals(95)local ImportGlobals return (function(...)local connections = {}
-local connectionsFunction = {}
-
-local services = require(script.Parent.Parent.Bundles.services)
-local ContextActionService = services.ContextActionService
-
-function connectionsFunction.add(connection)
-    table.insert(connections, connection)
-end
-function connectionsFunction.deleteConnections()
-    for i,v in connections do
-        v:Disconnect()
-        connections[i] = nil
-    end
-    ContextActionService:UnbindAllActions()
+function Button:StartKeybindListening()
+    self.IsListeningForKeybind = true
+    self.KeybindButton.Text = "..."
+    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent -- Accent color when listening
 end
 
-return connectionsFunction
-end)() end,
-    [96] = function()local wax,script,require=ImportGlobals(96)local ImportGlobals return (function(...)local functions = {}
-
-function functions.cloneref(service)
-    if cloneref then
-        return cloneref(service)
+function Button:UpdateKeybindDisplay()
+    if self.Keybind then
+        -- Convert KeyCode to readable text
+        local keyName = tostring(self.Keybind):gsub("Enum.KeyCode.", "")
+        self.KeybindButton.Text = keyName:upper()
+        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 -- Bigger text for all keys
     else
-        return service
+        self.KeybindButton.Text = "⌨"
     end
 end
 
-functions.getgenv = getgenv or nil
-return functions
-end)() end,
-    [97] = function()local wax,script,require=ImportGlobals(97)local ImportGlobals return (function(...)return function(o,s)
-	local services = require(script.Parent.Parent.Bundles.services)
-	local DRAG_SPEED = s or 10
-	local UserInputService = services.UserInputService
-	local runService = services.RunService
-	local gui = o
-	local dragging, lastMousePos, lastGoalPos, startPos
-	local function Lerp(a, b, m)
-		return a + (b - a) * m
-	end
-	
-	local function Update(dt)
-		if not (startPos) then return end;
-		
-		if not (dragging) and (lastGoalPos) then
-			gui.Position = UDim2.new(startPos.X.Scale, Lerp(gui.Position.X.Offset, lastGoalPos.X.Offset, dt * DRAG_SPEED), startPos.Y.Scale, Lerp(gui.Position.Y.Offset, lastGoalPos.Y.Offset, dt * DRAG_SPEED))
-			return 
-		end
-		
-		local delta = (lastMousePos - UserInputService:GetMouseLocation())
-		
-		local xGoal = (startPos.X.Offset - delta.X);
-		local yGoal = (startPos.Y.Offset - delta.Y);
-		
-		lastGoalPos = UDim2.new(startPos.X.Scale, xGoal, startPos.Y.Scale, yGoal)
-		
-		gui.Position = UDim2.new(startPos.X.Scale, Lerp(gui.Position.X.Offset, xGoal, dt * DRAG_SPEED), startPos.Y.Scale, Lerp(gui.Position.Y.Offset, yGoal, dt * DRAG_SPEED))
-	end
-	
-	gui.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			startPos = gui.Position
-			lastMousePos = UserInputService:GetMouseLocation()
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-	local connection = runService.Heartbeat:Connect(Update)
-	return connection
+function Button:CreateDraggableKeybind()
+    print("Button:CreateDraggableKeybind called for:", self.Name) -- Debug
+    local DraggableKeybind = require(script.Parent.DraggableKeybind)
+    
+    local draggable = DraggableKeybind.CreateFromButton(
+        self.KeybindButton,
+        "Button",
+        self.Name,
+        self.Callback,
+        nil,
+        nil
+    )
+    print("Draggable button created:", draggable) -- Debug
 end
 
+return Button
 end)() end,
-    [98] = function()local wax,script,require=ImportGlobals(98)local ImportGlobals return (function(...)return function(value, dependency)
-	if typeof(value) == "table" and value.type == "State" then
-		return value:get(dependency)
-	end
-	return value
-end
-end)() end,
-    [99] = function()local wax,script,require=ImportGlobals(99)local ImportGlobals return (function(...)return function(text:string, properties)
-    text = text or ""
-    properties = properties or {
-        TextSize = 14,
-        Font = Enum.Font.Arial,
-        VectorSize = Vector2.new(200,50)
-    }
-    local TextService = game:GetService("TextService")
-    return TextService:GetTextSize(text,properties.TextSize,properties.Font,properties.VectorSize)
-end
-end)() end,
-    [100] = function()local wax,script,require=ImportGlobals(100)local ImportGlobals return (function(...)local black = Color3.new(0, 0, 0)
-local white = Color3.new(1, 1, 1)
+    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)--[[
+    Config System for ProjectMadara UI Library
+    Automatically saves and loads component settings
+    Works in both Roblox Studio and Executors
+]]
 
-return function(color: Color3, BorW: string, lerpAmount: number) 
-	local check = string.lower(BorW)
-	if BorW == "black" then
-		return color:Lerp(black, lerpAmount)
-	elseif BorW == "white" then
-		return color:Lerp(white, lerpAmount)
-	else
-		return error("hey its not white or black")
-	end
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+local Config = {}
+Config.__index = Config
+
+function Config.new(gameName)
+    local self = setmetatable({}, Config)
+    
+    self.gameName = gameName or "ProjectMadara"
+    self.configFolder = "Project L | V2 By Project L Team"
+    self.configFileName = string.format("[%s].config", self.gameName)
+    self.configPath = string.format("%s/%s", self.configFolder, self.configFileName)
+    self.isFirstTime = false
+    
+    -- Detect environment (Studio vs Executor)
+    self.isExecutor = isfolder ~= nil and makefolder ~= nil and writefile ~= nil and readfile ~= nil
+    self.isStudio = not self.isExecutor
+    
+    -- Initialize config template
+    self.configTemplate = {}
+    
+    -- Initialize the config system
+    self:Initialize()
+    
+    return self
 end
-end)() end,
-    [101] = function()local wax,script,require=ImportGlobals(101)local ImportGlobals return (function(...)return function(Color1, Color2)
-    if Color1.R == Color2.R and Color1.G == Color2.G and Color1.B == Color2.B then
-        return true
-    end
-    return false
-end
-end)() end,
-    [102] = function()local wax,script,require=ImportGlobals(102)local ImportGlobals return (function(...)local charset = {}
-for i = 48,  57 do table.insert(charset, string.char(i)) end
-for i = 65,  90 do table.insert(charset, string.char(i)) end
-for i = 97, 122 do table.insert(charset, string.char(i)) end
-local function randomString(length)
-    if length > 0 then
-        return randomString(length - 1) .. charset[math.random(1, #charset)]
+
+function Config:Initialize()
+    if self.isExecutor then
+        self:InitializeExecutor()
     else
-        return ""
+        self:InitializeStudio()
+    end
+    
+    if self.isFirstTime then
+        print("[INFO] First-time setup completed. Default configuration applied.")
+    else
+        print("[INFO] Configuration loaded successfully.")
     end
 end
-return randomString
+
+function Config:InitializeExecutor()
+    -- Executor environment - use file system
+    print("[INFO] Running in Executor - using file system storage")
+    
+    -- Create folder if it doesn't exist
+    if not isfolder(self.configFolder) then
+        makefolder(self.configFolder)
+        self.isFirstTime = true
+        print("[DEBUG] Config folder created:", self.configFolder)
+    end
+    
+    -- Create config file if it doesn't exist
+    if not isfile(self.configPath) then
+        writefile(self.configPath, HttpService:JSONEncode(self.configTemplate))
+        self.isFirstTime = true
+        print("[DEBUG] Config file created:", self.configPath)
+    end
+    
+    -- Load existing config
+    local success, result = pcall(function()
+        return HttpService:JSONDecode(readfile(self.configPath))
+    end)
+    
+    if success and result then
+        getgenv().config = result
+    else
+        getgenv().config = self.configTemplate
+        print("[WARNING] Failed to load config, using template")
+    end
+    
+    -- Ensure getgenv().config exists
+    if not getgenv().config then
+        getgenv().config = {}
+    end
+end
+
+function Config:InitializeStudio()
+    -- Studio environment - use DataStore or simple memory storage
+    print("[INFO] Running in Roblox Studio - using memory storage")
+    print("[NOTE] Settings will persist until server restart in Studio")
+    
+    -- Use _G for persistent storage in Studio (resets on server restart)
+    if not _G.ProjectMadaraConfig then
+        _G.ProjectMadaraConfig = {}
+        self.isFirstTime = true
+    end
+    
+    -- Use _G instead of getgenv() in Studio
+    if not _G.ProjectMadaraConfig[self.gameName] then
+        _G.ProjectMadaraConfig[self.gameName] = self.configTemplate
+    end
+    
+    -- Create a reference for easier access
+    getgenv().config = _G.ProjectMadaraConfig[self.gameName]
+end
+
+function Config:UpdateConfig()
+    if self.isExecutor then
+        self:UpdateConfigExecutor()
+    else
+        self:UpdateConfigStudio()
+    end
+end
+
+function Config:UpdateConfigExecutor()
+    local success, error = pcall(function()
+        writefile(self.configPath, HttpService:JSONEncode(getgenv().config))
+    end)
+    
+    if not success then
+        warn("[ERROR] Failed to save config:", error)
+    end
+end
+
+function Config:UpdateConfigStudio()
+    -- In Studio, just update the _G storage
+    _G.ProjectMadaraConfig[self.gameName] = getgenv().config
+    -- Note: This will persist until server restart in Studio
+end
+
+function Config:EnsureTabExists(tabName)
+    if not getgenv().config[tabName] then
+        getgenv().config[tabName] = {}
+    end
+end
+
+function Config:GetValue(tabName, componentName, defaultValue)
+    self:EnsureTabExists(tabName)
+    
+    if getgenv().config[tabName][componentName] ~= nil then
+        return getgenv().config[tabName][componentName]
+    else
+        -- Set default value if it doesn't exist
+        getgenv().config[tabName][componentName] = defaultValue
+        self:UpdateConfig()
+        return defaultValue
+    end
+end
+
+function Config:SetValue(tabName, componentName, value)
+    self:EnsureTabExists(tabName)
+    getgenv().config[tabName][componentName] = value
+    self:UpdateConfig()
+end
+
+-- Optional: Add DataStore support for Studio (for persistent storage across server restarts)
+function Config:EnableDataStoreInStudio(dataStoreName)
+    if not self.isStudio then return end
+    
+    local DataStoreService = game:GetService("DataStoreService")
+    local success, dataStore = pcall(function()
+        return DataStoreService:GetDataStore(dataStoreName or "ProjectMadaraConfig")
+    end)
+    
+    if success then
+        self.dataStore = dataStore
+        print("[INFO] DataStore enabled for persistent storage in Studio")
+        
+        -- Try to load from DataStore
+        local loadSuccess, savedData = pcall(function()
+            return self.dataStore:GetAsync(self.gameName)
+        end)
+        
+        if loadSuccess and savedData then
+            getgenv().config = savedData
+            _G.ProjectMadaraConfig[self.gameName] = savedData
+            print("[INFO] Config loaded from DataStore")
+        end
+    else
+        warn("[WARNING] Failed to enable DataStore:", dataStore)
+    end
+end
+
+-- Override UpdateConfigStudio to use DataStore if available
+function Config:UpdateConfigStudio()
+    -- Update _G storage
+    _G.ProjectMadaraConfig[self.gameName] = getgenv().config
+    
+    -- Also save to DataStore if available
+    if self.dataStore then
+        local success, error = pcall(function()
+            self.dataStore:SetAsync(self.gameName, getgenv().config)
+        end)
+        
+        if not success then
+            warn("[WARNING] Failed to save to DataStore:", error)
+        end
+    end
+end
+
+return Config
 end)() end,
-    [103] = function()local wax,script,require=ImportGlobals(103)local ImportGlobals return (function(...)local references = {}
-local returnFunctions = {}
-local observe = require(script.Parent.Parent.Bundles.Fusion).Observer
+    function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)--[[
+    Draggable Keybind Component
+    Allows keybind buttons to be dragged out of the main UI and used as floating buttons
+]]
 
-local get = require(script.Parent.get)
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
-function returnFunctions.add(REF)
-    if typeof(get(REF)) ~= "Instance" then
-        observe(REF):onChange(function()
-            if typeof(get(REF)) == "Instance" then
-                if not references[get(REF).Name] then
-                    references[get(REF).Name] = get(REF)
-                else
-                    warn(get(REF).Name, " REF was already added")
+local DraggableKeybind = {}
+DraggableKeybind.__index = DraggableKeybind
+
+-- Global storage for dragged keybinds
+local DraggedKeybinds = {}
+local DraggedKeybindsGui = nil
+
+function DraggableKeybind.new(options)
+    local self = setmetatable({}, DraggableKeybind)
+    
+    self.Name = options.Name or "Keybind"
+    self.Callback = options.Callback or function() end
+    self.OriginalButton = options.OriginalButton -- Reference to the original keybind button
+    self.ComponentType = options.ComponentType or "Button" -- "Button" or "Toggle"
+    self.ToggleValue = options.ToggleValue -- For toggles
+    self.SetToggleValue = options.SetToggleValue -- For toggles
+    self.IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    
+    -- Create the dragged keybind GUI if it doesn't exist
+    if not DraggedKeybindsGui then
+        self:CreateDraggedKeybindsGui()
+    end
+    
+    -- Create the floating keybind
+    self:CreateFloatingKeybind()
+    
+    return self
+end
+
+function DraggableKeybind:CreateDraggedKeybindsGui()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    DraggedKeybindsGui = Instance.new("ScreenGui")
+    DraggedKeybindsGui.Name = "DraggedKeybinds"
+    DraggedKeybindsGui.ResetOnSpawn = false
+    DraggedKeybindsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    DraggedKeybindsGui.Parent = playerGui
+end
+
+function DraggableKeybind:CreateFloatingKeybind()
+    -- Create floating keybind container
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "FloatingKeybind"
+    self.Container.Size = UDim2.new(0, self.IsMobile and 70 or 60, 0, self.IsMobile and 70 or 60)
+    self.Container.Position = UDim2.new(0, math.random(100, 300), 0, math.random(150, 400))
+    self.Container.BackgroundTransparency = 1
+    self.Container.Parent = DraggedKeybindsGui
+    
+    -- Main floating button
+    self.FloatingButton = Instance.new("TextButton")
+    self.FloatingButton.Name = "FloatingButton"
+    self.FloatingButton.Size = UDim2.new(1, -6, 1, -6)
+    self.FloatingButton.Position = UDim2.new(0, 3, 0, 3)
+    self.FloatingButton.BackgroundColor3 = self.ComponentType == "Toggle" and Color3.fromRGB(88, 166, 255) or Color3.fromRGB(0, 120, 215)
+    self.FloatingButton.Text = ""
+    self.FloatingButton.BorderSizePixel = 0
+    self.FloatingButton.Parent = self.Container
+    
+    -- Circular shape
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = self.FloatingButton
+    
+    -- Premium border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 255, 255)
+    border.Thickness = 2
+    border.Transparency = 0.6
+    border.Parent = self.FloatingButton
+    
+    -- Shadow effect
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 8, 1, 8)
+    shadow.Position = UDim2.new(0, -4, 0, -4)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.7
+    shadow.BorderSizePixel = 0
+    shadow.ZIndex = self.FloatingButton.ZIndex - 1
+    shadow.Parent = self.FloatingButton
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(1, 0)
+    shadowCorner.Parent = shadow
+    
+    -- Icon using first letter of the component name
+    self.Icon = Instance.new("TextLabel")
+    self.Icon.Size = UDim2.new(1, 0, 1, 0)
+    self.Icon.BackgroundTransparency = 1
+    self.Icon.Text = string.upper(string.sub(self.Name, 1, 1)) -- First letter of name
+    self.Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.Icon.TextSize = self.IsMobile and 28 or 24
+    self.Icon.Font = Enum.Font.GothamBold
+    self.Icon.TextXAlignment = Enum.TextXAlignment.Center
+    self.Icon.TextYAlignment = Enum.TextYAlignment.Center
+    self.Icon.Parent = self.FloatingButton
+    
+    -- Name label (appears on hover/touch)
+    self.NameLabel = Instance.new("TextLabel")
+    self.NameLabel.Name = "NameLabel"
+    self.NameLabel.Size = UDim2.new(0, 120, 0, 24)
+    self.NameLabel.Position = UDim2.new(0.5, 0, 1, 8)
+    self.NameLabel.AnchorPoint = Vector2.new(0.5, 0)
+    self.NameLabel.BackgroundColor3 = Color3.fromRGB(20, 25, 32)
+    self.NameLabel.Text = self.Name
+    self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.NameLabel.TextSize = 12
+    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextXAlignment = Enum.TextXAlignment.Center
+    self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
+    self.NameLabel.BorderSizePixel = 0
+    self.NameLabel.Visible = false
+    self.NameLabel.Parent = self.Container
+    
+    local labelCorner = Instance.new("UICorner")
+    labelCorner.CornerRadius = UDim.new(0, 6)
+    labelCorner.Parent = self.NameLabel
+    
+    local labelBorder = Instance.new("UIStroke")
+    labelBorder.Color = Color3.fromRGB(40, 45, 52)
+    labelBorder.Thickness = 1
+    labelBorder.Parent = self.NameLabel
+    
+    -- Toggle state indicator (for toggles only)
+    if self.ComponentType == "Toggle" then
+        self.StateIndicator = Instance.new("Frame")
+        self.StateIndicator.Size = UDim2.new(0, 12, 0, 12)
+        self.StateIndicator.Position = UDim2.new(1, -8, 0, -4)
+        self.StateIndicator.BackgroundColor3 = Color3.fromRGB(255, 60, 60) -- Red for off
+        self.StateIndicator.BorderSizePixel = 0
+        self.StateIndicator.Parent = self.FloatingButton
+        
+        local stateCorner = Instance.new("UICorner")
+        stateCorner.CornerRadius = UDim.new(1, 0)
+        stateCorner.Parent = self.StateIndicator
+        
+        -- Update state indicator
+        self:UpdateToggleState()
+    end
+    
+    -- Close button (much bigger and easier to click)
+    self.CloseButton = Instance.new("TextButton")
+    self.CloseButton.Size = UDim2.new(0, 30, 0, 30) -- Even bigger
+    self.CloseButton.Position = UDim2.new(1, -20, 0, -10) -- Closer to the main button
+    self.CloseButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Center it properly
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    self.CloseButton.Text = "×"
+    self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.CloseButton.TextSize = 18 -- Bigger text
+    self.CloseButton.Font = Enum.Font.GothamBold
+    self.CloseButton.BorderSizePixel = 0
+    self.CloseButton.Visible = true -- Always visible for now so you can see it
+    self.CloseButton.ZIndex = 100 -- Make sure it's on top
+    self.CloseButton.Parent = self.Container
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = self.CloseButton
+    
+    -- Close button border for better visibility
+    local closeBorder = Instance.new("UIStroke")
+    closeBorder.Color = Color3.fromRGB(255, 255, 255)
+    closeBorder.Thickness = 3 -- Thicker border
+    closeBorder.Parent = self.CloseButton
+    
+    -- Make draggable
+    self:MakeDraggable()
+    
+    -- Setup interactions
+    self:SetupInteractions()
+    
+    -- Add to global storage
+    table.insert(DraggedKeybinds, self)
+    
+    return self
+end
+
+function DraggableKeybind:MakeDraggable()
+    -- Combined drag and click detection
+    local isDragging = false
+    local dragStart = nil
+    local startPos = nil
+    local pressTime = 0
+    local hasMovedEnough = false
+    local dragConnection = nil
+    local releaseConnection = nil
+    
+    self.FloatingButton.MouseButton1Down:Connect(function()
+        isDragging = true
+        dragStart = UserInputService:GetMouseLocation()
+        startPos = self.Container.Position
+        pressTime = tick()
+        hasMovedEnough = false
+        print("Floating button pressed:", self.Name) -- Debug
+        
+        -- Close button is always visible now
+        
+        -- Clean up existing connections
+        if dragConnection then dragConnection:Disconnect() end
+        if releaseConnection then releaseConnection:Disconnect() end
+        
+        -- Connect to mouse movement
+        dragConnection = UserInputService.InputChanged:Connect(function(input)
+            if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local currentPos = Vector2.new(input.Position.X, input.Position.Y)
+                local distance = (currentPos - dragStart).Magnitude
+                
+                if distance > 10 then -- Start dragging after 10 pixels
+                    hasMovedEnough = true
+                    local delta = currentPos - dragStart
+                    self.Container.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
                 end
             end
         end)
+        
+        -- Connect to mouse release
+        releaseConnection = UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
+                local holdTime = tick() - pressTime
+                print("Floating button released:", self.Name, "moved:", hasMovedEnough, "holdTime:", holdTime) -- Debug
+                
+                -- Clean up connections
+                if dragConnection then
+                    dragConnection:Disconnect()
+                    dragConnection = nil
+                end
+                if releaseConnection then
+                    releaseConnection:Disconnect()
+                    releaseConnection = nil
+                end
+                
+                -- If it was a quick click without much movement, activate the button
+                if not hasMovedEnough and holdTime < 0.3 then
+                    print("Activating floating button:", self.Name) -- Debug
+                    self:OnActivated()
+                end
+                
+                isDragging = false
+                hasMovedEnough = false
+                
+                -- Close button stays visible
+            end
+        end)
+    end)
+end
+
+function DraggableKeybind:SetupInteractions()
+    
+    -- Close button click
+    self.CloseButton.MouseButton1Click:Connect(function()
+        print("Close button clicked for:", self.Name) -- Debug
+        self:Remove()
+    end)
+    
+    -- Close button hover effects to make it more obvious
+    self.CloseButton.MouseEnter:Connect(function()
+        print("Hovering over close button") -- Debug
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 35, 0, 35), BackgroundColor3 = Color3.fromRGB(255, 100, 100)}
+        )
+        scaleTween:Play()
+    end)
+    
+    self.CloseButton.MouseLeave:Connect(function()
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 30, 0, 30), BackgroundColor3 = Color3.fromRGB(255, 60, 60)}
+        )
+        scaleTween:Play()
+    end)
+    
+    -- Hover effects (PC only)
+    if not self.IsMobile then
+        self.FloatingButton.MouseEnter:Connect(function()
+            self.NameLabel.Visible = true
+            self.CloseButton.Visible = true
+            
+            local scaleTween = TweenService:Create(
+                self.FloatingButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(1, 4, 1, 4)}
+            )
+            scaleTween:Play()
+        end)
+        
+        self.FloatingButton.MouseLeave:Connect(function()
+            self.NameLabel.Visible = false
+            self.CloseButton.Visible = false
+            
+            local scaleTween = TweenService:Create(
+                self.FloatingButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(1, -6, 1, -6)}
+            )
+            scaleTween:Play()
+        end)
     else
-        if not references[get(REF).Name] then
-            references[get(REF).Name] = get(REF)
-        else
-            warn(get(REF).Name, " REF was already added")
-        end
-    end
-end
-function returnFunctions.get(name)
-    if references[name] then
-        return references[name]
-    end
-end
-function returnFunctions.remove(name)
-    if references[name] then
-        references[name] = nil
-    else
-        warn(name, "isn't in the references list")
-    end
-end
-function returnFunctions.clear()
-    for i,v in references do
-        references[i] = nil
-        if typeof(v) == "Instance" then
-            v:Destroy()
-        end
+        -- Mobile: Show name on touch
+        self.FloatingButton.MouseButton1Down:Connect(function()
+            self.NameLabel.Visible = true
+            
+            local scaleTween = TweenService:Create(
+                self.FloatingButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(1, -10, 1, -10)}
+            )
+            scaleTween:Play()
+        end)
+        
+        self.FloatingButton.MouseButton1Up:Connect(function()
+            wait(1)
+            self.NameLabel.Visible = false
+            
+            local scaleTween = TweenService:Create(
+                self.FloatingButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(1, -6, 1, -6)}
+            )
+            scaleTween:Play()
+        end)
     end
 end
 
-return returnFunctions
+function DraggableKeybind:OnActivated()
+    -- Pulse effect
+    local pulseTween = TweenService:Create(
+        self.FloatingButton,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {Size = UDim2.new(1, 8, 1, 8)}
+    )
+    pulseTween:Play()
+    
+    pulseTween.Completed:Connect(function()
+        local returnTween = TweenService:Create(
+            self.FloatingButton,
+            TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, -6, 1, -6)}
+        )
+        returnTween:Play()
+    end)
+    
+    -- Handle different component types
+    if self.ComponentType == "Toggle" then
+        -- Toggle the value
+        local newValue = not self.ToggleValue()
+        self.SetToggleValue(newValue)
+        self:UpdateToggleState()
+    else
+        -- Regular button
+        self.Callback()
+    end
+end
+
+function DraggableKeybind:UpdateToggleState()
+    if self.ComponentType == "Toggle" and self.StateIndicator then
+        local isOn = self.ToggleValue()
+        local color = isOn and Color3.fromRGB(60, 255, 60) or Color3.fromRGB(255, 60, 60)
+        
+        local colorTween = TweenService:Create(
+            self.StateIndicator,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = color}
+        )
+        colorTween:Play()
+        
+        -- Update main button color
+        local buttonColor = isOn and Color3.fromRGB(60, 200, 60) or Color3.fromRGB(88, 166, 255)
+        local buttonTween = TweenService:Create(
+            self.FloatingButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = buttonColor}
+        )
+        buttonTween:Play()
+    end
+end
+
+function DraggableKeybind:Remove()
+    -- Remove from global storage
+    for i, keybind in ipairs(DraggedKeybinds) do
+        if keybind == self then
+            table.remove(DraggedKeybinds, i)
+            break
+        end
+    end
+    
+    -- Animate removal
+    local fadeTween = TweenService:Create(
+        self.Container,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}
+    )
+    fadeTween:Play()
+    
+    fadeTween.Completed:Connect(function()
+        self.Container:Destroy()
+    end)
+    
+    -- Re-enable the original keybind button
+    if self.OriginalButton then
+        self.OriginalButton.Visible = true
+    end
+end
+
+-- Static method to create draggable keybind from existing button
+function DraggableKeybind.CreateFromButton(button, componentType, name, callback, toggleValue, setToggleValue)
+    print("DraggableKeybind.CreateFromButton called:", name, componentType) -- Debug
+    
+    -- Hide the original button
+    button.Visible = false
+    print("Original button hidden") -- Debug
+    
+    -- Create draggable keybind
+    local draggableKeybind = DraggableKeybind.new({
+        Name = name,
+        Callback = callback,
+        OriginalButton = button,
+        ComponentType = componentType,
+        ToggleValue = toggleValue,
+        SetToggleValue = setToggleValue
+    })
+    
+    print("DraggableKeybind created successfully") -- Debug
+    return draggableKeybind
+end
+
+-- Static method to get all dragged keybinds
+function DraggableKeybind.GetAll()
+    return DraggedKeybinds
+end
+
+-- Static method to remove all dragged keybinds
+function DraggableKeybind.RemoveAll()
+    for _, keybind in ipairs(DraggedKeybinds) do
+        keybind:Remove()
+    end
+    DraggedKeybinds = {}
+end
+
+return DraggableKeybind
 end)() end,
-    [104] = function()local wax,script,require=ImportGlobals(104)local ImportGlobals return (function(...)local Fusion = require(script.Parent.Parent.Bundles.Fusion)
-local computed = Fusion.Computed
+    function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)--[[
+    Dropdown Component - Redesigned
+    A modern dropdown menu UI element with proper checkmarks, icons, and smooth animations
+]]
 
-return function(callback,style)
-	return Fusion.Tween(computed(callback), style)
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local Dropdown = {}
+Dropdown.__index = Dropdown
+
+function Dropdown.new(options, tab)
+    local self = setmetatable({}, Dropdown)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "Dropdown"
+    self.Description = options.Description or ""
+    self.Items = options.Items or {}
+    self.Multiselect = options.Multiselect or false
+    self.Open = false
+    self.FilteredItems = {}
+    
+    -- Initialize filtered items
+    for _, item in ipairs(self.Items) do
+        table.insert(self.FilteredItems, item)
+    end
+    
+    -- For single select
+    if not self.Multiselect then
+        self.Selected = options.Default or (self.Items[1] or "")
+    -- For multiselect
+    else
+        self.Selected = {}
+        if options.Default then
+            if type(options.Default) == "string" then
+                self.Selected[options.Default] = true
+            elseif type(options.Default) == "table" then
+                for _, item in ipairs(options.Default) do
+                    self.Selected[item] = true
+                end
+            end
+        end
+    end
+    
+    self.Callback = options.Callback or function() end
+    
+    -- Create the dropdown UI
+    self:Create()
+    
+    return self
 end
+
+function Dropdown:Create()
+    -- Main container with modern styling
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "Dropdown"
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Match content container
+    self.Container.BorderSizePixel = 0
+    self.Container.ClipsDescendants = true
+    self.Container.Parent = self.Tab.Container
+    
+    -- Modern border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(40, 45, 52)
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12) -- Match window corner radius
+    corner.Parent = self.Container
+    
+    -- Header container
+    self.Header = Instance.new("Frame")
+    self.Header.Name = "Header"
+    self.Header.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Header.BackgroundTransparency = 1
+    self.Header.Parent = self.Container
+    
+    -- Modern dropdown icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.DropdownIcon = Instance.new("ImageLabel")
+    self.DropdownIcon.Name = "Icon"
+    self.DropdownIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.DropdownIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
+    self.DropdownIcon.BackgroundTransparency = 1
+    self.DropdownIcon.Image = (success and Lucide and Lucide["list"]) or "rbxassetid://10723433811"
+    self.DropdownIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.DropdownIcon.Parent = self.Header
+    
+    -- Title label
+    self.NameLabel = Instance.new("TextLabel")
+    self.NameLabel.Name = "Name"
+    self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.BackgroundTransparency = 1
+    self.NameLabel.Text = self.Name
+    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.NameLabel.TextSize = 15
+    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.NameLabel.Parent = self.Header
+    
+    -- Description label
+    if self.Description ~= "" then
+        self.DescriptionLabel = Instance.new("TextLabel")
+        self.DescriptionLabel.Name = "Description"
+        self.DescriptionLabel.Size = UDim2.new(0, 250, 0, 16)
+        self.DescriptionLabel.Position = UDim2.new(0, 44, 0, 32)
+        self.DescriptionLabel.BackgroundTransparency = 1
+        self.DescriptionLabel.Text = self.Description
+        self.DescriptionLabel.TextColor3 = Color3.fromRGB(160, 170, 180)
+        self.DescriptionLabel.TextSize = 12
+        self.DescriptionLabel.Font = Enum.Font.Gotham
+        self.DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
+        self.DescriptionLabel.Parent = self.Header
+    end
+    
+    -- Clear all button for multiselect (modern design)
+    if self.Multiselect then
+        self.ClearButton = Instance.new("TextButton")
+        self.ClearButton.Name = "ClearButton"
+        self.ClearButton.Size = UDim2.new(0, 24, 0, 24)
+        self.ClearButton.Position = UDim2.new(1, -60, 0.5, 0)
+        self.ClearButton.AnchorPoint = Vector2.new(0, 0.5)
+        self.ClearButton.BackgroundColor3 = Color3.fromRGB(70, 75, 82)
+        self.ClearButton.Text = "✕"
+        self.ClearButton.TextColor3 = Color3.fromRGB(200, 205, 210)
+        self.ClearButton.TextSize = 12
+        self.ClearButton.Font = Enum.Font.GothamBold
+        self.ClearButton.BorderSizePixel = 0
+        self.ClearButton.Parent = self.Header
+        
+        local clearCorner = Instance.new("UICorner")
+        clearCorner.CornerRadius = UDim.new(0, 6)
+        clearCorner.Parent = self.ClearButton
+        
+        -- Clear button functionality
+        self.ClearButton.MouseButton1Click:Connect(function()
+            self:ClearAllSelections()
+        end)
+        
+        -- Clear button hover effects
+        self.ClearButton.MouseEnter:Connect(function()
+            local hoverTween = TweenService:Create(
+                self.ClearButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(220, 85, 85)}
+            )
+            hoverTween:Play()
+        end)
+        
+        self.ClearButton.MouseLeave:Connect(function()
+            local leaveTween = TweenService:Create(
+                self.ClearButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(70, 75, 82)}
+            )
+            leaveTween:Play()
+        end)
+    end
+    
+    -- Selected value display
+    self.SelectedLabel = Instance.new("TextLabel")
+    self.SelectedLabel.Name = "Selected"
+    self.SelectedLabel.Size = UDim2.new(1, self.Multiselect and -120 or -90, 1, 0)
+    self.SelectedLabel.Position = UDim2.new(1, -32, 0.5, 0)
+    self.SelectedLabel.AnchorPoint = Vector2.new(1, 0.5)
+    self.SelectedLabel.BackgroundTransparency = 1
+    self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+    self.SelectedLabel.TextSize = 13
+    self.SelectedLabel.Font = Enum.Font.Gotham
+    self.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
+    self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    self.SelectedLabel.Parent = self.Header
+    
+    -- Update the selected display
+    self:UpdateSelectedText()
+    
+    -- Modern chevron arrow
+    self.ArrowIcon = Instance.new("ImageLabel")
+    self.ArrowIcon.Name = "Arrow"
+    self.ArrowIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.ArrowIcon.Position = UDim2.new(1, -20, 0.5, 0)
+    self.ArrowIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.ArrowIcon.BackgroundTransparency = 1
+    self.ArrowIcon.Image = (success and Lucide and Lucide["chevron-down"]) or "rbxassetid://10709790948"
+    self.ArrowIcon.ImageColor3 = Color3.fromRGB(140, 150, 160)
+    self.ArrowIcon.Parent = self.Header
+    
+    -- Interaction button
+    self.DropdownButton = Instance.new("TextButton")
+    self.DropdownButton.Name = "Button"
+    self.DropdownButton.Size = UDim2.new(1, 0, 1, 0)
+    self.DropdownButton.BackgroundTransparency = 1
+    self.DropdownButton.Text = ""
+    self.DropdownButton.Parent = self.Header
+    
+    -- Modern search box (always show for better UX)
+    self.SearchContainer = Instance.new("Frame")
+    self.SearchContainer.Name = "SearchContainer"
+    self.SearchContainer.Size = UDim2.new(1, -20, 0, 36)
+    self.SearchContainer.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and 68 or 52) + 8)
+    self.SearchContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
+    self.SearchContainer.BorderSizePixel = 0
+    self.SearchContainer.Visible = false
+    self.SearchContainer.Parent = self.Container
+    
+    local searchBorder = Instance.new("UIStroke")
+    searchBorder.Color = Color3.fromRGB(50, 55, 62)
+    searchBorder.Thickness = 1
+    searchBorder.Parent = self.SearchContainer
+    
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(0, 6)
+    searchCorner.Parent = self.SearchContainer
+    
+    -- Search icon
+    self.SearchIcon = Instance.new("ImageLabel")
+    self.SearchIcon.Name = "SearchIcon"
+    self.SearchIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
+    self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.SearchIcon.BackgroundTransparency = 1
+    self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10709761530"
+    self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 130, 140)
+    self.SearchIcon.Parent = self.SearchContainer
+    
+    -- Select All button for multiselect (positioned on the right side of search)
+    if self.Multiselect then
+        self.SelectAllButton = Instance.new("TextButton")
+        self.SelectAllButton.Name = "SelectAllButton"
+        self.SelectAllButton.Size = UDim2.new(0, 60, 0, 24)
+        self.SelectAllButton.Position = UDim2.new(1, -66, 0.5, 0)
+        self.SelectAllButton.AnchorPoint = Vector2.new(0, 0.5)
+        self.SelectAllButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+        self.SelectAllButton.Text = "All"
+        self.SelectAllButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        self.SelectAllButton.TextSize = 11
+        self.SelectAllButton.Font = Enum.Font.GothamBold
+        self.SelectAllButton.BorderSizePixel = 0
+        self.SelectAllButton.Parent = self.SearchContainer
+        
+        local selectAllCorner = Instance.new("UICorner")
+        selectAllCorner.CornerRadius = UDim.new(0, 4)
+        selectAllCorner.Parent = self.SelectAllButton
+        
+        -- Select All button functionality
+        self.SelectAllButton.MouseButton1Click:Connect(function()
+            self:SelectAllItems()
+        end)
+        
+        -- Select All button hover effects
+        self.SelectAllButton.MouseEnter:Connect(function()
+            local hoverTween = TweenService:Create(
+                self.SelectAllButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(30, 140, 235)}
+            )
+            hoverTween:Play()
+        end)
+        
+        self.SelectAllButton.MouseLeave:Connect(function()
+            local leaveTween = TweenService:Create(
+                self.SelectAllButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+            )
+            leaveTween:Play()
+        end)
+    end
+    
+    self.SearchBox = Instance.new("TextBox")
+    self.SearchBox.Name = "SearchBox"
+    self.SearchBox.Size = UDim2.new(1, self.Multiselect and -110 or -40, 1, 0) -- Adjust size if Select All button exists
+    self.SearchBox.Position = UDim2.new(0, 36, 0, 0)
+    self.SearchBox.BackgroundTransparency = 1
+    self.SearchBox.Text = ""
+    self.SearchBox.PlaceholderText = "Search options..."
+    self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 130, 140)
+    self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.SearchBox.TextSize = 13
+    self.SearchBox.Font = Enum.Font.Gotham
+    self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+    self.SearchBox.Parent = self.SearchContainer
+    
+    -- Search functionality
+    self.SearchBox.Changed:Connect(function(property)
+        if property == "Text" then
+            self:FilterItems(self.SearchBox.Text)
+        end
+    end)
+    
+    -- Dropdown content container
+    self.Content = Instance.new("ScrollingFrame")
+    self.Content.Name = "Content"
+    self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) -- Updated from 34 to 44 for larger items
+    self.Content.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and 68 or 52) + 52)
+    self.Content.BackgroundTransparency = 1
+    self.Content.BorderSizePixel = 0
+    self.Content.ScrollBarThickness = 4
+    self.Content.ScrollBarImageColor3 = Color3.fromRGB(80, 90, 100)
+    self.Content.CanvasSize = UDim2.new(0, 0, 0, 0)
+    self.Content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    self.Content.Visible = false
+    self.Content.Parent = self.Container
+    
+    -- Content layout
+    self.ContentLayout = Instance.new("UIListLayout")
+    self.ContentLayout.FillDirection = Enum.FillDirection.Vertical
+    self.ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.ContentLayout.Padding = UDim.new(0, 4) -- Increased from 1 to 4 for better spacing
+    self.ContentLayout.Parent = self.Content
+    
+    -- Create dropdown items
+    self:CreateItems()
+    
+    -- Dropdown button click handler
+    self.DropdownButton.MouseButton1Click:Connect(function()
+        self:Toggle()
+    end)
+    
+    -- Modern hover effects
+    self.DropdownButton.MouseEnter:Connect(function()
+        if not self.Open then
+            local hoverTween = TweenService:Create(
+                self.Container,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            )
+            hoverTween:Play()
+            
+            local borderTween = TweenService:Create(
+                border,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(0, 120, 215)}
+            )
+            borderTween:Play()
+        end
+    end)
+    
+    self.DropdownButton.MouseLeave:Connect(function()
+        if not self.Open then
+            local leaveTween = TweenService:Create(
+                self.Container,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
+            )
+            leaveTween:Play()
+            
+            local borderTween = TweenService:Create(
+                border,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(40, 45, 52)}
+            )
+            borderTween:Play()
+        end
+    end)
+    
+    -- Close dropdown when clicking outside
+    UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and self.Open then
+            local mouse = game.Players.LocalPlayer:GetMouse()
+            local containerPos = self.Container.AbsolutePosition
+            local containerSize = self.Container.AbsoluteSize
+            
+            if mouse.X < containerPos.X or mouse.X > containerPos.X + containerSize.X or
+               mouse.Y < containerPos.Y or mouse.Y > containerPos.Y + containerSize.Y then
+                self:Toggle(false)
+            end
+        end
+    end)
+    
+    return self
+end
+
+function Dropdown:CreateItems()
+    -- Clear existing items
+    for _, child in ipairs(self.Content:GetChildren()) do
+        if child:IsA("Frame") and child.Name:find("Item_") then
+            child:Destroy()
+        end
+    end
+    
+    -- Create items from filtered list
+    local itemsToShow = #self.FilteredItems > 0 and self.FilteredItems or self.Items
+    
+    for i, item in ipairs(itemsToShow) do
+        -- Main item container with more spacing
+        local itemContainer = Instance.new("Frame")
+        itemContainer.Name = "Item_" .. i
+        itemContainer.Size = UDim2.new(1, 0, 0, 40) -- Increased from 32 to 40 for more space
+        itemContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
+        itemContainer.BorderSizePixel = 0
+        itemContainer.LayoutOrder = i
+        itemContainer.Parent = self.Content
+        
+        local itemCorner = Instance.new("UICorner")
+        itemCorner.CornerRadius = UDim.new(0, 6)
+        itemCorner.Parent = itemContainer
+        
+        -- Item button for interaction
+        local itemButton = Instance.new("TextButton")
+        itemButton.Name = "Button"
+        itemButton.Size = UDim2.new(1, 0, 1, 0)
+        itemButton.BackgroundTransparency = 1
+        itemButton.Text = ""
+        itemButton.Parent = itemContainer
+        
+        -- Item text
+        local itemText = Instance.new("TextLabel")
+        itemText.Name = "Text"
+        itemText.Size = UDim2.new(1, self.Multiselect and -50 or -40, 1, 0)
+        itemText.Position = UDim2.new(0, 16, 0, 0)
+        itemText.BackgroundTransparency = 1
+        itemText.Text = item
+        itemText.TextColor3 = Color3.fromRGB(220, 230, 240)
+        itemText.TextSize = 13
+        itemText.Font = Enum.Font.Gotham
+        itemText.TextXAlignment = Enum.TextXAlignment.Left
+        itemText.TextYAlignment = Enum.TextYAlignment.Center
+        itemText.Parent = itemContainer
+        
+        -- Selection indicator
+        if self.Multiselect then
+            -- Modern checkbox for multiselect
+            local checkboxContainer = Instance.new("Frame")
+            checkboxContainer.Name = "CheckboxContainer"
+            checkboxContainer.Size = UDim2.new(0, 20, 0, 20)
+            checkboxContainer.Position = UDim2.new(1, -30, 0.5, 0)
+            checkboxContainer.AnchorPoint = Vector2.new(0, 0.5)
+            checkboxContainer.BackgroundColor3 = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 65, 72)
+            checkboxContainer.BorderSizePixel = 0
+            checkboxContainer.Parent = itemContainer
+            
+            local checkboxCorner = Instance.new("UICorner")
+            checkboxCorner.CornerRadius = UDim.new(0, 4)
+            checkboxCorner.Parent = checkboxContainer
+            
+            -- Checkbox border
+            local checkboxBorder = Instance.new("UIStroke")
+            checkboxBorder.Color = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)
+            checkboxBorder.Thickness = 1
+            checkboxBorder.Parent = checkboxContainer
+            
+            -- Checkmark (simple text, no icon)
+            local checkmark = Instance.new("TextLabel")
+            checkmark.Name = "Checkmark"
+            checkmark.Size = UDim2.new(1, 0, 1, 0)
+            checkmark.BackgroundTransparency = 1
+            checkmark.Text = "✓"
+            checkmark.TextColor3 = Color3.fromRGB(255, 255, 255)
+            checkmark.TextSize = 12
+            checkmark.Font = Enum.Font.GothamBold
+            checkmark.TextXAlignment = Enum.TextXAlignment.Center
+            checkmark.TextYAlignment = Enum.TextYAlignment.Center
+            checkmark.Visible = self.Selected[item] == true
+            checkmark.Parent = checkboxContainer
+        else
+            -- Radio button for single select
+            local radioContainer = Instance.new("Frame")
+            radioContainer.Name = "RadioContainer"
+            radioContainer.Size = UDim2.new(0, 18, 0, 18)
+            radioContainer.Position = UDim2.new(1, -28, 0.5, 0)
+            radioContainer.AnchorPoint = Vector2.new(0, 0.5)
+            radioContainer.BackgroundColor3 = Color3.fromRGB(60, 65, 72)
+            radioContainer.BorderSizePixel = 0
+            radioContainer.Parent = itemContainer
+            
+            local radioCorner = Instance.new("UICorner")
+            radioCorner.CornerRadius = UDim.new(1, 0)
+            radioCorner.Parent = radioContainer
+            
+            local radioBorder = Instance.new("UIStroke")
+            radioBorder.Color = self.Selected == item and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)
+            radioBorder.Thickness = 1
+            radioBorder.Parent = radioContainer
+            
+            -- Radio dot
+            local radioDot = Instance.new("Frame")
+            radioDot.Name = "RadioDot"
+            radioDot.Size = UDim2.new(0, 8, 0, 8)
+            radioDot.Position = UDim2.new(0.5, 0, 0.5, 0)
+            radioDot.AnchorPoint = Vector2.new(0.5, 0.5)
+            radioDot.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+            radioDot.BorderSizePixel = 0
+            radioDot.Visible = self.Selected == item
+            radioDot.Parent = radioContainer
+            
+            local dotCorner = Instance.new("UICorner")
+            dotCorner.CornerRadius = UDim.new(1, 0)
+            dotCorner.Parent = radioDot
+        end
+        
+        -- Click handler
+        itemButton.MouseButton1Click:Connect(function()
+            self:SelectItem(item)
+        end)
+        
+        -- Hover effects
+        itemButton.MouseEnter:Connect(function()
+            local hoverTween = TweenService:Create(
+                itemContainer,
+                TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(40, 45, 52)}
+            )
+            hoverTween:Play()
+            
+            local textTween = TweenService:Create(
+                itemText,
+                TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {TextColor3 = Color3.fromRGB(255, 255, 255)}
+            )
+            textTween:Play()
+        end)
+        
+        itemButton.MouseLeave:Connect(function()
+            local leaveTween = TweenService:Create(
+                itemContainer,
+                TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
+            )
+            leaveTween:Play()
+            
+            local textTween = TweenService:Create(
+                itemText,
+                TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {TextColor3 = Color3.fromRGB(220, 230, 240)}
+            )
+            textTween:Play()
+        end)
+    end
+end
+
+function Dropdown:SelectItem(item)
+    if self.Multiselect then
+        -- Toggle selection for multiselect
+        if self.Selected[item] then
+            self.Selected[item] = nil -- Remove from table instead of setting to false
+        else
+            self.Selected[item] = true -- Add to table
+        end
+        
+        -- Update checkbox visual with animation
+        for _, child in ipairs(self.Content:GetChildren()) do
+            if child:IsA("Frame") and child.Name:find("Item_") and child.Text.Text == item then
+                local checkboxContainer = child:FindFirstChild("CheckboxContainer")
+                if checkboxContainer then
+                    local checkmark = checkboxContainer:FindFirstChild("Checkmark")
+                    local border = checkboxContainer:FindFirstChild("UIStroke")
+                    
+                    if checkmark then
+                        checkmark.Visible = self.Selected[item] == true
+                    end
+                    
+                    -- Animate checkbox colors
+                    local bgTween = TweenService:Create(
+                        checkboxContainer,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                        {BackgroundColor3 = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 65, 72)}
+                    )
+                    bgTween:Play()
+                    
+                    if border then
+                        local borderTween = TweenService:Create(
+                            border,
+                            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                            {Color = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)}
+                        )
+                        borderTween:Play()
+                    end
+                end
+                break
+            end
+        end
+        
+        -- Update selected text
+        self:UpdateSelectedText()
+        
+        -- Call callback with selected items
+        local selectedItems = {}
+        for selectedItem, selected in pairs(self.Selected) do
+            if selected == true then -- Only include items that are explicitly true
+                table.insert(selectedItems, selectedItem)
+            end
+        end
+        self.Callback(selectedItems)
+    else
+        -- Single select
+        local oldSelected = self.Selected
+        self.Selected = item
+        
+        -- Update radio button visuals
+        for _, child in ipairs(self.Content:GetChildren()) do
+            if child:IsA("Frame") and child.Name:find("Item_") then
+                local radioContainer = child:FindFirstChild("RadioContainer")
+                if radioContainer then
+                    local radioDot = radioContainer:FindFirstChild("RadioDot")
+                    local border = radioContainer:FindFirstChild("UIStroke")
+                    local isSelected = child.Text.Text == item
+                    
+                    if radioDot then
+                        radioDot.Visible = isSelected
+                    end
+                    
+                    if border then
+                        local borderTween = TweenService:Create(
+                            border,
+                            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                            {Color = isSelected and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)}
+                        )
+                        borderTween:Play()
+                    end
+                end
+            end
+        end
+        
+        -- Update selected text
+        self:UpdateSelectedText()
+        
+        -- Close dropdown after selection for single select
+        self:Toggle(false)
+        
+        -- Call callback with selected item
+        self.Callback(item)
+    end
+end
+
+function Dropdown:UpdateSelectedText()
+    if self.Multiselect then
+        local count = 0
+        local selectedText = ""
+        local selectedItems = {}
+        
+        for item, selected in pairs(self.Selected) do
+            if selected == true then -- Only count items that are explicitly true
+                count = count + 1
+                table.insert(selectedItems, item)
+            end
+        end
+        
+        if count == 0 then
+            selectedText = "Select options..."
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(120, 130, 140)
+        elseif count == 1 then
+            selectedText = selectedItems[1]
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+        elseif count <= 3 then
+            selectedText = table.concat(selectedItems, ", ")
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+        else
+            selectedText = selectedItems[1] .. ", " .. selectedItems[2] .. " (+" .. (count - 2) .. " more)"
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+        end
+        
+        self.SelectedLabel.Text = selectedText
+    else
+        if self.Selected == "" then
+            self.SelectedLabel.Text = "Select option..."
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(120, 130, 140)
+        else
+            self.SelectedLabel.Text = self.Selected
+            self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+        end
+    end
+end
+
+function Dropdown:Toggle(state)
+    if state ~= nil then
+        self.Open = state
+    else
+        self.Open = not self.Open
+    end
+    
+    local baseHeight = self.Description ~= "" and 68 or 52
+    local searchHeight = 44
+    local contentHeight = math.min(240, #self.Items * 44) -- Updated from 34 to 44 for larger items
+    
+    if self.Open then
+        -- Show search and content
+        self.SearchContainer.Visible = true
+        self.Content.Visible = true
+        
+        -- Expand container
+        local expandTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 0, baseHeight + searchHeight + contentHeight + 16)}
+        )
+        expandTween:Play()
+        
+        -- Rotate arrow up
+        local arrowTween = TweenService:Create(
+            self.ArrowIcon,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Rotation = 180}
+        )
+        arrowTween:Play()
+        
+        -- Highlight container
+        local bgTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+        )
+        bgTween:Play()
+        
+        -- Focus search box
+        wait(0.1)
+        self.SearchBox:CaptureFocus()
+    else
+        -- Collapse container
+        local collapseTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 0, baseHeight)}
+        )
+        collapseTween:Play()
+        
+        -- Rotate arrow down
+        local arrowTween = TweenService:Create(
+            self.ArrowIcon,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Rotation = 0}
+        )
+        arrowTween:Play()
+        
+        -- Reset container color
+        local bgTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        bgTween:Play()
+        
+        -- Hide search and content after animation
+        wait(0.25)
+        self.SearchContainer.Visible = false
+        self.Content.Visible = false
+        
+        -- Clear search
+        self.SearchBox.Text = ""
+        self:FilterItems("")
+    end
+end
+
+function Dropdown:SetItems(items)
+    self.Items = items
+    self:CreateItems()
+    
+    -- Reset selection for single select if current selection is not in new items
+    if not self.Multiselect then
+        local found = false
+        for _, item in ipairs(items) do
+            if item == self.Selected then
+                found = true
+                break
+            end
+        end
+        
+        if not found and #items > 0 then
+            self.Selected = items[1]
+            self:UpdateSelectedText()
+        elseif not found then
+            self.Selected = ""
+            self:UpdateSelectedText()
+        end
+    else
+        -- For multiselect, remove selections that are no longer in the items list
+        local newSelected = {}
+        for _, item in ipairs(items) do
+            if self.Selected[item] then
+                newSelected[item] = true
+            end
+        end
+        self.Selected = newSelected
+        self:UpdateSelectedText()
+    end
+    
+    return self
+end
+
+function Dropdown:FilterItems(searchText)
+    searchText = searchText:lower()
+    self.FilteredItems = {}
+    
+    -- Filter items based on search
+    for _, item in ipairs(self.Items) do
+        if searchText == "" or item:lower():find(searchText) then
+            table.insert(self.FilteredItems, item)
+        end
+    end
+    
+    -- Recreate items with filtered list
+    self:CreateItems()
+    
+    -- Update content size
+    local contentHeight = math.min(240, #self.FilteredItems * 44) -- Updated from 34 to 44 for larger items
+    local baseHeight = self.Description ~= "" and 68 or 52
+    local searchHeight = 44
+    
+    if self.Open then
+        local sizeTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 0, baseHeight + searchHeight + contentHeight + 16)}
+        )
+        sizeTween:Play()
+        
+        local contentSizeTween = TweenService:Create(
+            self.Content,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, -20, 0, contentHeight)}
+        )
+        contentSizeTween:Play()
+    end
+end
+
+function Dropdown:ClearAllSelections()
+    if not self.Multiselect then return end
+    
+    -- Clear all selections
+    self.Selected = {}
+    
+    -- Update all checkboxes
+    for _, child in ipairs(self.Content:GetChildren()) do
+        if child:IsA("Frame") and child.Name:find("Item_") then
+            local checkboxContainer = child:FindFirstChild("CheckboxContainer")
+            if checkboxContainer then
+                local checkmark = checkboxContainer:FindFirstChild("Checkmark")
+                local border = checkboxContainer:FindFirstChild("UIStroke")
+                
+                if checkmark then
+                    checkmark.Visible = false
+                end
+                
+                -- Animate checkbox colors
+                local bgTween = TweenService:Create(
+                    checkboxContainer,
+                    TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {BackgroundColor3 = Color3.fromRGB(60, 65, 72)}
+                )
+                bgTween:Play()
+                
+                if border then
+                    local borderTween = TweenService:Create(
+                        border,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                        {Color = Color3.fromRGB(100, 105, 112)}
+                    )
+                    borderTween:Play()
+                end
+            end
+        end
+    end
+    
+    -- Update selected text
+    self:UpdateSelectedText()
+    
+    -- Call callback
+    self.Callback({})
+end
+
+function Dropdown:SelectAllItems()
+    if not self.Multiselect then return end
+    
+    -- Select all items
+    for _, item in ipairs(self.Items) do
+        self.Selected[item] = true
+    end
+    
+    -- Update all checkboxes
+    for _, child in ipairs(self.Content:GetChildren()) do
+        if child:IsA("Frame") and child.Name:find("Item_") then
+            local itemText = child:FindFirstChild("Text")
+            if itemText then
+                local item = itemText.Text
+                local checkboxContainer = child:FindFirstChild("CheckboxContainer")
+                if checkboxContainer then
+                    local checkmark = checkboxContainer:FindFirstChild("Checkmark")
+                    local border = checkboxContainer:FindFirstChild("UIStroke")
+                    
+                    if checkmark then
+                        checkmark.Visible = true
+                    end
+                    
+                    -- Animate checkbox colors
+                    local bgTween = TweenService:Create(
+                        checkboxContainer,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                        {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+                    )
+                    bgTween:Play()
+                    
+                    if border then
+                        local borderTween = TweenService:Create(
+                            border,
+                            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                            {Color = Color3.fromRGB(0, 120, 215)}
+                        )
+                        borderTween:Play()
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Update selected text
+    self:UpdateSelectedText()
+    
+    -- Call callback with all selected items
+    local selectedItems = {}
+    for item, selected in pairs(self.Selected) do
+        if selected == true then -- Only include items that are explicitly true
+            table.insert(selectedItems, item)
+        end
+    end
+    self.Callback(selectedItems)
+end
+
+return Dropdown
+end)() end,
+    function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)--[[
+    Floating Controls Component
+    A draggable overlay with toggles and buttons for quick access
+]]
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local FloatingControls = {}
+FloatingControls.__index = FloatingControls
+
+function FloatingControls.new(options, library)
+    local self = setmetatable({}, FloatingControls)
+    
+    self.Library = library
+    self.Title = options.Title or "Quick Controls"
+    self.Controls = {}
+    self.IsVisible = true
+    self.IsMinimized = false
+    self.IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    
+    -- Create the floating UI
+    self:CreateGui()
+    
+    -- Create mobile icon if on mobile device
+    if self.IsMobile then
+        local MobileFloatingIcon = require(script.Parent.MobileFloatingIcon)
+        self.MobileIcon = MobileFloatingIcon.new({
+            IconText = options.IconText or "C",
+            IconColor = options.IconColor or Color3.fromRGB(0, 120, 215),
+            Size = options.IconSize or 60
+        }, self)
+        
+        -- Start with floating controls hidden on mobile
+        self:Hide()
+    end
+    
+    return self
+end
+
+function FloatingControls:CreateGui()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- Create ScreenGui for floating controls
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = "FloatingControls"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.Parent = playerGui
+    
+    -- Main floating container
+    self.MainFrame = Instance.new("Frame")
+    self.MainFrame.Name = "FloatingPanel"
+    self.MainFrame.Size = UDim2.new(0, 280, 0, 60) -- Start minimized
+    self.MainFrame.Position = UDim2.new(0, 20, 0, 200) -- Left side of screen
+    self.MainFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 32) -- Dark background
+    self.MainFrame.BorderSizePixel = 0
+    self.MainFrame.Parent = self.ScreenGui
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = self.MainFrame
+    
+    -- Premium border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(0, 120, 215)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = self.MainFrame
+    
+    -- Shadow effect
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 8, 1, 8)
+    shadow.Position = UDim2.new(0, -4, 0, -4)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.6
+    shadow.BorderSizePixel = 0
+    shadow.ZIndex = self.MainFrame.ZIndex - 1
+    shadow.Parent = self.MainFrame
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 12)
+    shadowCorner.Parent = shadow
+    
+    -- Header bar for dragging and controls
+    self.HeaderBar = Instance.new("Frame")
+    self.HeaderBar.Name = "HeaderBar"
+    self.HeaderBar.Size = UDim2.new(1, 0, 0, 40)
+    self.HeaderBar.BackgroundColor3 = Color3.fromRGB(15, 20, 27)
+    self.HeaderBar.BorderSizePixel = 0
+    self.HeaderBar.Parent = self.MainFrame
+    
+    -- Header corner radius (top only)
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 12)
+    headerCorner.Parent = self.HeaderBar
+    
+    -- Mask to hide bottom corners of header
+    local headerMask = Instance.new("Frame")
+    headerMask.Size = UDim2.new(1, 0, 0, 12)
+    headerMask.Position = UDim2.new(0, 0, 1, -12)
+    headerMask.BackgroundColor3 = Color3.fromRGB(15, 20, 27)
+    headerMask.BorderSizePixel = 0
+    headerMask.Parent = self.HeaderBar
+    
+    -- App icon
+    self.AppIcon = Instance.new("Frame")
+    self.AppIcon.Size = UDim2.new(0, 30, 0, 30)
+    self.AppIcon.Position = UDim2.new(0, 12, 0.5, 0)
+    self.AppIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.AppIcon.BorderSizePixel = 0
+    self.AppIcon.Parent = self.HeaderBar
+
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 8)
+    iconCorner.Parent = self.AppIcon
+
+    -- App icon text
+    local iconText = Instance.new("TextLabel")
+    iconText.Size = UDim2.new(1, 0, 1, 0)
+    iconText.BackgroundTransparency = 1
+    iconText.Text = "C"
+    iconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    iconText.TextSize = 18
+    iconText.Font = Enum.Font.GothamBold
+    iconText.TextXAlignment = Enum.TextXAlignment.Center
+    iconText.TextYAlignment = Enum.TextYAlignment.Center
+    iconText.Parent = self.AppIcon
+    
+    -- Title
+    self.TitleLabel = Instance.new("TextLabel")
+    self.TitleLabel.Size = UDim2.new(0, 120, 1, 0)
+    self.TitleLabel.Position = UDim2.new(0, 44, 0, 0)
+    self.TitleLabel.BackgroundTransparency = 1
+    self.TitleLabel.Text = self.Title
+    self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.TitleLabel.TextSize = 14
+    self.TitleLabel.Font = Enum.Font.GothamSemibold
+    self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+    self.TitleLabel.Parent = self.HeaderBar
+    
+    -- Expand/Collapse button
+    self.ExpandButton = Instance.new("TextButton")
+    self.ExpandButton.Size = UDim2.new(0, 28, 0, 28)
+    self.ExpandButton.Position = UDim2.new(1, -70, 0.5, 0)
+    self.ExpandButton.AnchorPoint = Vector2.new(0, 0.5)
+    self.ExpandButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65)
+    self.ExpandButton.Text = "▼"
+    self.ExpandButton.TextColor3 = Color3.fromRGB(200, 220, 240)
+    self.ExpandButton.TextSize = 12
+    self.ExpandButton.Font = Enum.Font.GothamBold
+    self.ExpandButton.BorderSizePixel = 0
+    self.ExpandButton.Parent = self.HeaderBar
+    
+    local expandCorner = Instance.new("UICorner")
+    expandCorner.CornerRadius = UDim.new(0, 6)
+    expandCorner.Parent = self.ExpandButton
+    
+    -- Hide/Show button
+    self.HideButton = Instance.new("TextButton")
+    self.HideButton.Size = UDim2.new(0, 28, 0, 28)
+    self.HideButton.Position = UDim2.new(1, -36, 0.5, 0)
+    self.HideButton.AnchorPoint = Vector2.new(0, 0.5)
+    self.HideButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70)
+    self.HideButton.Text = "×"
+    self.HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.HideButton.TextSize = 14
+    self.HideButton.Font = Enum.Font.GothamBold
+    self.HideButton.BorderSizePixel = 0
+    self.HideButton.Parent = self.HeaderBar
+    
+    local hideCorner = Instance.new("UICorner")
+    hideCorner.CornerRadius = UDim.new(0, 6)
+    hideCorner.Parent = self.HideButton
+    
+    -- Content container (initially hidden)
+    self.ContentContainer = Instance.new("ScrollingFrame")
+    self.ContentContainer.Name = "ContentContainer"
+    self.ContentContainer.Size = UDim2.new(1, 0, 1, -40)
+    self.ContentContainer.Position = UDim2.new(0, 0, 0, 40)
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(20, 25, 32)
+    self.ContentContainer.BorderSizePixel = 0
+    self.ContentContainer.ScrollBarThickness = 4
+    self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(0, 120, 215)
+    self.ContentContainer.ScrollBarImageTransparency = 0.3
+    self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    self.ContentContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    self.ContentContainer.Visible = false
+    self.ContentContainer.Parent = self.MainFrame
+    
+    -- Content layout
+    self.ContentLayout = Instance.new("UIListLayout")
+    self.ContentLayout.FillDirection = Enum.FillDirection.Vertical
+    self.ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.ContentLayout.Padding = UDim.new(0, 8)
+    self.ContentLayout.Parent = self.ContentContainer
+    
+    -- Content padding
+    local contentPadding = Instance.new("UIPadding")
+    contentPadding.PaddingAll = UDim.new(0, 12)
+    contentPadding.Parent = self.ContentContainer
+    
+    -- Make draggable
+    self:MakeDraggable()
+    
+    -- Button functionality
+    self.ExpandButton.MouseButton1Click:Connect(function()
+        self:ToggleExpanded()
+    end)
+    
+    self.HideButton.MouseButton1Click:Connect(function()
+        self:Hide()
+    end)
+    
+    -- Hover effects
+    self:SetupHoverEffects()
+    
+    return self
+end
+
+function FloatingControls:MakeDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    self.HeaderBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    self.HeaderBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+end
+
+function FloatingControls:SetupHoverEffects()
+    -- Expand button hover
+    self.ExpandButton.MouseEnter:Connect(function()
+        local tween = TweenService:Create(
+            self.ExpandButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        tween:Play()
+    end)
+    
+    self.ExpandButton.MouseLeave:Connect(function()
+        local tween = TweenService:Create(
+            self.ExpandButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(45, 55, 65)}
+        )
+        tween:Play()
+    end)
+    
+    -- Hide button hover
+    self.HideButton.MouseEnter:Connect(function()
+        local tween = TweenService:Create(
+            self.HideButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(255, 90, 90)}
+        )
+        tween:Play()
+    end)
+    
+    self.HideButton.MouseLeave:Connect(function()
+        local tween = TweenService:Create(
+            self.HideButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(200, 70, 70)}
+        )
+        tween:Play()
+    end)
+end
+
+function FloatingControls:ToggleExpanded()
+    if self.IsMinimized then
+        -- Expand
+        self.IsMinimized = false
+        self.ExpandButton.Text = "▼"
+        self.ContentContainer.Visible = true
+        
+        -- Calculate content height
+        local contentHeight = math.max(200, math.min(400, self.ContentLayout.AbsoluteContentSize.Y + 64))
+        
+        local expandTween = TweenService:Create(
+            self.MainFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 280, 0, contentHeight)}
+        )
+        expandTween:Play()
+    else
+        -- Minimize
+        self.IsMinimized = true
+        self.ExpandButton.Text = "▲"
+        
+        local minimizeTween = TweenService:Create(
+            self.MainFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 280, 0, 40)}
+        )
+        minimizeTween:Play()
+        
+        minimizeTween.Completed:Connect(function()
+            self.ContentContainer.Visible = false
+        end)
+    end
+end
+
+function FloatingControls:Show()
+    self.IsVisible = true
+    self.ScreenGui.Enabled = true
+end
+
+function FloatingControls:Hide()
+    self.IsVisible = false
+    self.ScreenGui.Enabled = false
+end
+
+function FloatingControls:Toggle()
+    if self.IsVisible then
+        self:Hide()
+    else
+        self:Show()
+    end
+end
+
+-- Add a toggle control
+function FloatingControls:AddToggle(options)
+    options = options or {}
+    local name = options.Name or "Toggle"
+    local description = options.Description or ""
+    local default = options.Default or false
+    local keybind = options.Keybind
+    local callback = options.Callback or function() end
+    
+    -- Create toggle container
+    local container = Instance.new("Frame")
+    container.Name = name .. "Toggle"
+    container.Size = UDim2.new(1, 0, 0, description ~= "" and 60 or 44)
+    container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
+    container.BorderSizePixel = 0
+    container.Parent = self.ContentContainer
+    
+    local containerCorner = Instance.new("UICorner")
+    containerCorner.CornerRadius = UDim.new(0, 8)
+    containerCorner.Parent = container
+    
+    local containerBorder = Instance.new("UIStroke")
+    containerBorder.Color = Color3.fromRGB(40, 45, 52)
+    containerBorder.Thickness = 1
+    containerBorder.Parent = container
+    
+    -- Toggle icon
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(0, 32, 0, 32)
+    icon.Position = UDim2.new(0, 12, 0, description ~= "" and 6 or 6)
+    icon.BackgroundTransparency = 1
+    icon.Text = "⚡"
+    icon.TextColor3 = Color3.fromRGB(120, 140, 160)
+    icon.TextSize = 24
+    icon.Font = Enum.Font.GothamBold
+    icon.TextXAlignment = Enum.TextXAlignment.Center
+    icon.TextYAlignment = Enum.TextYAlignment.Center
+    icon.Parent = container
+    
+    -- Toggle name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(0, 120, 0, 18)
+    nameLabel.Position = UDim2.new(0, 40, 0, description ~= "" and 6 or 13)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = name
+    nameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    nameLabel.TextSize = 13
+    nameLabel.Font = Enum.Font.GothamSemibold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = container
+    
+    -- Toggle description
+    if description ~= "" then
+        local descLabel = Instance.new("TextLabel")
+        descLabel.Size = UDim2.new(0, 150, 0, 14)
+        descLabel.Position = UDim2.new(0, 40, 0, 26)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = description
+        descLabel.TextColor3 = Color3.fromRGB(160, 170, 180)
+        descLabel.TextSize = 10
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        descLabel.Parent = container
+    end
+    
+    -- Keybind display (if provided)
+    local keybindLabel
+    if keybind then
+        keybindLabel = Instance.new("TextLabel")
+        keybindLabel.Size = UDim2.new(0, 44, 0, 26)
+        keybindLabel.Position = UDim2.new(1, -92, 0.5, 0)
+        keybindLabel.AnchorPoint = Vector2.new(0, 0.5)
+        keybindLabel.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+        keybindLabel.Text = tostring(keybind):gsub("Enum.KeyCode.", ""):upper()
+        keybindLabel.TextColor3 = Color3.fromRGB(200, 205, 210)
+        keybindLabel.TextSize = 14
+        keybindLabel.Font = Enum.Font.GothamBold
+        keybindLabel.TextXAlignment = Enum.TextXAlignment.Center
+        keybindLabel.TextYAlignment = Enum.TextYAlignment.Center
+        keybindLabel.BorderSizePixel = 0
+        keybindLabel.Parent = container
+
+        local keybindCorner = Instance.new("UICorner")
+        keybindCorner.CornerRadius = UDim.new(0, 6)
+        keybindCorner.Parent = keybindLabel
+    end
+    
+    -- Toggle switch
+    local toggleBg = Instance.new("Frame")
+    toggleBg.Size = UDim2.new(0, 36, 0, 20)
+    toggleBg.Position = UDim2.new(1, keybind and -40 or -46, 0.5, 0)
+    toggleBg.AnchorPoint = Vector2.new(0, 0.5)
+    toggleBg.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+    toggleBg.BorderSizePixel = 0
+    toggleBg.Parent = container
+    
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(1, 0)
+    toggleCorner.Parent = toggleBg
+    
+    local toggleIndicator = Instance.new("Frame")
+    toggleIndicator.Size = UDim2.new(0, 16, 0, 16)
+    toggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
+    toggleIndicator.AnchorPoint = Vector2.new(0, 0.5)
+    toggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    toggleIndicator.BorderSizePixel = 0
+    toggleIndicator.Parent = toggleBg
+    
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(1, 0)
+    indicatorCorner.Parent = toggleIndicator
+    
+    -- Toggle state
+    local isToggled = default
+    
+    local function updateToggle(value, animate)
+        if animate == nil then animate = true end
+        isToggled = value
+        
+        if animate then
+            local bgTween = TweenService:Create(
+                toggleBg,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = isToggled and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 60, 65)}
+            )
+            bgTween:Play()
+            
+            local indicatorTween = TweenService:Create(
+                toggleIndicator,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Position = UDim2.new(0, isToggled and 18 or 2, 0.5, 0)}
+            )
+            indicatorTween:Play()
+        else
+            toggleBg.BackgroundColor3 = isToggled and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 60, 65)
+            toggleIndicator.Position = UDim2.new(0, isToggled and 18 or 2, 0.5, 0)
+        end
+        
+        callback(isToggled)
+    end
+    
+    -- Set initial state
+    updateToggle(default, false)
+    
+    -- Toggle button
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(1, keybind and -40 or 0, 1, 0)
+    toggleButton.BackgroundTransparency = 1
+    toggleButton.Text = ""
+    toggleButton.Parent = container
+    
+    toggleButton.MouseButton1Click:Connect(function()
+        updateToggle(not isToggled)
+    end)
+    
+    -- Keybind functionality
+    if keybind then
+        UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.KeyCode == keybind then
+                updateToggle(not isToggled)
+            end
+        end)
+    end
+    
+    -- Hover effects
+    toggleButton.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        hoverTween:Play()
+    end)
+    
+    toggleButton.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
+        )
+        leaveTween:Play()
+    end)
+    
+    -- Store control reference
+    local control = {
+        Type = "Toggle",
+        Name = name,
+        Container = container,
+        GetValue = function() return isToggled end,
+        SetValue = updateToggle
+    }
+    
+    table.insert(self.Controls, control)
+    
+    -- Update mobile badge when toggle changes
+    if self.MobileIcon then
+        spawn(function()
+            wait(0.1) -- Small delay to ensure state is updated
+            self.MobileIcon:UpdateBadge()
+        end)
+    end
+    
+    return control
+end
+
+-- Add a button control
+function FloatingControls:AddButton(options)
+    options = options or {}
+    local name = options.Name or "Button"
+    local description = options.Description or ""
+    local keybind = options.Keybind
+    local callback = options.Callback or function() end
+    
+    -- Create button container
+    local container = Instance.new("Frame")
+    container.Name = name .. "Button"
+    container.Size = UDim2.new(1, 0, 0, description ~= "" and 60 or 44)
+    container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    container.BorderSizePixel = 0
+    container.Parent = self.ContentContainer
+    
+    local containerCorner = Instance.new("UICorner")
+    containerCorner.CornerRadius = UDim.new(0, 8)
+    containerCorner.Parent = container
+    
+    local containerBorder = Instance.new("UIStroke")
+    containerBorder.Color = Color3.fromRGB(55, 60, 67)
+    containerBorder.Thickness = 1
+    containerBorder.Parent = container
+    
+    -- Button icon
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(0, 32, 0, 32)
+    icon.Position = UDim2.new(0, 12, 0, description ~= "" and 6 or 6)
+    icon.BackgroundTransparency = 1
+    icon.Text = "🎯"
+    icon.TextColor3 = Color3.fromRGB(120, 140, 160)
+    icon.TextSize = 24
+    icon.Font = Enum.Font.GothamBold
+    icon.TextXAlignment = Enum.TextXAlignment.Center
+    icon.TextYAlignment = Enum.TextYAlignment.Center
+    icon.Parent = container
+    
+    -- Button name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(0, 120, 0, 18)
+    nameLabel.Position = UDim2.new(0, 40, 0, description ~= "" and 6 or 13)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = name
+    nameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    nameLabel.TextSize = 13
+    nameLabel.Font = Enum.Font.GothamSemibold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = container
+    
+    -- Button description
+    if description ~= "" then
+        local descLabel = Instance.new("TextLabel")
+        descLabel.Size = UDim2.new(0, 150, 0, 14)
+        descLabel.Position = UDim2.new(0, 40, 0, 26)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = description
+        descLabel.TextColor3 = Color3.fromRGB(160, 170, 180)
+        descLabel.TextSize = 10
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        descLabel.Parent = container
+    end
+    
+    -- Keybind display (if provided)
+    if keybind then
+        local keybindLabel = Instance.new("TextLabel")
+        keybindLabel.Size = UDim2.new(0, 44, 0, 26)
+        keybindLabel.Position = UDim2.new(1, -52, 0.5, 0)
+        keybindLabel.AnchorPoint = Vector2.new(0, 0.5)
+        keybindLabel.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+        keybindLabel.Text = tostring(keybind):gsub("Enum.KeyCode.", ""):upper()
+        keybindLabel.TextColor3 = Color3.fromRGB(200, 205, 210)
+        keybindLabel.TextSize = 14
+        keybindLabel.Font = Enum.Font.GothamBold
+        keybindLabel.TextXAlignment = Enum.TextXAlignment.Center
+        keybindLabel.TextYAlignment = Enum.TextYAlignment.Center
+        keybindLabel.BorderSizePixel = 0
+        keybindLabel.Parent = container
+
+        local keybindCorner = Instance.new("UICorner")
+        keybindCorner.CornerRadius = UDim.new(0, 6)
+        keybindCorner.Parent = keybindLabel
+    end
+    
+    -- Action indicator
+    local actionIcon = Instance.new("TextLabel")
+    actionIcon.Size = UDim2.new(0, 20, 0, 20)
+    actionIcon.Position = UDim2.new(1, keybind and -22 or -28, 0.5, 0)
+    actionIcon.AnchorPoint = Vector2.new(0, 0.5)
+    actionIcon.BackgroundTransparency = 1
+    actionIcon.Text = "▶"
+    actionIcon.TextColor3 = Color3.fromRGB(240, 245, 250)
+    actionIcon.TextSize = 14
+    actionIcon.Font = Enum.Font.GothamBold
+    actionIcon.TextXAlignment = Enum.TextXAlignment.Center
+    actionIcon.TextYAlignment = Enum.TextYAlignment.Center
+    actionIcon.Parent = container
+    
+    -- Button interaction
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 1, 0)
+    button.BackgroundTransparency = 1
+    button.Text = ""
+    button.Parent = container
+    
+    button.MouseButton1Click:Connect(function()
+        -- Click effect
+        local ripple = Instance.new("Frame")
+        ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+        ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+        ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ripple.BackgroundTransparency = 0.8
+        ripple.BorderSizePixel = 0
+        ripple.Size = UDim2.new(0, 0, 0, 0)
+        ripple.Parent = container
+        
+        local rippleCorner = Instance.new("UICorner")
+        rippleCorner.CornerRadius = UDim.new(1, 0)
+        rippleCorner.Parent = ripple
+        
+        local expandTween = TweenService:Create(
+            ripple,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1.5, 0, 1.5, 0), BackgroundTransparency = 1}
+        )
+        expandTween:Play()
+        
+        expandTween.Completed:Connect(function()
+            ripple:Destroy()
+        end)
+        
+        callback()
+    end)
+    
+    -- Keybind functionality
+    if keybind then
+        UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.KeyCode == keybind then
+                callback()
+            end
+        end)
+    end
+    
+    -- Hover effects
+    button.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+        )
+        hoverTween:Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        leaveTween:Play()
+    end)
+    
+    -- Store control reference
+    local control = {
+        Type = "Button",
+        Name = name,
+        Container = container,
+        Trigger = callback
+    }
+    
+    table.insert(self.Controls, control)
+    return control
+end
+
+return FloatingControls
+end)() end,
+    function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)--[[
+    Label Component
+    A simple text display UI element
+]]
+
+local Label = {}
+Label.__index = Label
+
+function Label.new(options, tab)
+    local self = setmetatable({}, Label)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Text = options.Text or ""
+    
+    -- Create the label UI
+    self:Create()
+    
+    return self
+end
+
+function Label:Create()
+    -- Main container with subtle styling (no border for labels)
+    self.Container = Instance.new("Frame")
+    self.Container.Name = "Label"
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.Tab.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.Container
+    
+    -- Label icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.LabelIcon = Instance.new("ImageLabel")
+    self.LabelIcon.Name = "Icon"
+    self.LabelIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.LabelIcon.Position = UDim2.new(0, 16, 0.5, 0)
+    self.LabelIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.LabelIcon.BackgroundTransparency = 1
+    self.LabelIcon.Image = (success and Lucide and Lucide["tag"]) or "rbxassetid://10723416057"
+    self.LabelIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.LabelIcon.Parent = self.Container
+    
+    -- Label text
+    self.TextLabel = Instance.new("TextLabel")
+    self.TextLabel.Name = "Text"
+    self.TextLabel.Size = UDim2.new(1, -50, 1, 0)
+    self.TextLabel.Position = UDim2.new(0, 44, 0, 0)
+    self.TextLabel.BackgroundTransparency = 1
+    self.TextLabel.Text = self.Text
+    self.TextLabel.TextColor3 = Color3.fromRGB(220, 230, 240)
+    self.TextLabel.TextSize = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and 16 or 14
+    self.TextLabel.Font = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and Enum.Font.GothamBold or Enum.Font.Gotham
+    self.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+    self.TextLabel.TextWrapped = true
+    self.TextLabel.Parent = self.Container
+    
+    return self
+end
+
+function Label:SetText(text)
+    self.Text = text
+    self.TextLabel.Text = text
+    return self
+end
+
+return Label
+end)() end,
+    function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local Loading = {}
+Loading.__index = Loading
+
+function Loading.new(options, library)
+    local self = setmetatable({}, Loading)
+    
+    self.Library = library
+    self.Title = options.Title or "Loading"
+    self.Subtitle = options.Subtitle or "Please wait..."
+    self.Duration = options.Duration or 3
+    self.ShowProgress = options.ShowProgress ~= false -- Default true
+    self.ShowPercentage = options.ShowPercentage ~= false -- Default true
+    self.OnComplete = options.OnComplete or function() end
+    
+    -- Animation state
+    self.Progress = 0
+    self.IsComplete = false
+    self.StartTime = tick()
+    
+    -- Create the loading screen
+    self:Create()
+    self:StartLoading()
+    
+    return self
+end
+
+function Loading:Create()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- 🎭 MAIN LOADING SCREEN GUI 🎭
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = "ProjectMadaraLoading"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.DisplayOrder = 999 -- Always on top
+    self.ScreenGui.Parent = playerGui
+    
+    -- 🌌 SEMI-TRANSPARENT PREMIUM BACKGROUND WITH GRADIENT 🌌
+    self.Background = Instance.new("Frame")
+    self.Background.Name = "Background"
+    self.Background.Size = UDim2.new(1, 0, 1, 0)
+    self.Background.Position = UDim2.new(0, 0, 0, 0)
+    self.Background.BackgroundColor3 = Color3.fromRGB(8, 12, 18) -- Ultra-dark premium
+    self.Background.BackgroundTransparency = 0.3 -- Semi-transparent overlay
+    self.Background.BorderSizePixel = 0
+    self.Background.Parent = self.ScreenGui
+    
+    -- Animated gradient background (semi-transparent)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(8, 12, 18)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(15, 20, 28)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 12, 18))
+    }
+    gradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.3), -- Semi-transparent edges
+        NumberSequenceKeypoint.new(0.5, 0.2), -- Slightly more opaque center
+        NumberSequenceKeypoint.new(1, 0.3) -- Semi-transparent edges
+    }
+    gradient.Rotation = 45
+    gradient.Parent = self.Background
+    
+    -- Animate gradient rotation
+    local gradientTween = TweenService:Create(
+        gradient,
+        TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
+        {Rotation = 405}
+    )
+    gradientTween:Play()
+    
+    -- 🌟 FLOATING PARTICLES EFFECT 🌟
+    self:CreateParticles()
+    
+    -- 💎 MAIN LOADING CONTAINER 💎
+    self.LoadingContainer = Instance.new("Frame")
+    self.LoadingContainer.Name = "LoadingContainer"
+    self.LoadingContainer.Size = UDim2.new(0, 500, 0, 300)
+    self.LoadingContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.LoadingContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.LoadingContainer.BackgroundTransparency = 1
+    self.LoadingContainer.Parent = self.Background
+    
+    -- 🎨 PREMIUM LOGO/ICON AREA 🎨
+    self.LogoContainer = Instance.new("Frame")
+    self.LogoContainer.Name = "LogoContainer"
+    self.LogoContainer.Size = UDim2.new(0, 120, 0, 120)
+    self.LogoContainer.Position = UDim2.new(0.5, 0, 0, 0)
+    self.LogoContainer.AnchorPoint = Vector2.new(0.5, 0)
+    self.LogoContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.LogoContainer.BorderSizePixel = 0
+    self.LogoContainer.Parent = self.LoadingContainer
+    
+    -- Premium logo styling
+    local logoCorner = Instance.new("UICorner")
+    logoCorner.CornerRadius = UDim.new(0, 25)
+    logoCorner.Parent = self.LogoContainer
+    
+    -- Glowing border effect
+    local logoBorder = Instance.new("UIStroke")
+    logoBorder.Color = Color3.fromRGB(100, 180, 255)
+    logoBorder.Thickness = 3
+    logoBorder.Transparency = 0.3
+    logoBorder.Parent = self.LogoContainer
+    
+    -- Logo text/symbol
+    self.LogoText = Instance.new("TextLabel")
+    self.LogoText.Name = "LogoText"
+    self.LogoText.Size = UDim2.new(1, 0, 1, 0)
+    self.LogoText.BackgroundTransparency = 1
+    self.LogoText.Text = "M" -- Project Madara
+    self.LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.LogoText.TextSize = 48
+    self.LogoText.Font = Enum.Font.GothamBold
+    self.LogoText.TextXAlignment = Enum.TextXAlignment.Center
+    self.LogoText.TextYAlignment = Enum.TextYAlignment.Center
+    self.LogoText.Parent = self.LogoContainer
+    
+    -- 🌟 PREMIUM TITLE TEXT 🌟
+    self.TitleLabel = Instance.new("TextLabel")
+    self.TitleLabel.Name = "TitleLabel"
+    self.TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+    self.TitleLabel.Position = UDim2.new(0, 0, 0, 140)
+    self.TitleLabel.BackgroundTransparency = 1
+    self.TitleLabel.Text = self.Title
+    self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.TitleLabel.TextSize = 32
+    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    self.TitleLabel.Parent = self.LoadingContainer
+    
+    -- Title glow effect
+    local titleGlow = Instance.new("UIStroke")
+    titleGlow.Color = Color3.fromRGB(100, 180, 255)
+    titleGlow.Thickness = 1
+    titleGlow.Transparency = 0.7
+    titleGlow.Parent = self.TitleLabel
+    
+    -- 💫 SUBTITLE TEXT 💫
+    self.SubtitleLabel = Instance.new("TextLabel")
+    self.SubtitleLabel.Name = "SubtitleLabel"
+    self.SubtitleLabel.Size = UDim2.new(1, 0, 0, 24)
+    self.SubtitleLabel.Position = UDim2.new(0, 0, 0, 185)
+    self.SubtitleLabel.BackgroundTransparency = 1
+    self.SubtitleLabel.Text = self.Subtitle
+    self.SubtitleLabel.TextColor3 = Color3.fromRGB(160, 180, 200)
+    self.SubtitleLabel.TextSize = 16
+    self.SubtitleLabel.Font = Enum.Font.Gotham
+    self.SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    self.SubtitleLabel.Parent = self.LoadingContainer
+    
+    if self.ShowProgress then
+        -- 🎯 ULTRA-MODERN PROGRESS BAR 🎯
+        self.ProgressContainer = Instance.new("Frame")
+        self.ProgressContainer.Name = "ProgressContainer"
+        self.ProgressContainer.Size = UDim2.new(0, 400, 0, 8)
+        self.ProgressContainer.Position = UDim2.new(0.5, 0, 0, 230)
+        self.ProgressContainer.AnchorPoint = Vector2.new(0.5, 0)
+        self.ProgressContainer.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
+        self.ProgressContainer.BorderSizePixel = 0
+        self.ProgressContainer.Parent = self.LoadingContainer
+        
+        -- Progress bar styling
+        local progressCorner = Instance.new("UICorner")
+        progressCorner.CornerRadius = UDim.new(1, 0)
+        progressCorner.Parent = self.ProgressContainer
+        
+        -- Progress bar border
+        local progressBorder = Instance.new("UIStroke")
+        progressBorder.Color = Color3.fromRGB(45, 55, 65)
+        progressBorder.Thickness = 1
+        progressBorder.Parent = self.ProgressContainer
+        
+        -- 🌈 ANIMATED PROGRESS FILL 🌈
+        self.ProgressFill = Instance.new("Frame")
+        self.ProgressFill.Name = "ProgressFill"
+        self.ProgressFill.Size = UDim2.new(0, 0, 1, 0)
+        self.ProgressFill.Position = UDim2.new(0, 0, 0, 0)
+        self.ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        self.ProgressFill.BorderSizePixel = 0
+        self.ProgressFill.Parent = self.ProgressContainer
+        
+        -- Progress fill styling
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(1, 0)
+        fillCorner.Parent = self.ProgressFill
+        
+        -- Animated gradient on progress bar
+        local progressGradient = Instance.new("UIGradient")
+        progressGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 180, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255))
+        }
+        progressGradient.Parent = self.ProgressFill
+        
+        -- Animate progress gradient
+        local progressGradientTween = TweenService:Create(
+            progressGradient,
+            TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
+            {Offset = Vector2.new(1, 0)}
+        )
+        progressGradientTween:Play()
+        
+        -- 🔥 PROGRESS GLOW EFFECT 🔥
+        self.ProgressGlow = Instance.new("Frame")
+        self.ProgressGlow.Name = "ProgressGlow"
+        self.ProgressGlow.Size = UDim2.new(1, 20, 1, 20)
+        self.ProgressGlow.Position = UDim2.new(0, -10, 0, -10)
+        self.ProgressGlow.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        self.ProgressGlow.BackgroundTransparency = 0.8
+        self.ProgressGlow.BorderSizePixel = 0
+        self.ProgressGlow.ZIndex = self.ProgressContainer.ZIndex - 1
+        self.ProgressGlow.Parent = self.ProgressContainer
+        
+        local glowCorner = Instance.new("UICorner")
+        glowCorner.CornerRadius = UDim.new(1, 0)
+        glowCorner.Parent = self.ProgressGlow
+    end
+    
+    if self.ShowPercentage then
+        -- 📊 PERCENTAGE DISPLAY 📊
+        self.PercentageLabel = Instance.new("TextLabel")
+        self.PercentageLabel.Name = "PercentageLabel"
+        self.PercentageLabel.Size = UDim2.new(0, 100, 0, 30)
+        self.PercentageLabel.Position = UDim2.new(0.5, 0, 0, 250)
+        self.PercentageLabel.AnchorPoint = Vector2.new(0.5, 0)
+        self.PercentageLabel.BackgroundTransparency = 1
+        self.PercentageLabel.Text = "0%"
+        self.PercentageLabel.TextColor3 = Color3.fromRGB(100, 180, 255)
+        self.PercentageLabel.TextSize = 18
+        self.PercentageLabel.Font = Enum.Font.GothamBold
+        self.PercentageLabel.TextXAlignment = Enum.TextXAlignment.Center
+        self.PercentageLabel.Parent = self.LoadingContainer
+    end
+    
+    -- 🎭 ENTRANCE ANIMATIONS 🎭
+    self:PlayEntranceAnimations()
+end
+
+function Loading:CreateParticles()
+    -- Create floating particles for extra premium feel
+    for i = 1, 15 do
+        local particle = Instance.new("Frame")
+        particle.Name = "Particle" .. i
+        particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
+        particle.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        particle.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+        particle.BackgroundTransparency = math.random(30, 80) / 100
+        particle.BorderSizePixel = 0
+        particle.Parent = self.Background
+        
+        -- Make particles circular
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = particle
+        
+        -- Animate particles floating
+        local floatTween = TweenService:Create(
+            particle,
+            TweenInfo.new(math.random(8, 15), Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true),
+            {
+                Position = UDim2.new(math.random(), 0, math.random(), 0),
+                BackgroundTransparency = math.random(20, 90) / 100
+            }
+        )
+        floatTween:Play()
+    end
+end
+
+function Loading:PlayEntranceAnimations()
+    -- Start everything invisible/scaled down
+    self.LoadingContainer.Size = UDim2.new(0, 0, 0, 0)
+    self.LogoContainer.Rotation = -180
+    self.TitleLabel.TextTransparency = 1
+    self.SubtitleLabel.TextTransparency = 1
+    
+    if self.ProgressContainer then
+        self.ProgressContainer.Size = UDim2.new(0, 0, 0, 8)
+    end
+    
+    -- 🎬 EPIC ENTRANCE SEQUENCE 🎬
+    
+    -- 1. Scale in main container
+    local containerTween = TweenService:Create(
+        self.LoadingContainer,
+        TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 500, 0, 300)}
+    )
+    containerTween:Play()
+    
+    -- 2. Rotate and glow logo
+    wait(0.2)
+    local logoTween = TweenService:Create(
+        self.LogoContainer,
+        TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out),
+        {Rotation = 0}
+    )
+    logoTween:Play()
+    
+    -- 3. Fade in title
+    wait(0.3)
+    local titleTween = TweenService:Create(
+        self.TitleLabel,
+        TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {TextTransparency = 0}
+    )
+    titleTween:Play()
+    
+    -- 4. Fade in subtitle
+    wait(0.2)
+    local subtitleTween = TweenService:Create(
+        self.SubtitleLabel,
+        TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {TextTransparency = 0}
+    )
+    subtitleTween:Play()
+    
+    -- 5. Expand progress bar
+    if self.ProgressContainer then
+        wait(0.3)
+        local progressTween = TweenService:Create(
+            self.ProgressContainer,
+            TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 400, 0, 8)}
+        )
+        progressTween:Play()
+    end
+end
+
+function Loading:StartLoading()
+    -- 🚀 MAIN LOADING ANIMATION LOOP 🚀
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if self.IsComplete then
+            connection:Disconnect()
+            return
+        end
+        
+        local elapsed = tick() - self.StartTime
+        self.Progress = math.min(elapsed / self.Duration, 1)
+        
+        -- Update progress bar
+        if self.ProgressFill then
+            local targetSize = UDim2.new(self.Progress, 0, 1, 0)
+            local progressTween = TweenService:Create(
+                self.ProgressFill,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = targetSize}
+            )
+            progressTween:Play()
+        end
+        
+        -- Update percentage
+        if self.PercentageLabel then
+            local percentage = math.floor(self.Progress * 100)
+            self.PercentageLabel.Text = percentage .. "%"
+            
+            -- Color transition based on progress
+            local color = Color3.fromRGB(
+                math.floor(100 + (155 * self.Progress)),
+                math.floor(180 + (75 * self.Progress)),
+                255
+            )
+            self.PercentageLabel.TextColor3 = color
+        end
+        
+        -- Pulse logo based on progress
+        local pulseScale = 1 + (math.sin(elapsed * 8) * 0.05)
+        self.LogoContainer.Size = UDim2.new(0, 120 * pulseScale, 0, 120 * pulseScale)
+        
+        -- Complete loading
+        if self.Progress >= 1 and not self.IsComplete then
+            self.IsComplete = true
+            self:CompleteLoading()
+        end
+    end)
+end
+
+function Loading:CompleteLoading()
+    -- 🎉 EPIC COMPLETION SEQUENCE 🎉
+    
+    -- Flash effect
+    local flash = Instance.new("Frame")
+    flash.Size = UDim2.new(1, 0, 1, 0)
+    flash.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+    flash.BackgroundTransparency = 1
+    flash.BorderSizePixel = 0
+    flash.Parent = self.Background
+    
+    local flashTween = TweenService:Create(
+        flash,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut),
+        {BackgroundTransparency = 0.7}
+    )
+    flashTween:Play()
+    
+    flashTween.Completed:Connect(function()
+        local flashOut = TweenService:Create(
+            flash,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 1}
+        )
+        flashOut:Play()
+        
+        flashOut.Completed:Connect(function()
+            flash:Destroy()
+        end)
+    end)
+    
+    -- Success message
+    if self.SubtitleLabel then
+        self.SubtitleLabel.Text = "Loading Complete! ✨"
+        self.SubtitleLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
+    end
+    
+    -- Scale out animation
+    wait(0.8)
+    local exitTween = TweenService:Create(
+        self.LoadingContainer,
+        TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+        {
+            Size = UDim2.new(0, 0, 0, 0),
+            Rotation = 180
+        }
+    )
+    exitTween:Play()
+    
+    -- Fade out background (from semi-transparent to fully transparent)
+    local bgTween = TweenService:Create(
+        self.Background,
+        TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundTransparency = 1}
+    )
+    bgTween:Play()
+    
+    bgTween.Completed:Connect(function()
+        -- Call completion callback
+        self.OnComplete()
+        
+        -- Clean up
+        wait(0.2)
+        self.ScreenGui:Destroy()
+    end)
+end
+
+return Loading
+end)() end,
+    function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)--[[
+    Mobile Floating Icon Component
+    A small draggable app icon for mobile users to access floating controls
+]]
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local MobileFloatingIcon = {}
+MobileFloatingIcon.__index = MobileFloatingIcon
+
+function MobileFloatingIcon.new(options, floatingControls)
+    local self = setmetatable({}, MobileFloatingIcon)
+    
+    self.FloatingControls = floatingControls
+    self.IconText = options.IconText or "C"
+    self.IconColor = options.IconColor or Color3.fromRGB(0, 120, 215)
+    self.Size = options.Size or 60
+    
+    -- Only create on mobile devices
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+        self:CreateGui()
+    end
+    
+    return self
+end
+
+function MobileFloatingIcon:CreateGui()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- Create ScreenGui for mobile icon
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = "MobileFloatingIcon"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.Parent = playerGui
+    
+    -- Container for dragging
+    self.Container = Instance.new("Frame")
+    self.Container.Name = "IconContainer"
+    self.Container.Size = UDim2.new(0, self.Size + 10, 0, self.Size + 10)
+    self.Container.Position = UDim2.new(0, 20, 0, 150) -- Top left, below other UI
+    self.Container.BackgroundTransparency = 1
+    self.Container.Parent = self.ScreenGui
+    
+    -- Main icon button
+    self.IconButton = Instance.new("TextButton")
+    self.IconButton.Name = "IconButton"
+    self.IconButton.Size = UDim2.new(0, self.Size, 0, self.Size)
+    self.IconButton.Position = UDim2.new(0, 5, 0, 5)
+    self.IconButton.BackgroundColor3 = self.IconColor
+    self.IconButton.Text = self.IconText
+    self.IconButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.IconButton.TextSize = self.Size * 0.4
+    self.IconButton.Font = Enum.Font.GothamBold
+    self.IconButton.BorderSizePixel = 0
+    self.IconButton.Parent = self.Container
+    
+    -- Circular shape
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = self.IconButton
+    
+    -- Premium border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 255, 255)
+    border.Thickness = 3
+    border.Transparency = 0.7
+    border.Parent = self.IconButton
+    
+    -- Shadow effect
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 8, 1, 8)
+    shadow.Position = UDim2.new(0, -4, 0, -4)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.6
+    shadow.BorderSizePixel = 0
+    shadow.ZIndex = self.IconButton.ZIndex - 1
+    shadow.Parent = self.IconButton
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(1, 0)
+    shadowCorner.Parent = shadow
+    
+    -- Notification badge (for showing active features count)
+    self.Badge = Instance.new("Frame")
+    self.Badge.Name = "Badge"
+    self.Badge.Size = UDim2.new(0, 20, 0, 20)
+    self.Badge.Position = UDim2.new(1, -10, 0, -5)
+    self.Badge.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    self.Badge.BorderSizePixel = 0
+    self.Badge.Visible = false
+    self.Badge.Parent = self.IconButton
+    
+    local badgeCorner = Instance.new("UICorner")
+    badgeCorner.CornerRadius = UDim.new(1, 0)
+    badgeCorner.Parent = self.Badge
+    
+    self.BadgeText = Instance.new("TextLabel")
+    self.BadgeText.Size = UDim2.new(1, 0, 1, 0)
+    self.BadgeText.BackgroundTransparency = 1
+    self.BadgeText.Text = "0"
+    self.BadgeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.BadgeText.TextSize = 12
+    self.BadgeText.Font = Enum.Font.GothamBold
+    self.BadgeText.TextXAlignment = Enum.TextXAlignment.Center
+    self.BadgeText.TextYAlignment = Enum.TextYAlignment.Center
+    self.BadgeText.Parent = self.Badge
+    
+    -- Close button for mobile icon
+    self.CloseButton = Instance.new("TextButton")
+    self.CloseButton.Name = "CloseButton"
+    self.CloseButton.Size = UDim2.new(0, 25, 0, 25)
+    self.CloseButton.Position = UDim2.new(0, -8, 0, -8) -- Top left corner
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    self.CloseButton.Text = "×"
+    self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.CloseButton.TextSize = 16
+    self.CloseButton.Font = Enum.Font.GothamBold
+    self.CloseButton.BorderSizePixel = 0
+    self.CloseButton.ZIndex = 100
+    self.CloseButton.Parent = self.IconButton
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = self.CloseButton
+    
+    local closeBorder = Instance.new("UIStroke")
+    closeBorder.Color = Color3.fromRGB(255, 255, 255)
+    closeBorder.Thickness = 2
+    closeBorder.Parent = self.CloseButton
+    
+    -- Make draggable
+    self:MakeDraggable()
+    
+    -- Button functionality
+    self.IconButton.MouseButton1Click:Connect(function()
+        self:OnIconTapped()
+    end)
+    
+    -- Close button functionality
+    self.CloseButton.MouseButton1Click:Connect(function()
+        print("Mobile icon close button clicked") -- Debug
+        self:Hide()
+    end)
+    
+    -- Close button hover effects
+    self.CloseButton.MouseEnter:Connect(function()
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 30, 0, 30), BackgroundColor3 = Color3.fromRGB(255, 100, 100)}
+        )
+        scaleTween:Play()
+    end)
+    
+    self.CloseButton.MouseLeave:Connect(function()
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 25, 0, 25), BackgroundColor3 = Color3.fromRGB(255, 60, 60)}
+        )
+        scaleTween:Play()
+    end)
+    
+    -- Hover/touch effects
+    self:SetupTouchEffects()
+    
+    -- Update badge when controls change
+    self:UpdateBadge()
+    
+    return self
+end
+
+function MobileFloatingIcon:MakeDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        self.Container.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    self.Container.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.Container.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    self.Container.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+end
+
+function MobileFloatingIcon:SetupTouchEffects()
+    -- Touch down effect
+    self.IconButton.MouseButton1Down:Connect(function()
+        local scaleTween = TweenService:Create(
+            self.IconButton,
+            TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, self.Size * 0.9, 0, self.Size * 0.9)}
+        )
+        scaleTween:Play()
+        
+        local colorTween = TweenService:Create(
+            self.IconButton,
+            TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(
+                math.min(255, self.IconColor.R * 255 + 30),
+                math.min(255, self.IconColor.G * 255 + 30),
+                math.min(255, self.IconColor.B * 255 + 30)
+            )}
+        )
+        colorTween:Play()
+    end)
+    
+    -- Touch up effect
+    self.IconButton.MouseButton1Up:Connect(function()
+        local scaleTween = TweenService:Create(
+            self.IconButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, self.Size, 0, self.Size)}
+        )
+        scaleTween:Play()
+        
+        local colorTween = TweenService:Create(
+            self.IconButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = self.IconColor}
+        )
+        colorTween:Play()
+    end)
+end
+
+function MobileFloatingIcon:OnIconTapped()
+    -- Toggle the floating controls
+    if self.FloatingControls then
+        self.FloatingControls:Toggle()
+        
+        -- Pulse effect
+        local pulseTween = TweenService:Create(
+            self.IconButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, self.Size * 1.2, 0, self.Size * 1.2)}
+        )
+        pulseTween:Play()
+        
+        pulseTween.Completed:Connect(function()
+            local returnTween = TweenService:Create(
+                self.IconButton,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {Size = UDim2.new(0, self.Size, 0, self.Size)}
+            )
+            returnTween:Play()
+        end)
+    end
+end
+
+function MobileFloatingIcon:UpdateBadge()
+    if not self.FloatingControls then return end
+    
+    -- Count active toggles
+    local activeCount = 0
+    for _, control in ipairs(self.FloatingControls.Controls) do
+        if control.Type == "Toggle" and control.GetValue() then
+            activeCount = activeCount + 1
+        end
+    end
+    
+    -- Update badge
+    if activeCount > 0 then
+        self.Badge.Visible = true
+        self.BadgeText.Text = tostring(activeCount)
+        
+        -- Animate badge appearance
+        local badgeTween = TweenService:Create(
+            self.Badge,
+            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 20, 0, 20)}
+        )
+        badgeTween:Play()
+    else
+        self.Badge.Visible = false
+    end
+end
+
+function MobileFloatingIcon:Show()
+    if self.ScreenGui then
+        self.ScreenGui.Enabled = true
+    end
+end
+
+function MobileFloatingIcon:Hide()
+    if self.ScreenGui then
+        self.ScreenGui.Enabled = false
+    end
+end
+
+return MobileFloatingIcon
+end)() end,
+    function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)--[[
+    Notifications System - Ultra-Modern Design
+    Beautiful toast notifications with premium animations and styling
+]]
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local Notifications = {}
+Notifications.__index = Notifications
+
+-- Notification types with their styling
+local NotificationTypes = {
+    Success = {
+        Color = Color3.fromRGB(34, 197, 94), -- Green
+        Icon = "check-circle",
+        Sound = "rbxassetid://131961136" -- Success sound
+    },
+    Error = {
+        Color = Color3.fromRGB(239, 68, 68), -- Red
+        Icon = "x-circle",
+        Sound = "rbxassetid://131961136" -- Error sound
+    },
+    Warning = {
+        Color = Color3.fromRGB(245, 158, 11), -- Orange
+        Icon = "alert-triangle",
+        Sound = "rbxassetid://131961136" -- Warning sound
+    },
+    Info = {
+        Color = Color3.fromRGB(59, 130, 246), -- Blue
+        Icon = "info",
+        Sound = "rbxassetid://131961136" -- Info sound
+    }
+}
+
+function Notifications.new()
+    local self = setmetatable({}, Notifications)
+    
+    self.ActiveNotifications = {}
+    self.NotificationQueue = {}
+    self.MaxNotifications = 5 -- Maximum notifications on screen
+    
+    -- Create the notification container
+    self:CreateContainer()
+    
+    return self
+end
+
+function Notifications:CreateContainer()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- 🚀 ULTRA-MODERN NOTIFICATION CONTAINER 🚀
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = "ProjectMadaraNotifications"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.DisplayOrder = 999 -- Always on top
+    self.ScreenGui.Parent = playerGui
+    
+    -- Notification container (top-right corner)
+    self.Container = Instance.new("Frame")
+    self.Container.Name = "NotificationContainer"
+    self.Container.Size = UDim2.new(0, 350, 1, 0) -- Fixed width, full height
+    self.Container.Position = UDim2.new(1, -370, 0, 20) -- Top-right with margin
+    self.Container.BackgroundTransparency = 1
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.ScreenGui
+    
+    -- Layout for notifications (top to bottom)
+    self.Layout = Instance.new("UIListLayout")
+    self.Layout.FillDirection = Enum.FillDirection.Vertical
+    self.Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.Layout.Padding = UDim.new(0, 12) -- Space between notifications
+    self.Layout.Parent = self.Container
+end
+
+function Notifications:Show(options)
+    options = options or {}
+    local title = options.Title or "Notification"
+    local content = options.Content or "This is a notification message."
+    local type = options.Type or "Info" -- Success, Error, Warning, Info
+    local duration = options.Duration or 3 -- Seconds
+    
+    -- Get notification style
+    local style = NotificationTypes[type] or NotificationTypes.Info
+    
+    -- If we have too many notifications, queue this one
+    if #self.ActiveNotifications >= self.MaxNotifications then
+        table.insert(self.NotificationQueue, options)
+        return
+    end
+    
+    -- Create the notification
+    local notification = self:CreateNotification(title, content, style, duration)
+    table.insert(self.ActiveNotifications, notification)
+    
+    -- Animate in
+    self:AnimateIn(notification)
+    
+    -- Auto-dismiss after duration
+    if duration > 0 then
+        task.wait(duration)
+        self:Dismiss(notification)
+    end
+end
+
+function Notifications:CreateNotification(title, content, style, duration)
+    -- 🎨 ULTRA-PREMIUM NOTIFICATION DESIGN 🎨
+    local notification = Instance.new("Frame")
+    notification.Name = "Notification"
+    notification.Size = UDim2.new(1, 0, 0, 80) -- Minimum height of 80 pixels
+    notification.BackgroundColor3 = Color3.fromRGB(20, 25, 32) -- Ultra-dark premium background
+    notification.BorderSizePixel = 0
+    notification.AutomaticSize = Enum.AutomaticSize.Y
+    notification.LayoutOrder = #self.ActiveNotifications + 1
+    notification.Parent = self.Container
+    
+    -- Premium corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12) -- Very rounded for modern look
+    corner.Parent = notification
+    
+    -- Stunning gradient border
+    local border = Instance.new("UIStroke")
+    border.Color = style.Color
+    border.Thickness = 2
+    border.Transparency = 0.3 -- Subtle glow effect
+    border.Parent = notification
+    
+    -- Subtle inner glow
+    local glow = Instance.new("Frame")
+    glow.Name = "Glow"
+    glow.Size = UDim2.new(1, -4, 1, -4)
+    glow.Position = UDim2.new(0, 2, 0, 2)
+    glow.BackgroundColor3 = style.Color
+    glow.BackgroundTransparency = 0.95 -- Very subtle
+    glow.BorderSizePixel = 0
+    glow.Parent = notification
+    
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(0, 10)
+    glowCorner.Parent = glow
+    
+    -- Colored accent bar (left side)
+    local accentBar = Instance.new("Frame")
+    accentBar.Name = "AccentBar"
+    accentBar.Size = UDim2.new(0, 4, 1, -16)
+    accentBar.Position = UDim2.new(0, 8, 0, 8)
+    accentBar.BackgroundColor3 = style.Color
+    accentBar.BorderSizePixel = 0
+    accentBar.Parent = notification
+    
+    local accentCorner = Instance.new("UICorner")
+    accentCorner.CornerRadius = UDim.new(0, 2)
+    accentCorner.Parent = accentBar
+    
+    -- Premium icon container
+    local iconContainer = Instance.new("Frame")
+    iconContainer.Name = "IconContainer"
+    iconContainer.Size = UDim2.new(0, 36, 0, 36)
+    iconContainer.Position = UDim2.new(0, 20, 0, 16)
+    iconContainer.BackgroundColor3 = style.Color
+    iconContainer.BackgroundTransparency = 0.9
+    iconContainer.BorderSizePixel = 0
+    iconContainer.Parent = notification
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 8)
+    iconCorner.Parent = iconContainer
+    
+    -- Icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    local icon = Instance.new("ImageLabel")
+    icon.Name = "Icon"
+    icon.Size = UDim2.new(0, 20, 0, 20)
+    icon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    icon.AnchorPoint = Vector2.new(0.5, 0.5)
+    icon.BackgroundTransparency = 1
+    icon.Image = (success and Lucide and Lucide[style.Icon]) or "rbxassetid://10723416057"
+    icon.ImageColor3 = style.Color
+    icon.Parent = iconContainer
+    
+    -- Close button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.Size = UDim2.new(0, 24, 0, 24)
+    closeButton.Position = UDim2.new(1, -32, 0, 16)
+    closeButton.BackgroundColor3 = Color3.fromRGB(60, 65, 72)
+    closeButton.BackgroundTransparency = 0.8
+    closeButton.Text = "×"
+    closeButton.TextColor3 = Color3.fromRGB(200, 205, 210)
+    closeButton.TextSize = 14
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.BorderSizePixel = 0
+    closeButton.Parent = notification
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = closeButton
+    
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "Title"
+    titleLabel.Size = UDim2.new(1, -120, 0, 20)
+    titleLabel.Position = UDim2.new(0, 68, 0, 16)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = title
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 15
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+    titleLabel.Parent = notification
+    
+    -- Content
+    local contentLabel = Instance.new("TextLabel")
+    contentLabel.Name = "Content"
+    contentLabel.Size = UDim2.new(1, -80, 0, 0)
+    contentLabel.Position = UDim2.new(0, 68, 0, 42)
+    contentLabel.BackgroundTransparency = 1
+    contentLabel.Text = content
+    contentLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+    contentLabel.TextSize = 13
+    contentLabel.Font = Enum.Font.Gotham
+    contentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    contentLabel.TextYAlignment = Enum.TextYAlignment.Top
+    contentLabel.TextWrapped = true
+    contentLabel.AutomaticSize = Enum.AutomaticSize.Y
+    contentLabel.Parent = notification
+    
+    -- Padding - ensure enough bottom padding for content and progress bar
+    local padding = Instance.new("UIPadding")
+    padding.PaddingLeft = UDim.new(0, 0)
+    padding.PaddingRight = UDim.new(0, 16)
+    padding.PaddingTop = UDim.new(0, 0)
+    padding.PaddingBottom = UDim.new(0, 24) -- More bottom padding for progress bar
+    padding.Parent = notification
+    
+    -- Progress bar (if duration > 0)
+    if duration > 0 then
+        local progressBar = Instance.new("Frame")
+        progressBar.Name = "ProgressBar"
+        progressBar.Size = UDim2.new(1, -16, 0, 2)
+        progressBar.Position = UDim2.new(0, 8, 1, -10) -- Position higher to avoid clipping
+        progressBar.BackgroundColor3 = style.Color
+        progressBar.BorderSizePixel = 0
+        progressBar.Parent = notification
+        
+        local progressCorner = Instance.new("UICorner")
+        progressCorner.CornerRadius = UDim.new(0, 1)
+        progressCorner.Parent = progressBar
+        
+        -- Animate progress bar
+        local progressTween = TweenService:Create(
+            progressBar,
+            TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 0, 0, 2)}
+        )
+        progressTween:Play()
+    end
+    
+    -- Close button functionality
+    closeButton.MouseButton1Click:Connect(function()
+        self:Dismiss(notification)
+    end)
+    
+    -- Close button hover effects
+    closeButton.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            closeButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(220, 85, 85), BackgroundTransparency = 0}
+        )
+        hoverTween:Play()
+    end)
+    
+    closeButton.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            closeButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(60, 65, 72), BackgroundTransparency = 0.8}
+        )
+        leaveTween:Play()
+    end)
+    
+    -- Store references using attributes or just return the notification
+    -- We don't need to store these as properties since we can find them by name
+    
+    return notification
+end
+
+function Notifications:AnimateIn(notification)
+    -- Start from the right, slide in
+    notification.Position = UDim2.new(1, 50, 0, 0)
+    notification.BackgroundTransparency = 1
+    
+    -- Slide in animation
+    local slideTween = TweenService:Create(
+        notification,
+        TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {Position = UDim2.new(0, 0, 0, 0)}
+    )
+    slideTween:Play()
+    
+    -- Fade in animation
+    local fadeTween = TweenService:Create(
+        notification,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundTransparency = 0}
+    )
+    fadeTween:Play()
+    
+    -- Icon bounce animation
+    local iconContainer = notification:FindFirstChild("IconContainer")
+    if iconContainer then
+        iconContainer.Size = UDim2.new(0, 0, 0, 0)
+        local iconTween = TweenService:Create(
+            iconContainer,
+            TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 36, 0, 36)}
+        )
+        iconTween:Play()
+    end
+end
+
+function Notifications:Dismiss(notification)
+    -- Find and remove from active notifications
+    for i, activeNotif in ipairs(self.ActiveNotifications) do
+        if activeNotif == notification then
+            table.remove(self.ActiveNotifications, i)
+            break
+        end
+    end
+    
+    -- Slide out animation
+    local slideOutTween = TweenService:Create(
+        notification,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
+        {Position = UDim2.new(1, 50, 0, 0), BackgroundTransparency = 1}
+    )
+    slideOutTween:Play()
+    
+    slideOutTween.Completed:Connect(function()
+        notification:Destroy()
+        
+        -- Process queue
+        if #self.NotificationQueue > 0 then
+            local nextNotification = table.remove(self.NotificationQueue, 1)
+            self:Show(nextNotification)
+        end
+    end)
+end
+
+-- Convenience methods
+function Notifications:Success(title, content, duration)
+    self:Show({
+        Title = title,
+        Content = content,
+        Type = "Success",
+        Duration = duration or 4
+    })
+end
+
+function Notifications:Error(title, content, duration)
+    self:Show({
+        Title = title,
+        Content = content,
+        Type = "Error",
+        Duration = duration or 6
+    })
+end
+
+function Notifications:Warning(title, content, duration)
+    self:Show({
+        Title = title,
+        Content = content,
+        Type = "Warning",
+        Duration = duration or 5
+    })
+end
+
+function Notifications:Info(title, content, duration)
+    self:Show({
+        Title = title,
+        Content = content,
+        Type = "Info",
+        Duration = duration or 4
+    })
+end
+
+return Notifications
+end)() end,
+    function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)--[[
+    Options Manager
+    A centralized system for managing UI component values with easy referencing
+    
+    Usage:
+    local Toggles, Options = OptionsManager.new()
+    
+    -- Access values:
+    Toggles.toggleName.Value
+    Toggles["toggleName"].Value
+    Options.dropdownName.Value
+    Options["dropdownName"].Value
+    Options.sliderName.Value
+    Options["sliderName"].Value
+    Options.inputName.Value
+    Options["inputName"].Value
+]]
+
+local OptionsManager = {}
+OptionsManager.__index = OptionsManager
+
+-- Create a new options manager instance
+function OptionsManager.new()
+    local self = setmetatable({}, OptionsManager)
+    
+    -- Storage for all components
+    self.Toggles = {}
+    self.Options = {}
+    
+    -- Metatable for easy access
+    setmetatable(self.Toggles, {
+        __index = function(t, key)
+            local component = rawget(t, key)
+            if component then
+                return component
+            end
+            -- Return a dummy object if component doesn't exist yet
+            return {Value = false}
+        end
+    })
+    
+    setmetatable(self.Options, {
+        __index = function(t, key)
+            local component = rawget(t, key)
+            if component then
+                return component
+            end
+            -- Return a dummy object if component doesn't exist yet
+            return {Value = ""}
+        end
+    })
+    
+    return self.Toggles, self.Options, self
+end
+
+-- Register a toggle component
+function OptionsManager:RegisterToggle(name, component)
+    self.Toggles[name] = component
+    return component
+end
+
+-- Register an option component (dropdown, slider, textbox)
+function OptionsManager:RegisterOption(name, component)
+    self.Options[name] = component
+    return component
+end
+
+-- Get all toggle values
+function OptionsManager:GetToggles()
+    local values = {}
+    for name, component in pairs(self.Toggles) do
+        values[name] = component.Value
+    end
+    return values
+end
+
+-- Get all option values
+function OptionsManager:GetOptions()
+    local values = {}
+    for name, component in pairs(self.Options) do
+        values[name] = component.Value
+    end
+    return values
+end
+
+-- Get all values combined
+function OptionsManager:GetAllValues()
+    return {
+        Toggles = self:GetToggles(),
+        Options = self:GetOptions()
+    }
+end
+
+-- Set toggle value
+function OptionsManager:SetToggle(name, value)
+    if self.Toggles[name] and self.Toggles[name].SetValue then
+        self.Toggles[name]:SetValue(value)
+    end
+end
+
+-- Set option value
+function OptionsManager:SetOption(name, value)
+    if self.Options[name] and self.Options[name].SetValue then
+        self.Options[name]:SetValue(value)
+    end
+end
+
+-- Load values from a table
+function OptionsManager:LoadValues(data)
+    if data.Toggles then
+        for name, value in pairs(data.Toggles) do
+            self:SetToggle(name, value)
+        end
+    end
+    
+    if data.Options then
+        for name, value in pairs(data.Options) do
+            self:SetOption(name, value)
+        end
+    end
+end
+
+-- Save values to a table (for config saving)
+function OptionsManager:SaveValues()
+    return self:GetAllValues()
+end
+
+return OptionsManager
+end)() end,
+    function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)--[[
+    Paragraph Component - Ultra-Modern Design
+    A beautiful paragraph display component for longer text content
+]]
+
+local TweenService = game:GetService("TweenService")
+
+local Paragraph = {}
+Paragraph.__index = Paragraph
+
+function Paragraph.new(options, tab)
+    local self = setmetatable({}, Paragraph)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "Paragraph"
+    self.Subtitle = options.Subtitle or "Add your paragraph content here..."
+    
+    -- Create the paragraph UI
+    self:Create()
+    
+    return self
+end
+
+function Paragraph:Create()
+    -- 🎨 ULTRA-MODERN PARAGRAPH CONTAINER 🎨
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "Paragraph"
+    self.Container.Size = UDim2.new(1, 0, 0, 0) -- Auto-size based on content
+    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40) -- Slightly different from other components
+    self.Container.BorderSizePixel = 0
+    self.Container.AutomaticSize = Enum.AutomaticSize.Y -- Auto-resize based on text
+    self.Container.Parent = self.Tab.Container
+    
+    -- Premium border with subtle accent
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(45, 55, 65) -- Subtle border, not as bright as interactive components
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.Container
+    
+    -- Subtle accent line on the left (like a quote indicator)
+    self.AccentLine = Instance.new("Frame")
+    self.AccentLine.Name = "AccentLine"
+    self.AccentLine.Size = UDim2.new(0, 3, 1, -24) -- Full height minus padding
+    self.AccentLine.Position = UDim2.new(0, 12, 0, 12)
+    self.AccentLine.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.AccentLine.BorderSizePixel = 0
+    self.AccentLine.Parent = self.Container
+    
+    local accentCorner = Instance.new("UICorner")
+    accentCorner.CornerRadius = UDim.new(0, 2)
+    accentCorner.Parent = self.AccentLine
+    
+    -- Premium paragraph icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.ParagraphIcon = Instance.new("ImageLabel")
+    self.ParagraphIcon.Name = "Icon"
+    self.ParagraphIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ParagraphIcon.Position = UDim2.new(0, 24, 0, 16)
+    self.ParagraphIcon.BackgroundTransparency = 1
+    self.ParagraphIcon.Image = (success and Lucide and Lucide["file-text"]) or "rbxassetid://10723416057"
+    self.ParagraphIcon.ImageColor3 = Color3.fromRGB(100, 140, 180) -- Subtle blue-gray
+    self.ParagraphIcon.Parent = self.Container
+    
+    -- Paragraph title
+    self.TitleLabel = Instance.new("TextLabel")
+    self.TitleLabel.Name = "Title"
+    self.TitleLabel.Size = UDim2.new(1, -60, 0, 24)
+    self.TitleLabel.Position = UDim2.new(0, 52, 0, 12)
+    self.TitleLabel.BackgroundTransparency = 1
+    self.TitleLabel.Text = self.Name
+    self.TitleLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.TitleLabel.TextSize = 16
+    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+    self.TitleLabel.Parent = self.Container
+    
+    -- Paragraph content text
+    self.ContentLabel = Instance.new("TextLabel")
+    self.ContentLabel.Name = "Content"
+    self.ContentLabel.Size = UDim2.new(1, -60, 0, 0) -- Auto-size height
+    self.ContentLabel.Position = UDim2.new(0, 52, 0, 44)
+    self.ContentLabel.BackgroundTransparency = 1
+    self.ContentLabel.Text = self.Subtitle
+    self.ContentLabel.TextColor3 = Color3.fromRGB(180, 195, 210) -- Readable but not too bright
+    self.ContentLabel.TextSize = 13
+    self.ContentLabel.Font = Enum.Font.Gotham
+    self.ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
+    self.ContentLabel.TextWrapped = true -- Allow text wrapping
+    self.ContentLabel.AutomaticSize = Enum.AutomaticSize.Y -- Auto-resize based on text
+    self.ContentLabel.Parent = self.Container
+    
+    -- Add padding to the container
+    local padding = Instance.new("UIPadding")
+    padding.PaddingLeft = UDim.new(0, 0)
+    padding.PaddingRight = UDim.new(0, 16)
+    padding.PaddingTop = UDim.new(0, 0)
+    padding.PaddingBottom = UDim.new(0, 16)
+    padding.Parent = self.Container
+    
+    -- Update container size when content changes
+    self.ContentLabel:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+        self.Container.Size = UDim2.new(1, 0, 0, self.ContentLabel.AbsoluteSize.Y + 60) -- Title + content + padding
+        -- Update accent line height
+        self.AccentLine.Size = UDim2.new(0, 3, 1, -24)
+    end)
+    
+    -- Subtle hover effect for premium feel
+    self.Container.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(60, 70, 80)}
+        )
+        borderTween:Play()
+        
+        -- Subtle accent line glow
+        local accentTween = TweenService:Create(
+            self.AccentLine,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 140, 235)}
+        )
+        accentTween:Play()
+    end)
+    
+    self.Container.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(45, 55, 65)}
+        )
+        borderTween:Play()
+        
+        local accentTween = TweenService:Create(
+            self.AccentLine,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        accentTween:Play()
+    end)
+    
+    return self
+end
+
+function Paragraph:SetTitle(title)
+    self.Name = title
+    self.TitleLabel.Text = title
+    return self
+end
+
+function Paragraph:SetContent(content)
+    self.Subtitle = content
+    self.ContentLabel.Text = content
+    return self
+end
+
+return Paragraph
+end)() end,
+    function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)--[[
+    Slider Component
+    A slider UI element for selecting values in a range
+]]
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local Slider = {}
+Slider.__index = Slider
+
+function Slider:FormatValue(value)
+    -- Clean up decimal display - max 2 decimal places, remove trailing zeros
+    if value == math.floor(value) then
+        -- Integer value
+        return tostring(math.floor(value))
+    else
+        -- Decimal value - round to 2 decimal places and remove trailing zeros
+        local formatted = string.format("%.2f", value)
+        formatted = formatted:gsub("%.?0+$", "") -- Remove trailing zeros and decimal point if needed
+        return formatted
+    end
+end
+
+function Slider.new(options, tab)
+    local self = setmetatable({}, Slider)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "Slider"
+    self.Description = options.Description or "" -- Add subtitle support
+    self.Min = options.Min or 0
+    self.Max = options.Max or 100
+    self.Step = options.Step or 1
+    
+    self.Value = options.InitialValue or self.Min
+    self.Callback = options.Callback or function() end
+    
+    -- Ensure value is within bounds and properly stepped
+    self.Value = math.clamp(self.Value, self.Min, self.Max)
+    self.Value = self.Min + (math.floor((self.Value - self.Min) / self.Step + 0.5) * self.Step)
+    
+    -- Create the slider UI
+    self:Create()
+    
+    return self
+end
+
+function Slider:Create()
+    -- Main container with modern styling
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "Slider"
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.Tab.Container
+    
+    -- Modern border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.Container
+    
+    -- Slider icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.SliderIcon = Instance.new("ImageLabel")
+    self.SliderIcon.Name = "Icon"
+    self.SliderIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.SliderIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
+    self.SliderIcon.BackgroundTransparency = 1
+    self.SliderIcon.Image = (success and Lucide and Lucide["sliders"]) or "rbxassetid://10734942565"
+    self.SliderIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.SliderIcon.Parent = self.Container
+    
+    -- Slider name
+    self.NameLabel = Instance.new("TextLabel")
+    self.NameLabel.Name = "Name"
+    self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.BackgroundTransparency = 1
+    self.NameLabel.Text = self.Name
+    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.NameLabel.TextSize = 15
+    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.NameLabel.Parent = self.Container
+    
+    -- Slider description
+    if self.Description ~= "" then
+        self.SliderDescription = Instance.new("TextLabel")
+        self.SliderDescription.Name = "Description"
+        self.SliderDescription.Size = UDim2.new(0, 250, 0, 16)
+        self.SliderDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.SliderDescription.BackgroundTransparency = 1
+        self.SliderDescription.Text = self.Description
+        self.SliderDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
+        self.SliderDescription.TextSize = 12
+        self.SliderDescription.Font = Enum.Font.Gotham
+        self.SliderDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.SliderDescription.Parent = self.Container
+    end
+    
+    -- Value display
+    self.ValueLabel = Instance.new("TextLabel")
+    self.ValueLabel.Name = "Value"
+    self.ValueLabel.Size = UDim2.new(0, 40, 1, 0) -- Bigger size for value
+    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0) -- Right aligned with more space
+    self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5) -- Right anchor
+    self.ValueLabel.BackgroundTransparency = 1
+    self.ValueLabel.Text = self:FormatValue(self.Value)
+    self.ValueLabel.TextColor3 = self.Library.Colors.LightText
+    self.ValueLabel.TextSize = 14
+    self.ValueLabel.Font = Enum.Font.GothamMedium
+    self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    self.ValueLabel.Parent = self.Container
+    
+    -- Slider track
+    self.SliderTrack = Instance.new("Frame")
+    self.SliderTrack.Name = "Track"
+    self.SliderTrack.Size = UDim2.new(1, -220, 0, 4) -- Smaller track, more space for value
+    self.SliderTrack.Position = UDim2.new(0, 170, 0.5, 0) -- Better positioning
+    self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
+    self.SliderTrack.BackgroundColor3 = self.Library.Colors.Background
+    self.SliderTrack.BorderSizePixel = 0
+    self.SliderTrack.Parent = self.Container
+    
+    -- Track corner radius
+    local trackCorner = Instance.new("UICorner")
+    trackCorner.CornerRadius = UDim.new(1, 0)
+    trackCorner.Parent = self.SliderTrack
+    
+    -- Slider fill
+    self.SliderFill = Instance.new("Frame")
+    self.SliderFill.Name = "Fill"
+    self.SliderFill.Size = UDim2.new(0, 0, 1, 0) -- Will be set in UpdateValue
+    self.SliderFill.BackgroundColor3 = self.Library.Colors.Accent
+    self.SliderFill.BorderSizePixel = 0
+    self.SliderFill.Parent = self.SliderTrack
+    
+    -- Fill corner radius
+    local fillCorner = Instance.new("UICorner")
+    fillCorner.CornerRadius = UDim.new(1, 0)
+    fillCorner.Parent = self.SliderFill
+    
+    -- Slider indicator
+    self.SliderIndicator = Instance.new("Frame")
+    self.SliderIndicator.Name = "Indicator"
+    self.SliderIndicator.Size = UDim2.new(0, 12, 0, 12) -- Smaller, more refined like Darius
+    self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0) -- Will be set in UpdateValue
+    self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    self.SliderIndicator.BorderSizePixel = 0
+    self.SliderIndicator.Parent = self.SliderTrack
+    
+    -- Indicator corner radius
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(1, 0)
+    indicatorCorner.Parent = self.SliderIndicator
+    
+    -- Slider interaction button
+    self.SliderButton = Instance.new("TextButton")
+    self.SliderButton.Name = "Button"
+    self.SliderButton.Size = UDim2.new(1, 0, 1, 0)
+    self.SliderButton.BackgroundTransparency = 1
+    self.SliderButton.Text = ""
+    self.SliderButton.Parent = self.SliderTrack
+    
+    -- Update the slider to the initial value
+    self:UpdateValue(self.Value)
+    
+    -- Slider interaction
+    local isDragging = false
+    
+    self.SliderButton.MouseButton1Down:Connect(function()
+        isDragging = true
+        self:UpdateFromMouse()
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
+            self:UpdateFromMouse()
+        end
+    end)
+    
+    -- Modern hover effects
+    self.Container.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(70, 80, 90)}
+        )
+        borderTween:Play()
+    end)
+    
+    self.Container.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(55, 60, 67)}
+        )
+        borderTween:Play()
+    end)
+    
+    return self
+end
+
+function Slider:UpdateFromMouse()
+    local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+    local trackPosition = self.SliderTrack.AbsolutePosition
+    local trackSize = self.SliderTrack.AbsoluteSize
+    
+    local relativeX = math.clamp(mouse.X - trackPosition.X, 0, trackSize.X)
+    local percent = relativeX / trackSize.X
+    
+    local value = self.Min + ((self.Max - self.Min) * percent)
+    value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
+    
+    self:UpdateValue(value)
+end
+
+function Slider:UpdateValue(value)
+    value = math.clamp(value, self.Min, self.Max)
+    value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
+    
+    self.Value = value
+    self.ValueLabel.Text = self:FormatValue(value)
+    
+    -- Calculate the percentage for visual updates
+    local percent = (value - self.Min) / (self.Max - self.Min)
+    
+    -- Update the fill and indicator position
+    self.SliderFill.Size = UDim2.new(percent, 0, 1, 0)
+    self.SliderIndicator.Position = UDim2.new(percent, 0, 0.5, 0)
+    
+    -- Call the callback with the new value
+    self.Callback(value)
+    
+    return self
+end
+
+return Slider
+end)() end,
+    function()local wax,script,require=ImportGlobals(14)local ImportGlobals return (function(...)--[[
+    Tab Component
+    Represents a section in the UI
+]]
+
+local TweenService = game:GetService("TweenService")
+
+local Tab = {}
+Tab.__index = Tab
+
+function Tab.new(options, window)
+    local self = setmetatable({}, Tab)
+    
+    self.Window = window
+    self.Library = window.Library
+    self.Name = options.Name or "Tab"
+    self.Color = options.tabColor or self.Library.Colors.Accent
+    self.Icon = options.Icon or ""
+    self.Elements = {}
+    
+    -- Options manager integration
+    self.OptionsManager = options.OptionsManager
+    
+    -- Create the tab button and content container
+    self:Create()
+    
+    return self
+end
+
+function Tab:Create()
+    -- Load Lucide icons with error handling
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    -- 🚀 ULTRA-MODERN TAB BUTTON DESIGN 🚀
+    self.TabButton = Instance.new("TextButton")
+    self.TabButton.Name = self.Name .. "Tab"
+    self.TabButton.Size = UDim2.new(1, 0, 0, 50) -- Taller for premium feel
+    self.TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32) -- Dark premium background
+    self.TabButton.BackgroundTransparency = 1 -- Start transparent
+    self.TabButton.BorderSizePixel = 0
+    self.TabButton.Text = ""
+    self.TabButton.AutoButtonColor = false
+    self.TabButton.Parent = self.Window.TabListContainer
+    
+    -- Ultra-modern corner radius
+    local tabCorner = Instance.new("UICorner")
+    tabCorner.CornerRadius = UDim.new(0, 14) -- Very rounded for premium look
+    tabCorner.Parent = self.TabButton
+    
+    -- Premium gradient border effect
+    self.TabBorder = Instance.new("UIStroke")
+    self.TabBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.TabBorder.Thickness = 1
+    self.TabBorder.Transparency = 1 -- Hidden initially
+    self.TabBorder.Parent = self.TabButton
+    
+    -- Subtle glow effect background
+    self.TabGlow = Instance.new("Frame")
+    self.TabGlow.Name = "GlowEffect"
+    self.TabGlow.Size = UDim2.new(1, 4, 1, 4)
+    self.TabGlow.Position = UDim2.new(0, -2, 0, -2)
+    self.TabGlow.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.TabGlow.BackgroundTransparency = 1 -- Hidden initially
+    self.TabGlow.BorderSizePixel = 0
+    self.TabGlow.ZIndex = self.TabButton.ZIndex - 1
+    self.TabGlow.Parent = self.TabButton
+    
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(0, 16)
+    glowCorner.Parent = self.TabGlow
+    
+    -- Premium Icon Design
+    if self.Icon and self.Icon ~= "" and success and Lucide and Lucide[self.Icon] then
+        -- Icon container with subtle background
+        self.IconContainer = Instance.new("Frame")
+        self.IconContainer.Name = "IconContainer"
+        self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
+        self.IconContainer.Position = UDim2.new(0, 12, 0.5, 0)
+        self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
+        self.IconContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+        self.IconContainer.BackgroundTransparency = 0.9 -- Very subtle
+        self.IconContainer.BorderSizePixel = 0
+        self.IconContainer.Parent = self.TabButton
+        
+        local iconCorner = Instance.new("UICorner")
+        iconCorner.CornerRadius = UDim.new(0, 8)
+        iconCorner.Parent = self.IconContainer
+        
+        self.TabIcon = Instance.new("ImageLabel")
+        self.TabIcon.Name = "Icon"
+        self.TabIcon.Size = UDim2.new(0, 18, 0, 18)
+        self.TabIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+        self.TabIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+        self.TabIcon.BackgroundTransparency = 1
+        self.TabIcon.Image = Lucide[self.Icon]
+        self.TabIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+        self.TabIcon.Parent = self.IconContainer
+        
+        -- Premium Tab Text (with icon)
+        self.TabText = Instance.new("TextLabel")
+        self.TabText.Name = "Text"
+        self.TabText.Size = UDim2.new(1, -60, 1, 0)
+        self.TabText.Position = UDim2.new(0, 52, 0.5, 0)
+        self.TabText.AnchorPoint = Vector2.new(0, 0.5)
+        self.TabText.BackgroundTransparency = 1
+        self.TabText.Text = self.Name
+        self.TabText.TextColor3 = Color3.fromRGB(160, 180, 200)
+        self.TabText.TextSize = 15
+        self.TabText.Font = Enum.Font.GothamMedium
+        self.TabText.TextXAlignment = Enum.TextXAlignment.Left
+        self.TabText.Parent = self.TabButton
+    else
+        -- Premium Tab Text (without icon)
+        self.TabText = Instance.new("TextLabel")
+        self.TabText.Name = "Text"
+        self.TabText.Size = UDim2.new(1, -32, 1, 0)
+        self.TabText.Position = UDim2.new(0, 20, 0.5, 0)
+        self.TabText.AnchorPoint = Vector2.new(0, 0.5)
+        self.TabText.BackgroundTransparency = 1
+        self.TabText.Text = self.Name
+        self.TabText.TextColor3 = Color3.fromRGB(160, 180, 200)
+        self.TabText.TextSize = 15
+        self.TabText.Font = Enum.Font.GothamMedium
+        self.TabText.TextXAlignment = Enum.TextXAlignment.Left
+        self.TabText.Parent = self.TabButton
+    end
+    
+    -- Ultra-Modern Active Indicator (left side accent)
+    self.TabIndicator = Instance.new("Frame")
+    self.TabIndicator.Name = "Indicator"
+    self.TabIndicator.Size = UDim2.new(0, 4, 0, 30)
+    self.TabIndicator.Position = UDim2.new(0, 0, 0.5, 0)
+    self.TabIndicator.AnchorPoint = Vector2.new(0, 0.5)
+    self.TabIndicator.BackgroundColor3 = Color3.fromRGB(0, 150, 255) -- Bright blue accent
+    self.TabIndicator.BorderSizePixel = 0
+    self.TabIndicator.Visible = false
+    self.TabIndicator.Parent = self.TabButton
+    
+    -- Indicator corner radius
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(0, 2)
+    indicatorCorner.Parent = self.TabIndicator
+    
+    -- Content Container
+    self.Container = Instance.new("ScrollingFrame")
+    self.Container.Name = self.Name .. "Container"
+    self.Container.Size = UDim2.new(1, -8, 1, -8) -- Less margin
+    self.Container.Position = UDim2.new(0, 4, 0, 4) -- Minimal offset
+    self.Container.BackgroundTransparency = 1
+    self.Container.BorderSizePixel = 0
+    self.Container.ScrollBarThickness = 3 -- Thinner scrollbar
+    self.Container.ScrollBarImageColor3 = self.Library.Colors.Accent
+    self.Container.CanvasSize = UDim2.new(0, 0, 0, 0)
+    self.Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    self.Container.Visible = false -- Hidden by default
+    self.Container.Parent = self.Window.ContentContainer
+    
+    -- Container Layout with better spacing
+    self.ContainerLayout = Instance.new("UIListLayout")
+    self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
+    self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.ContainerLayout.Padding = UDim.new(0, 12) -- Better spacing between components
+    self.ContainerLayout.Parent = self.Container
+    
+    -- Container Padding
+    local containerPadding = Instance.new("UIPadding")
+    containerPadding.PaddingLeft = UDim.new(0, 12) -- Reduced padding
+    containerPadding.PaddingRight = UDim.new(0, 12)
+    containerPadding.PaddingTop = UDim.new(0, 12)
+    containerPadding.PaddingBottom = UDim.new(0, 12)
+    containerPadding.Parent = self.Container
+    
+    -- Tab button click handler
+    self.TabButton.MouseButton1Click:Connect(function()
+        self.Window:SelectTab(self)
+    end)
+    
+    -- 🌟 ULTRA-MODERN HOVER EFFECTS WITH PREMIUM ANIMATIONS 🌟
+    self.TabButton.MouseEnter:Connect(function()
+        if self.Window.ActiveTab ~= self then
+            -- Premium background animation
+            local bgTween = TweenService:Create(
+                self.TabButton,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(28, 35, 42), BackgroundTransparency = 0}
+            )
+            bgTween:Play()
+            
+            -- Subtle glow effect
+            local glowTween = TweenService:Create(
+                self.TabGlow,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0.95}
+            )
+            glowTween:Play()
+            
+            -- Border highlight
+            local borderTween = TweenService:Create(
+                self.TabBorder,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Transparency = 0.7}
+            )
+            borderTween:Play()
+            
+            -- Premium text animation
+            local textTween = TweenService:Create(
+                self.TabText,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {TextColor3 = Color3.fromRGB(220, 240, 255)}
+            )
+            textTween:Play()
+            
+            -- Icon container and icon animations
+            if self.IconContainer then
+                local iconBgTween = TweenService:Create(
+                    self.IconContainer,
+                    TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {BackgroundTransparency = 0.8}
+                )
+                iconBgTween:Play()
+                
+                local iconTween = TweenService:Create(
+                    self.TabIcon,
+                    TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {ImageColor3 = Color3.fromRGB(100, 180, 255)}
+                )
+                iconTween:Play()
+            end
+        end
+    end)
+    
+    self.TabButton.MouseLeave:Connect(function()
+        if self.Window.ActiveTab ~= self then
+            -- Smooth return animations
+            local bgTween = TweenService:Create(
+                self.TabButton,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 1}
+            )
+            bgTween:Play()
+            
+            local glowTween = TweenService:Create(
+                self.TabGlow,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 1}
+            )
+            glowTween:Play()
+            
+            local borderTween = TweenService:Create(
+                self.TabBorder,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Transparency = 1}
+            )
+            borderTween:Play()
+            
+            local textTween = TweenService:Create(
+                self.TabText,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {TextColor3 = Color3.fromRGB(160, 180, 200)}
+            )
+            textTween:Play()
+            
+            if self.IconContainer then
+                local iconBgTween = TweenService:Create(
+                    self.IconContainer,
+                    TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {BackgroundTransparency = 0.9}
+                )
+                iconBgTween:Play()
+                
+                local iconTween = TweenService:Create(
+                    self.TabIcon,
+                    TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+                )
+                iconTween:Play()
+            end
+        end
+    end)
+    
+    return self
+end
+
+function Tab:Show()
+    self.Container.Visible = true
+    self.TabIndicator.Visible = true
+    
+    -- 🔥 ULTRA-PREMIUM ACTIVE STATE ANIMATIONS 🔥
+    
+    -- Stunning gradient background
+    local bgTween = TweenService:Create(
+        self.TabButton,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(0, 120, 215), BackgroundTransparency = 0}
+    )
+    bgTween:Play()
+    
+    -- Premium glow effect
+    local glowTween = TweenService:Create(
+        self.TabGlow,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundTransparency = 0.8}
+    )
+    glowTween:Play()
+    
+    -- Bright border highlight
+    local borderTween = TweenService:Create(
+        self.TabBorder,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {Color = Color3.fromRGB(100, 180, 255), Transparency = 0}
+    )
+    borderTween:Play()
+    
+    -- Premium text styling
+    local textTween = TweenService:Create(
+        self.TabText,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {TextColor3 = Color3.fromRGB(255, 255, 255)}
+    )
+    textTween:Play()
+    
+    self.TabText.Font = Enum.Font.GothamBold -- Bold when active for premium feel
+    
+    -- Icon container and icon premium animations
+    if self.IconContainer then
+        local iconBgTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.1}
+        )
+        iconBgTween:Play()
+        
+        local iconTween = TweenService:Create(
+            self.TabIcon,
+            TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        iconTween:Play()
+    end
+end
+
+function Tab:Hide()
+    self.Container.Visible = false
+    self.TabIndicator.Visible = false
+    
+    -- Smooth return to inactive state
+    local bgTween = TweenService:Create(
+        self.TabButton,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundTransparency = 1}
+    )
+    bgTween:Play()
+    
+    local glowTween = TweenService:Create(
+        self.TabGlow,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundTransparency = 1}
+    )
+    glowTween:Play()
+    
+    local borderTween = TweenService:Create(
+        self.TabBorder,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {Color = Color3.fromRGB(0, 120, 215), Transparency = 1}
+    )
+    borderTween:Play()
+    
+    local textTween = TweenService:Create(
+        self.TabText,
+        TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {TextColor3 = Color3.fromRGB(160, 180, 200)}
+    )
+    textTween:Play()
+    
+    self.TabText.Font = Enum.Font.GothamMedium -- Medium weight when inactive
+    
+    if self.IconContainer then
+        local iconBgTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215), BackgroundTransparency = 0.9}
+        )
+        iconBgTween:Play()
+        
+        local iconTween = TweenService:Create(
+            self.TabIcon,
+            TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
+    end
+end
+
+-- Create a section to group elements
+function Tab:Section(name)
+    local section = Instance.new("Frame")
+    section.Name = name .. "Section"
+    section.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+    section.BackgroundTransparency = 1
+    section.BorderSizePixel = 0
+    section.AutomaticSize = Enum.AutomaticSize.Y
+    section.Parent = self.Container
+    
+    -- Section title
+    local title = Instance.new("TextLabel")
+    title.Name = "Title"
+    title.Size = UDim2.new(1, 0, 0, 18) -- Slightly smaller height
+    title.BackgroundTransparency = 1
+    title.Text = name
+    title.TextColor3 = self.Library.Colors.LightText
+    title.TextSize = 14 -- Smaller text size
+    title.Font = Enum.Font.GothamBold
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = section
+    
+    -- Section content
+    local content = Instance.new("Frame")
+    content.Name = "Content"
+    content.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+    content.Position = UDim2.new(0, 0, 0, 22) -- Reduced spacing
+    content.BackgroundTransparency = 1
+    content.BorderSizePixel = 0
+    content.AutomaticSize = Enum.AutomaticSize.Y
+    content.Parent = section
+    
+    -- Content layout
+    local layout = Instance.new("UIListLayout")
+    layout.FillDirection = Enum.FillDirection.Vertical
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 4) -- Reduced padding between elements
+    layout.Parent = content
+    
+    -- Auto-size the section based on its contents
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        content.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
+        section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + 30)
+    end)
+    
+    return content
+end
+
+-- UI Element Creation Methods
+function Tab:Toggle(options)
+    options = options or {}
+    options.Name = options.Name or "Toggle"
+    options.Default = options.Default or false
+    options.Callback = options.Callback or function() end
+    
+    local toggle = require(script.Parent.Toggle).new(options, self)
+    table.insert(self.Elements, toggle)
+    
+    -- Register with options manager if available
+    if self.OptionsManager then
+        self.OptionsManager:RegisterToggle(options.Name, toggle)
+    end
+    
+    return toggle
+end
+
+function Tab:Button(options)
+    options = options or {}
+    options.Name = options.Name or "Button"
+    options.Callback = options.Callback or function() end
+    
+    local button = require(script.Parent.Button).new(options, self)
+    table.insert(self.Elements, button)
+    return button
+end
+
+function Tab:TextBox(options)
+    options = options or {}
+    options.Name = options.Name or "TextBox"
+    options.Placeholder = options.Placeholder or "Type here..."
+    options.Callback = options.Callback or function() end
+    
+    local textbox = require(script.Parent.TextBox).new(options, self)
+    table.insert(self.Elements, textbox)
+    
+    -- Register with options manager if available
+    if self.OptionsManager then
+        self.OptionsManager:RegisterOption(options.Name, textbox)
+    end
+    
+    return textbox
+end
+
+function Tab:Slider(options)
+    options = options or {}
+    options.Name = options.Name or "Slider"
+    options.Min = options.Min or 0
+    options.Max = options.Max or 100
+    options.Step = options.Step or 1
+    options.InitialValue = options.InitialValue or options.Min
+    options.Callback = options.Callback or function() end
+    
+    local slider = require(script.Parent.Slider).new(options, self)
+    table.insert(self.Elements, slider)
+    
+    -- Register with options manager if available
+    if self.OptionsManager then
+        self.OptionsManager:RegisterOption(options.Name, slider)
+    end
+    
+    return slider
+end
+
+function Tab:Dropdown(options)
+    options = options or {}
+    options.Name = options.Name or "Dropdown"
+    options.Default = options.Default or ""
+    options.Items = options.Items or {}
+    options.Multiselect = options.Multiselect or false
+    options.Callback = options.Callback or function() end
+    
+    local dropdown = require(script.Parent.Dropdown).new(options, self)
+    table.insert(self.Elements, dropdown)
+    
+    -- Register with options manager if available
+    if self.OptionsManager then
+        self.OptionsManager:RegisterOption(options.Name, dropdown)
+    end
+    
+    return dropdown
+end
+
+function Tab:Label(text)
+    local label = require(script.Parent.Label).new({Text = text}, self)
+    table.insert(self.Elements, label)
+    return label
+end
+
+function Tab:Paragraph(options)
+    options = options or {}
+    options.Name = options.Name or "Paragraph"
+    options.Subtitle = options.Subtitle or "Add your paragraph content here..."
+    
+    local paragraph = require(script.Parent.Paragraph).new(options, self)
+    table.insert(self.Elements, paragraph)
+    return paragraph
+end
+
+return Tab
+end)() end,
+    function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)--[[
+    TextBox Component
+    A text input UI element
+]]
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local TextBox = {}
+TextBox.__index = TextBox
+
+function TextBox.new(options, tab)
+    local self = setmetatable({}, TextBox)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "TextBox"
+    self.Placeholder = options.Placeholder or "Type here..."
+    
+    self.Value = ""
+    self.Callback = options.Callback or function() end
+    
+    -- Create the textbox UI
+    self:Create()
+    
+    return self
+end
+
+function TextBox:Create()
+    -- Main container with modern styling
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "TextBox"
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.Tab.Container
+    
+    -- Modern border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.Container
+    
+    -- TextBox icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.TextBoxIcon = Instance.new("ImageLabel")
+    self.TextBoxIcon.Name = "Icon"
+    self.TextBoxIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.TextBoxIcon.Position = UDim2.new(0, 16, 0.5, 0)
+    self.TextBoxIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.TextBoxIcon.BackgroundTransparency = 1
+    self.TextBoxIcon.Image = (success and Lucide and Lucide["type"]) or "rbxassetid://10723367606"
+    self.TextBoxIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.TextBoxIcon.Parent = self.Container
+    
+    -- TextBox name
+    self.NameLabel = Instance.new("TextLabel")
+    self.NameLabel.Name = "Name"
+    self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 44, 0, 15)
+    self.NameLabel.BackgroundTransparency = 1
+    self.NameLabel.Text = self.Name
+    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.NameLabel.TextSize = 15
+    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.NameLabel.Parent = self.Container
+    
+    -- Modern TextBox input background
+    self.InputBackground = Instance.new("Frame")
+    self.InputBackground.Name = "InputBackground"
+    self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
+    self.InputBackground.Position = UDim2.new(1, -16, 0.5, 0)
+    self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
+    self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
+    self.InputBackground.BorderSizePixel = 0
+    self.InputBackground.Parent = self.Container
+    
+    -- Input background border
+    self.InputBorder = Instance.new("UIStroke")
+    self.InputBorder.Color = Color3.fromRGB(50, 55, 62)
+    self.InputBorder.Thickness = 1
+    self.InputBorder.Parent = self.InputBackground
+    
+    -- Input background corner radius
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 6)
+    inputCorner.Parent = self.InputBackground
+    
+    -- TextBox input
+    self.Input = Instance.new("TextBox")
+    self.Input.Name = "Input"
+    self.Input.Size = UDim2.new(1, -16, 1, 0)
+    self.Input.Position = UDim2.new(0, 8, 0, 0)
+    self.Input.BackgroundTransparency = 1
+    self.Input.Text = ""
+    self.Input.PlaceholderText = self.Placeholder
+    self.Input.PlaceholderColor3 = Color3.fromRGB(120, 130, 140)
+    self.Input.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.Input.TextSize = 13
+    self.Input.Font = Enum.Font.Gotham
+    self.Input.TextXAlignment = Enum.TextXAlignment.Left
+    self.Input.ClearTextOnFocus = false
+    self.Input.Parent = self.InputBackground
+    
+    -- Modern input focus/unfocus effects
+    self.Input.Focused:Connect(function()
+        local bgTween = TweenService:Create(
+            self.InputBackground,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(35, 40, 47)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            self.InputBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215)}
+        )
+        borderTween:Play()
+    end)
+    
+    self.Input.FocusLost:Connect(function(enterPressed)
+        local bgTween = TweenService:Create(
+            self.InputBackground,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            self.InputBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(50, 55, 62)}
+        )
+        borderTween:Play()
+        
+        self.Value = self.Input.Text
+        self.Callback(self.Value)
+    end)
+    
+    -- Modern hover effects
+    self.Container.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(70, 80, 90)}
+        )
+        borderTween:Play()
+    end)
+    
+    self.Container.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(55, 60, 67)}
+        )
+        borderTween:Play()
+    end)
+    
+    return self
+end
+
+function TextBox:SetValue(value)
+    self.Value = value
+    self.Input.Text = value
+    self.Callback(value)
+    return self
+end
+
+return TextBox
+end)() end,
+    function()local wax,script,require=ImportGlobals(16)local ImportGlobals return (function(...)--[[
+    Toggle Component
+    A toggle switch UI element
+]]
+
+local TweenService = game:GetService("TweenService")
+
+local Toggle = {}
+Toggle.__index = Toggle
+
+function Toggle.new(options, tab)
+    local self = setmetatable({}, Toggle)
+    
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Name = options.Name or "Toggle"
+    self.Description = options.Description or "" -- Add subtitle support
+    self.HasKeybind = options.Keybind or false -- Keybind support
+    self.Keybind = nil -- Will be set by user
+    self.IsListeningForKeybind = false
+    
+    self.Value = options.Default or false
+    self.Callback = options.Callback or function() end
+    
+    -- Create the toggle UI
+    self:Create()
+    
+    -- Setup keybind system if enabled
+    if self.HasKeybind then
+        self:SetupKeybindSystem()
+    end
+    
+    return self
+end
+
+function Toggle:Create()
+    -- Main container with modern styling
+    self.Container = Instance.new("Frame")
+    self.Container.Name = self.Name .. "Toggle"
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Match content container
+    self.Container.BorderSizePixel = 0
+    self.Container.Parent = self.Tab.Container
+    
+    -- Modern border
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(40, 45, 52)
+    border.Thickness = 1
+    border.Parent = self.Container
+    
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12) -- Match window corner radius
+    corner.Parent = self.Container
+    
+    -- Toggle icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.ToggleIcon = Instance.new("ImageLabel")
+    self.ToggleIcon.Name = "Icon"
+    self.ToggleIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.ToggleIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 14)
+    self.ToggleIcon.BackgroundTransparency = 1
+    self.ToggleIcon.Image = (success and Lucide and Lucide["power"]) or "rbxassetid://10734930466"
+    self.ToggleIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
+    self.ToggleIcon.Parent = self.Container
+    
+    -- Toggle name
+    self.NameLabel = Instance.new("TextLabel")
+    self.NameLabel.Name = "Name"
+    self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.BackgroundTransparency = 1
+    self.NameLabel.Text = self.Name
+    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    self.NameLabel.TextSize = 15
+    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.NameLabel.Parent = self.Container
+    
+    -- Toggle description
+    if self.Description ~= "" then
+        self.ToggleDescription = Instance.new("TextLabel")
+        self.ToggleDescription.Name = "Description"
+        self.ToggleDescription.Size = UDim2.new(0, 250, 0, 16)
+        self.ToggleDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.ToggleDescription.BackgroundTransparency = 1
+        self.ToggleDescription.Text = self.Description
+        self.ToggleDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
+        self.ToggleDescription.TextSize = 12
+        self.ToggleDescription.Font = Enum.Font.Gotham
+        self.ToggleDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.ToggleDescription.Parent = self.Container
+    end
+    
+
+    
+    -- Toggle switch background
+    self.ToggleBackground = Instance.new("Frame")
+    self.ToggleBackground.Name = "Background"
+    self.ToggleBackground.Size = UDim2.new(0, 44, 0, 24) -- Bigger Fluent-style toggle
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -94 or -54, 0.5, 0) -- Move left if keybind exists
+    self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
+    self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 65) -- Darker background
+    self.ToggleBackground.BorderSizePixel = 0
+    self.ToggleBackground.Parent = self.Container
+    
+    -- Toggle background corner radius
+    local bgCorner = Instance.new("UICorner")
+    bgCorner.CornerRadius = UDim.new(1, 0) -- Fully rounded
+    bgCorner.Parent = self.ToggleBackground
+    
+    -- Toggle switch indicator
+    self.ToggleIndicator = Instance.new("Frame")
+    self.ToggleIndicator.Name = "Indicator"
+    self.ToggleIndicator.Size = UDim2.new(0, 18, 0, 18) -- Bigger indicator
+    self.ToggleIndicator.Position = UDim2.new(0, 3, 0.5, 0) -- Left position
+    self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
+    self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White indicator
+    self.ToggleIndicator.BorderSizePixel = 0
+    self.ToggleIndicator.Parent = self.ToggleBackground
+    
+    -- Toggle indicator corner radius
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(1, 0) -- Fully rounded
+    indicatorCorner.Parent = self.ToggleIndicator
+    
+    -- Keybind button (if enabled) - positioned AFTER the toggle switch
+    if self.HasKeybind then
+        self.KeybindButton = Instance.new("TextButton")
+        self.KeybindButton.Name = "KeybindButton"
+        self.KeybindButton.Size = UDim2.new(0, 36, 0, 28)
+        self.KeybindButton.Position = UDim2.new(1, -44, 0.5, 0) -- Right side, after toggle
+        self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
+        self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+        self.KeybindButton.Text = "⌨"
+        self.KeybindButton.TextColor3 = Color3.fromRGB(200, 205, 210)
+        self.KeybindButton.TextSize = 14
+        self.KeybindButton.Font = Enum.Font.GothamBold
+        self.KeybindButton.BorderSizePixel = 0
+        self.KeybindButton.ZIndex = 10 -- Higher z-index to ensure it's on top
+        self.KeybindButton.Parent = self.Container
+        
+        -- Keybind button corner radius
+        local keybindCorner = Instance.new("UICorner")
+        keybindCorner.CornerRadius = UDim.new(0, 6)
+        keybindCorner.Parent = self.KeybindButton
+        
+        -- Keybind button functionality handled by drag detection below
+        
+        -- Drag out functionality for all platforms
+        local UserInputService = game:GetService("UserInputService")
+        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+        
+        -- Variables for drag detection
+        local isDragging = false
+        local dragStart = nil
+        local pressTime = 0
+        local hasMovedEnough = false
+        local dragConnection = nil
+        
+        -- Variables for connections
+        local releaseConnection = nil
+        
+        -- Mouse/Touch down
+        self.KeybindButton.MouseButton1Down:Connect(function()
+            isDragging = true
+            dragStart = UserInputService:GetMouseLocation()
+            pressTime = tick()
+            hasMovedEnough = false
+            print("Toggle keybind drag started") -- Debug
+            
+            -- Clean up any existing connections
+            if dragConnection then
+                dragConnection:Disconnect()
+            end
+            if releaseConnection then
+                releaseConnection:Disconnect()
+            end
+            
+            -- Connect to mouse movement
+            dragConnection = UserInputService.InputChanged:Connect(function(input)
+                if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local currentPos = Vector2.new(input.Position.X, input.Position.Y)
+                    local distance = (currentPos - dragStart).Magnitude
+                    if distance > 15 then -- Reduced threshold
+                        hasMovedEnough = true
+                        print("Toggle keybind moved enough:", distance) -- Debug
+                    end
+                end
+            end)
+            
+            -- Connect to global mouse release
+            releaseConnection = UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
+                    print("Toggle keybind mouse released") -- Debug
+                    
+                    -- Clean up connections
+                    if releaseConnection then
+                        releaseConnection:Disconnect()
+                        releaseConnection = nil
+                    end
+                    if dragConnection then
+                        dragConnection:Disconnect()
+                        dragConnection = nil
+                    end
+                    
+                    local holdTime = tick() - pressTime
+                    print("Toggle keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) -- Debug
+                    
+                    -- Create draggable if: moved enough OR held long enough
+                    if hasMovedEnough or holdTime > 0.5 then
+                        print("Creating draggable toggle keybind") -- Debug
+                        self:CreateDraggableKeybind()
+                    elseif holdTime < 0.3 then
+                        -- Quick click - start keybind listening
+                        print("Starting keybind listening") -- Debug
+                        self:StartKeybindListening()
+                    end
+                    
+                    isDragging = false
+                    dragStart = nil
+                    hasMovedEnough = false
+                end
+            end)
+        end)
+        
+        -- Right click for PC users (alternative method)
+        self.KeybindButton.MouseButton2Click:Connect(function()
+            print("Right click - creating draggable toggle keybind") -- Debug
+            self:CreateDraggableKeybind()
+        end)
+        
+        -- Keybind button hover effects
+        self.KeybindButton.MouseEnter:Connect(function()
+            if not self.IsListeningForKeybind then
+                local hoverTween = TweenService:Create(
+                    self.KeybindButton,
+                    TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+                )
+                hoverTween:Play()
+            end
+        end)
+        
+        self.KeybindButton.MouseLeave:Connect(function()
+            if not self.IsListeningForKeybind then
+                local leaveTween = TweenService:Create(
+                    self.KeybindButton,
+                    TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                    {BackgroundColor3 = Color3.fromRGB(50, 55, 62)}
+                )
+                leaveTween:Play()
+            end
+        end)
+    end
+    
+    -- Toggle button for interaction (exclude keybind area)
+    self.ToggleButton = Instance.new("TextButton")
+    self.ToggleButton.Name = "Button"
+    self.ToggleButton.Size = UDim2.new(1, self.HasKeybind and -44 or 0, 1, 0) -- Exclude keybind button area
+    self.ToggleButton.BackgroundTransparency = 1
+    self.ToggleButton.Text = ""
+    self.ToggleButton.Parent = self.Container
+    
+    -- Set initial state
+    if self.Value then
+        self:SetValue(true, false) -- Set value without callback
+    end
+    
+    -- Toggle click handler
+    self.ToggleButton.MouseButton1Click:Connect(function()
+        self:SetValue(not self.Value)
+    end)
+    
+    -- Modern hover effects
+    self.ToggleButton.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215)}
+        )
+        borderTween:Play()
+    end)
+    
+    self.ToggleButton.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.Container,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            border,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(40, 45, 52)}
+        )
+        borderTween:Play()
+    end)
+    
+    return self
+end
+
+function Toggle:SetValue(value, callCallback)
+    if callCallback == nil then callCallback = true end
+    
+    self.Value = value
+    
+    -- Update visual state
+    if value then
+        -- Tween the indicator to the right
+        local indicatorTween = TweenService:Create(
+            self.ToggleIndicator,
+            self.Library.TweenInfo,
+            {Position = UDim2.new(0, 23, 0.5, 0)} -- Adjusted for bigger toggle
+        )
+        indicatorTween:Play()
+        
+        -- Tween the background color
+        local bgTween = TweenService:Create(
+            self.ToggleBackground,
+            self.Library.TweenInfo,
+            {BackgroundColor3 = self.Library.Colors.Toggle}
+        )
+        bgTween:Play()
+    else
+        -- Tween the indicator to the left
+        local indicatorTween = TweenService:Create(
+            self.ToggleIndicator,
+            self.Library.TweenInfo,
+            {Position = UDim2.new(0, 3, 0.5, 0)} -- Adjusted for bigger toggle
+        )
+        indicatorTween:Play()
+        
+        -- Tween the background color
+        local bgTween = TweenService:Create(
+            self.ToggleBackground,
+            self.Library.TweenInfo,
+            {BackgroundColor3 = Color3.fromRGB(60, 60, 65)}
+        )
+        bgTween:Play()
+    end
+    
+    -- Call the callback function if requested
+    if callCallback then
+        self.Callback(self.Value)
+    end
+    
+    return self
+end
+
+function Toggle:SetupKeybindSystem()
+    local UserInputService = game:GetService("UserInputService")
+    
+    -- Listen for keybind input
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        
+        if self.IsListeningForKeybind then
+            -- Set new keybind
+            self.Keybind = input.KeyCode
+            self.IsListeningForKeybind = false
+            self:UpdateKeybindDisplay()
+            self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+            return
+        end
+        
+        -- Check if pressed key matches toggle keybind
+        if self.Keybind and input.KeyCode == self.Keybind then
+            self:SetValue(not self.Value)
+        end
+    end)
+end
+
+function Toggle:StartKeybindListening()
+    self.IsListeningForKeybind = true
+    self.KeybindButton.Text = "..."
+    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent -- Accent color when listening
+end
+
+function Toggle:UpdateKeybindDisplay()
+    if self.Keybind then
+        -- Convert KeyCode to readable text
+        local keyName = tostring(self.Keybind):gsub("Enum.KeyCode.", "")
+        self.KeybindButton.Text = keyName:upper()
+        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 -- Bigger text for all keys
+    else
+        self.KeybindButton.Text = "⌨"
+    end
+end
+
+function Toggle:CreateDraggableKeybind()
+    print("Toggle:CreateDraggableKeybind called for:", self.Name) -- Debug
+    local DraggableKeybind = require(script.Parent.DraggableKeybind)
+    
+    local draggable = DraggableKeybind.CreateFromButton(
+        self.KeybindButton,
+        "Toggle",
+        self.Name,
+        function() self:SetValue(not self.Value) end,
+        function() return self.Value end,
+        function(value) self:SetValue(value) end
+    )
+    print("Draggable toggle created:", draggable) -- Debug
+end
+
+return Toggle
+end)() end,
+    function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)--[[
+    Window Component
+    The main container for the UI
+]]
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local Window = {}
+Window.__index = Window
+
+function Window.new(options, library)
+    local self = setmetatable({}, Window)
+    
+    self.Library = library
+    self.Title = options.Title or "ProjectMadara UI"
+    self.Subtitle = options.Subtitle or "Please Set this up when you get a chance"
+    self.Tabs = {}
+    self.ActiveTab = nil
+    
+    -- Options manager integration
+    self.OptionsManager = options.OptionsManager
+    
+    -- Config system disabled for now
+    -- self.Config = library.Components.Config.new(options.ConfigName or self.Title)
+    
+    -- Create the main GUI
+    self:CreateGui()
+    
+    return self
+end
+
+function Window:CreateGui()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- Detect device type for responsive scaling
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    
+    -- Create ScreenGui
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = "ProjectMadaraUI"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.Parent = playerGui
+    
+    -- Responsive sizing based on device
+    local baseWidth = isMobile and 320 or 675  -- Smaller for mobile
+    local baseHeight = isMobile and 400 or 550
+    local scaleFactor = isMobile and 0.9 or 1.0
+    
+    -- Main Frame with responsive sizing
+    self.MainFrame = Instance.new("Frame")
+    self.MainFrame.Name = "MainFrame"
+    self.MainFrame.Size = UDim2.new(0, baseWidth, 0, baseHeight)
+    self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.MainFrame.BackgroundColor3 = self.Library.Colors.Background
+    self.MainFrame.BorderSizePixel = 0
+    self.MainFrame.Parent = self.ScreenGui
+    
+    -- Store device info for later use
+    self.IsMobile = isMobile
+    self.ScaleFactor = scaleFactor
+    
+    -- Apply corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = self.MainFrame
+    
+    -- 🚀 ULTRA-MODERN PREMIUM TITLE BAR 🚀
+    self.TitleBar = Instance.new("Frame")
+    self.TitleBar.Name = "TitleBar"
+    self.TitleBar.Size = UDim2.new(1, 0, 0, 70) -- Taller for premium feel
+    self.TitleBar.Position = UDim2.new(0, 0, 0, 0) -- Ensure it's at the top
+    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24) -- Ultra-dark premium background
+    self.TitleBar.BorderSizePixel = 0
+    self.TitleBar.Parent = self.MainFrame
+    
+    -- Premium corner radius - only round top corners
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 12) -- Match main frame
+    titleCorner.Parent = self.TitleBar
+    
+    -- Create a bottom mask to hide the bottom corners of title bar
+    local titleMask = Instance.new("Frame")
+    titleMask.Name = "TitleMask"
+    titleMask.Size = UDim2.new(1, 0, 0, 12)
+    titleMask.Position = UDim2.new(0, 0, 1, -12)
+    titleMask.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+    titleMask.BorderSizePixel = 0
+    titleMask.Parent = self.TitleBar
+    
+    -- Premium gradient border
+    local titleBorder = Instance.new("UIStroke")
+    titleBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent border
+    titleBorder.Thickness = 1
+    titleBorder.Transparency = 0.6 -- Subtle glow effect
+    titleBorder.Parent = self.TitleBar
+    
+    -- Subtle inner glow effect
+    self.TitleGlow = Instance.new("Frame")
+    self.TitleGlow.Name = "TitleGlow"
+    self.TitleGlow.Size = UDim2.new(1, -4, 1, -4)
+    self.TitleGlow.Position = UDim2.new(0, 2, 0, 2)
+    self.TitleGlow.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.TitleGlow.BackgroundTransparency = 0.95 -- Very subtle
+    self.TitleGlow.BorderSizePixel = 0
+    self.TitleGlow.Parent = self.TitleBar
+    
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(0, 10)
+    glowCorner.Parent = self.TitleGlow
+    
+    -- Premium App Icon/Logo Area
+    self.AppIcon = Instance.new("Frame")
+    self.AppIcon.Name = "AppIcon"
+    self.AppIcon.Size = UDim2.new(0, 40, 0, 40)
+    self.AppIcon.Position = UDim2.new(0, 20, 0.5, 0)
+    self.AppIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.AppIcon.BorderSizePixel = 0
+    self.AppIcon.Parent = self.TitleBar
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.Parent = self.AppIcon
+    
+    -- App icon symbol
+    self.AppIconText = Instance.new("TextLabel")
+    self.AppIconText.Name = "IconText"
+    self.AppIconText.Size = UDim2.new(1, 0, 1, 0)
+    self.AppIconText.BackgroundTransparency = 1
+    self.AppIconText.Text = "M" -- First letter of "Madara"
+    self.AppIconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.AppIconText.TextSize = 20
+    self.AppIconText.Font = Enum.Font.GothamBold
+    self.AppIconText.TextXAlignment = Enum.TextXAlignment.Center
+    self.AppIconText.TextYAlignment = Enum.TextYAlignment.Center
+    self.AppIconText.Parent = self.AppIcon
+    
+    -- Premium Title Text
+    self.TitleText = Instance.new("TextLabel")
+    self.TitleText.Name = "TitleText"
+    self.TitleText.Size = UDim2.new(0, 250, 0, 24)
+    self.TitleText.Position = UDim2.new(0, 75, 0, 12)
+    self.TitleText.BackgroundTransparency = 1
+    self.TitleText.Text = self.Title
+    self.TitleText.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white for premium feel
+    self.TitleText.TextSize = 18
+    self.TitleText.Font = Enum.Font.GothamBold
+    self.TitleText.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleText.Parent = self.TitleBar
+    
+    -- Premium Subtitle Text
+    self.SubtitleText = Instance.new("TextLabel")
+    self.SubtitleText.Name = "SubtitleText"
+    self.SubtitleText.Size = UDim2.new(0, 350, 0, 16)
+    self.SubtitleText.Position = UDim2.new(0, 75, 0, 38)
+    self.SubtitleText.BackgroundTransparency = 1
+    self.SubtitleText.Text = self.Subtitle
+    self.SubtitleText.TextColor3 = Color3.fromRGB(160, 180, 200) -- Subtle blue-gray
+    self.SubtitleText.TextSize = 12
+    self.SubtitleText.Font = Enum.Font.Gotham
+    self.SubtitleText.TextXAlignment = Enum.TextXAlignment.Left
+    self.SubtitleText.Parent = self.TitleBar
+    
+    -- 🔍 COMPACT MODERN SEARCH BAR 🔍
+    self.SearchBackground = Instance.new("Frame")
+    self.SearchBackground.Name = "SearchBackground"
+    self.SearchBackground.Size = UDim2.new(0, 220, 0, 32) -- Smaller to show subtitle
+    self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0) -- More space from keybind button
+    self.SearchBackground.AnchorPoint = Vector2.new(0, 0.5)
+    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32) -- Dark premium background
+    self.SearchBackground.BorderSizePixel = 0
+    self.SearchBackground.Parent = self.TitleBar
+    
+    -- Premium search border
+    local searchBorder = Instance.new("UIStroke")
+    searchBorder.Color = Color3.fromRGB(40, 50, 60) -- Subtle border
+    searchBorder.Thickness = 1
+    searchBorder.Parent = self.SearchBackground
+    
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(0, 12) -- More rounded for premium look
+    searchCorner.Parent = self.SearchBackground
+    
+    -- Premium Search Icon
+    local success, Lucide = pcall(function()
+        return require(script.Parent.lucide)
+    end)
+    
+    self.SearchIcon = Instance.new("ImageLabel")
+    self.SearchIcon.Name = "SearchIcon"
+    self.SearchIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
+    self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.SearchIcon.BackgroundTransparency = 1
+    self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10723416057"
+    self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 140, 160) -- Subtle icon color
+    self.SearchIcon.Parent = self.SearchBackground
+    
+    -- Premium Search TextBox
+    self.SearchBox = Instance.new("TextBox")
+    self.SearchBox.Name = "SearchBox"
+    self.SearchBox.Size = UDim2.new(1, -45, 1, 0)
+    self.SearchBox.Position = UDim2.new(0, 40, 0, 0)
+    self.SearchBox.BackgroundTransparency = 1
+    self.SearchBox.Text = ""
+    self.SearchBox.PlaceholderText = "Search components..."
+    self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) -- Bright text
+    self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) -- Subtle placeholder
+    self.SearchBox.TextSize = 14
+    self.SearchBox.Font = Enum.Font.Gotham
+    self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+    self.SearchBox.Parent = self.SearchBackground
+    
+    -- Search functionality
+    self.SearchBox.Changed:Connect(function(property)
+        if property == "Text" then
+            self:FilterComponents(self.SearchBox.Text)
+        end
+    end)
+    
+    -- 🌟 PREMIUM SEARCH FOCUS EFFECTS 🌟
+    self.SearchBox.Focused:Connect(function()
+        -- Premium background glow
+        local bgTween = TweenService:Create(
+            self.SearchBackground,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 35, 42)}
+        )
+        bgTween:Play()
+        
+        -- Blue accent border
+        local borderTween = TweenService:Create(
+            searchBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215)}
+        )
+        borderTween:Play()
+        
+        -- Icon highlight
+        local iconTween = TweenService:Create(
+            self.SearchIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
+    end)
+    
+    self.SearchBox.FocusLost:Connect(function()
+        -- Return to normal state
+        local bgTween = TweenService:Create(
+            self.SearchBackground,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            searchBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(40, 50, 60)}
+        )
+        borderTween:Play()
+        
+        local iconTween = TweenService:Create(
+            self.SearchIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(120, 140, 160)}
+        )
+        iconTween:Play()
+    end)
+    
+    -- 🎮 ULTRA-MODERN CONTROL BUTTONS 🎮
+    
+    -- Premium Keybind Button
+    self.KeybindButton = Instance.new("TextButton")
+    self.KeybindButton.Name = "KeybindButton"
+    self.KeybindButton.Size = UDim2.new(0, 36, 0, 36)
+    self.KeybindButton.Position = UDim2.new(1, -140, 0.5, 0) -- Centered vertically
+    self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
+    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) -- Premium dark blue
+    self.KeybindButton.Text = "⌨"
+    self.KeybindButton.TextColor3 = Color3.fromRGB(200, 220, 240)
+    self.KeybindButton.TextSize = 16
+    self.KeybindButton.Font = Enum.Font.GothamBold
+    self.KeybindButton.BorderSizePixel = 0
+    self.KeybindButton.Parent = self.TitleBar
+    
+    -- Premium keybind button styling
+    local keybindBorder = Instance.new("UIStroke")
+    keybindBorder.Color = Color3.fromRGB(70, 80, 90)
+    keybindBorder.Thickness = 1
+    keybindBorder.Parent = self.KeybindButton
+    
+    local keybindCorner = Instance.new("UICorner")
+    keybindCorner.CornerRadius = UDim.new(0, 10)
+    keybindCorner.Parent = self.KeybindButton
+    
+    -- Premium Minimize Button
+    self.MinimizeButton = Instance.new("TextButton")
+    self.MinimizeButton.Name = "MinimizeButton"
+    self.MinimizeButton.Size = UDim2.new(0, 36, 0, 36)
+    self.MinimizeButton.Position = UDim2.new(1, -92, 0.5, 0) -- Centered vertically
+    self.MinimizeButton.AnchorPoint = Vector2.new(0, 0.5)
+    self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 70, 80) -- Premium gray
+    self.MinimizeButton.Text = "−"
+    self.MinimizeButton.TextColor3 = Color3.fromRGB(220, 230, 240)
+    self.MinimizeButton.TextSize = 18
+    self.MinimizeButton.Font = Enum.Font.GothamBold
+    self.MinimizeButton.BorderSizePixel = 0
+    self.MinimizeButton.Parent = self.TitleBar
+    
+    local minimizeBorder = Instance.new("UIStroke")
+    minimizeBorder.Color = Color3.fromRGB(80, 90, 100)
+    minimizeBorder.Thickness = 1
+    minimizeBorder.Parent = self.MinimizeButton
+    
+    local minimizeCorner = Instance.new("UICorner")
+    minimizeCorner.CornerRadius = UDim.new(0, 10)
+    minimizeCorner.Parent = self.MinimizeButton
+    
+    -- Premium Close Button
+    self.CloseButton = Instance.new("TextButton")
+    self.CloseButton.Name = "CloseButton"
+    self.CloseButton.Size = UDim2.new(0, 36, 0, 36)
+    self.CloseButton.Position = UDim2.new(1, -44, 0.5, 0) -- Centered vertically
+    self.CloseButton.AnchorPoint = Vector2.new(0, 0.5)
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70) -- Premium red
+    self.CloseButton.Text = "×"
+    self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.CloseButton.TextSize = 18
+    self.CloseButton.Font = Enum.Font.GothamBold
+    self.CloseButton.BorderSizePixel = 0
+    self.CloseButton.Parent = self.TitleBar
+    
+    local closeBorder = Instance.new("UIStroke")
+    closeBorder.Color = Color3.fromRGB(220, 90, 90)
+    closeBorder.Thickness = 1
+    closeBorder.Parent = self.CloseButton
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 10)
+    closeCorner.Parent = self.CloseButton
+    
+    self.Sidebar = Instance.new("Frame")
+    self.Sidebar.Name = "Sidebar"
+    self.Sidebar.Size = UDim2.new(0, 200, 1, -70) -- Adjusted for taller title bar
+    self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
+    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28) -- Ultra-dark premium background
+    self.Sidebar.BorderSizePixel = 0
+    self.Sidebar.Parent = self.MainFrame
+    
+    -- Keep sidebar completely flat - no corner radius needed
+    -- The main frame's corner radius will handle the overall window shape
+    
+    -- Premium gradient border effect
+    local sidebarBorder = Instance.new("UIStroke")
+    sidebarBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent border
+    sidebarBorder.Thickness = 1
+    sidebarBorder.Transparency = 0.7 -- Subtle glow effect
+    sidebarBorder.Parent = self.Sidebar
+    
+    -- Subtle inner shadow effect
+    self.SidebarShadow = Instance.new("Frame")
+    self.SidebarShadow.Name = "InnerShadow"
+    self.SidebarShadow.Size = UDim2.new(1, -4, 1, -4)
+    self.SidebarShadow.Position = UDim2.new(0, 2, 0, 2)
+    self.SidebarShadow.BackgroundColor3 = Color3.fromRGB(15, 18, 24) -- Even darker for depth
+    self.SidebarShadow.BackgroundTransparency = 0.5
+    self.SidebarShadow.BorderSizePixel = 0
+    self.SidebarShadow.Parent = self.Sidebar
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 10)
+    shadowCorner.Parent = self.SidebarShadow
+    
+    -- Ultra-Modern Tab List Container (full height, no wasted space)
+    self.TabListContainer = Instance.new("ScrollingFrame")
+    self.TabListContainer.Name = "TabListContainer"
+    self.TabListContainer.Size = UDim2.new(1, -24, 1, -24)
+    self.TabListContainer.Position = UDim2.new(0, 12, 0, 12)
+    self.TabListContainer.BackgroundTransparency = 1
+    self.TabListContainer.BorderSizePixel = 0
+    self.TabListContainer.ScrollBarThickness = 2
+    self.TabListContainer.ScrollBarImageColor3 = Color3.fromRGB(0, 120, 215)
+    self.TabListContainer.ScrollBarImageTransparency = 0.2
+    self.TabListContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    self.TabListContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    self.TabListContainer.Parent = self.Sidebar
+    
+    -- Tab List Layout with better spacing
+    self.TabListLayout = Instance.new("UIListLayout")
+    self.TabListLayout.FillDirection = Enum.FillDirection.Vertical
+    self.TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.TabListLayout.Padding = UDim.new(0, 4) -- Tighter spacing for modern look
+    self.TabListLayout.Parent = self.TabListContainer
+    
+    -- Tab list padding
+    local tabPadding = Instance.new("UIPadding")
+    tabPadding.PaddingLeft = UDim.new(0, 12)
+    tabPadding.PaddingRight = UDim.new(0, 12)
+    tabPadding.PaddingTop = UDim.new(0, 12)
+    tabPadding.PaddingBottom = UDim.new(0, 12)
+    tabPadding.Parent = self.TabListContainer
+    
+    -- 🎨 ULTRA-MODERN CONTENT AREA 🎨
+    self.ContentContainer = Instance.new("Frame")
+    self.ContentContainer.Name = "ContentContainer"
+    self.ContentContainer.Size = UDim2.new(1, -200, 1, -70) -- Adjusted for taller title bar
+    self.ContentContainer.Position = UDim2.new(0, 200, 0, 70) -- Next to sidebar
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Premium dark background
+    self.ContentContainer.BorderSizePixel = 0
+    self.ContentContainer.Parent = self.MainFrame
+    
+    -- Keep content container completely flat - no corner radius needed
+    -- The main frame's corner radius will handle the overall window shape
+    
+    -- Premium content border
+    local contentBorder = Instance.new("UIStroke")
+    contentBorder.Color = Color3.fromRGB(0, 120, 215)
+    contentBorder.Thickness = 1
+    contentBorder.Transparency = 0.8 -- Subtle glow
+    contentBorder.Parent = self.ContentContainer
+    
+    -- Content container padding for consistency
+    local contentPadding = Instance.new("UIPadding")
+    contentPadding.PaddingLeft = UDim.new(0, 12)
+    contentPadding.PaddingRight = UDim.new(0, 12)
+    contentPadding.PaddingTop = UDim.new(0, 12)
+    contentPadding.PaddingBottom = UDim.new(0, 12)
+    contentPadding.Parent = self.ContentContainer
+    
+    -- Make window draggable
+    self:MakeDraggable()
+    
+    -- Mobile icon creation removed
+    
+    -- Setup keybind system
+    self:SetupKeybindSystem()
+    self:UpdateKeybindDisplay() -- Show initial keybind
+    
+    -- Window state
+    self.IsMinimized = false
+    self.OriginalSize = self.MainFrame.Size
+    self.ToggleKeybind = Enum.KeyCode.Insert -- Default keybind
+    self.IsListeningForKeybind = false
+    
+    -- Keybind button functionality
+    self.KeybindButton.MouseButton1Click:Connect(function()
+        self:StartKeybindListening()
+    end)
+    
+    -- Minimize button functionality
+    self.MinimizeButton.MouseButton1Click:Connect(function()
+        self:ToggleMinimize()
+    end)
+    
+    -- 🌟 PREMIUM BUTTON HOVER EFFECTS 🌟
+    
+    -- Keybind button premium hover
+    self.KeybindButton.MouseEnter:Connect(function()
+        local bgTween = TweenService:Create(
+            self.KeybindButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            keybindBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(100, 180, 255)}
+        )
+        borderTween:Play()
+        
+        local textTween = TweenService:Create(
+            self.KeybindButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {TextColor3 = Color3.fromRGB(255, 255, 255)}
+        )
+        textTween:Play()
+    end)
+    
+    self.KeybindButton.MouseLeave:Connect(function()
+        local bgTween = TweenService:Create(
+            self.KeybindButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(45, 55, 65)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            keybindBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(70, 80, 90)}
+        )
+        borderTween:Play()
+        
+        local textTween = TweenService:Create(
+            self.KeybindButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {TextColor3 = Color3.fromRGB(200, 220, 240)}
+        )
+        textTween:Play()
+    end)
+    
+    -- Minimize button premium hover
+    self.MinimizeButton.MouseEnter:Connect(function()
+        local bgTween = TweenService:Create(
+            self.MinimizeButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(80, 90, 100)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            minimizeBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(120, 130, 140)}
+        )
+        borderTween:Play()
+        
+        local textTween = TweenService:Create(
+            self.MinimizeButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {TextColor3 = Color3.fromRGB(255, 255, 255)}
+        )
+        textTween:Play()
+    end)
+    
+    self.MinimizeButton.MouseLeave:Connect(function()
+        local bgTween = TweenService:Create(
+            self.MinimizeButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(60, 70, 80)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            minimizeBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(80, 90, 100)}
+        )
+        borderTween:Play()
+        
+        local textTween = TweenService:Create(
+            self.MinimizeButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {TextColor3 = Color3.fromRGB(220, 230, 240)}
+        )
+        textTween:Play()
+    end)
+    
+    -- Close button functionality
+    self.CloseButton.MouseButton1Click:Connect(function()
+        self.ScreenGui:Destroy()
+    end)
+    
+    -- Close button premium hover with danger effect
+    self.CloseButton.MouseEnter:Connect(function()
+        local bgTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(255, 90, 90)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            closeBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(255, 120, 120)}
+        )
+        borderTween:Play()
+        
+        -- Subtle scale effect for danger
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 38, 0, 38)}
+        )
+        scaleTween:Play()
+    end)
+    
+    self.CloseButton.MouseLeave:Connect(function()
+        local bgTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(200, 70, 70)}
+        )
+        bgTween:Play()
+        
+        local borderTween = TweenService:Create(
+            closeBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(220, 90, 90)}
+        )
+        borderTween:Play()
+        
+        -- Return to normal size
+        local scaleTween = TweenService:Create(
+            self.CloseButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 36, 0, 36)}
+        )
+        scaleTween:Play()
+    end)
+    
+    return self
+end
+
+function Window:MakeDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    self.TitleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    self.TitleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+end
+
+function Window:Tab(options)
+    options = options or {}
+    options.Name = options.Name or "Tab"
+    options.tabColor = options.tabColor or self.Library.Colors.Accent
+    options.Icon = options.Icon or ""
+    options.OptionsManager = self.OptionsManager
+    
+    local tab = require(script.Parent.Tab).new(options, self)
+    table.insert(self.Tabs, tab)
+    
+    -- If this is the first tab, set it as active
+    if #self.Tabs == 1 then
+        self:SelectTab(tab)
+    end
+    
+    return tab
+end
+
+function Window:SelectTab(tab)
+    -- Hide all tabs
+    for _, t in ipairs(self.Tabs) do
+        t:Hide()
+    end
+    
+    -- Show the selected tab
+    tab:Show()
+    self.ActiveTab = tab
+end
+
+function Window:ToggleMinimize()
+    local TweenService = game:GetService("TweenService")
+    
+    if not self.IsMinimized then
+        -- Minimize
+        self.IsMinimized = true
+        self.MinimizeButton.Text = "+"
+        
+        -- Hide content and sidebar
+        self.ContentContainer.Visible = false
+        self.Sidebar.Visible = false
+        
+        -- Animate to smaller size
+        local minimizeTween = TweenService:Create(
+            self.MainFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 400, 0, 60)}
+        )
+        minimizeTween:Play()
+    else
+        -- Restore
+        self.IsMinimized = false
+        self.MinimizeButton.Text = "−"
+        
+        -- Animate back to original size
+        local restoreTween = TweenService:Create(
+            self.MainFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = self.OriginalSize}
+        )
+        restoreTween:Play()
+        
+        -- Show content and sidebar after animation
+        restoreTween.Completed:Connect(function()
+            self.ContentContainer.Visible = true
+            self.Sidebar.Visible = true
+        end)
+    end
+end
+
+function Window:CreateMobileIcon()
+    -- Create mobile toggle icon for touch devices
+    self.MobileIcon = Instance.new("ScreenGui")
+    self.MobileIcon.Name = "ProjectMadaraMobile"
+    self.MobileIcon.ResetOnSpawn = false
+    self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Mobile button container for dragging
+    self.MobileContainer = Instance.new("Frame")
+    self.MobileContainer.Name = "MobileContainer"
+    self.MobileContainer.Size = UDim2.new(0, 60, 0, 60)
+    self.MobileContainer.Position = UDim2.new(0, 20, 0, 100) -- Top left corner
+    self.MobileContainer.BackgroundTransparency = 1
+    self.MobileContainer.Parent = self.MobileIcon
+    
+    -- Mobile button
+    self.MobileButton = Instance.new("TextButton")
+    self.MobileButton.Name = "MobileButton"
+    self.MobileButton.Size = UDim2.new(0, 50, 0, 50)
+    self.MobileButton.Position = UDim2.new(0, 5, 0, 5)
+    self.MobileButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent like the UI
+    self.MobileButton.Text = "M"
+    self.MobileButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.MobileButton.TextSize = 22
+    self.MobileButton.Font = Enum.Font.GothamBold
+    self.MobileButton.BorderSizePixel = 0
+    self.MobileButton.Parent = self.MobileContainer
+    
+    -- Mobile button corner radius
+    local mobileCorner = Instance.new("UICorner")
+    mobileCorner.CornerRadius = UDim.new(0, 25) -- Circular
+    mobileCorner.Parent = self.MobileButton
+    
+    -- Premium border effect
+    local mobileBorder = Instance.new("UIStroke")
+    mobileBorder.Color = Color3.fromRGB(100, 180, 255)
+    mobileBorder.Thickness = 2
+    mobileBorder.Transparency = 0.3
+    mobileBorder.Parent = self.MobileButton
+    
+    -- Mobile button shadow effect
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 6, 1, 6)
+    shadow.Position = UDim2.new(0, -3, 0, -3)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.7
+    shadow.BorderSizePixel = 0
+    shadow.ZIndex = self.MobileButton.ZIndex - 1
+    shadow.Parent = self.MobileButton
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 25)
+    shadowCorner.Parent = shadow
+    
+    -- Drag functionality for mobile button
+    self:MakeMobileDraggable()
+    
+    -- Mobile button functionality - tap to toggle
+    local tapStartTime = 0
+    local isDragging = false
+    
+    self.MobileButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            tapStartTime = tick()
+            isDragging = false
+        end
+    end)
+    
+    self.MobileButton.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local tapDuration = tick() - tapStartTime
+            -- If it was a quick tap (not a drag), toggle the UI
+            if tapDuration < 0.3 and not isDragging then
+                self:ToggleVisibility()
+                -- Visual feedback for tap
+                self:MobileButtonFeedback()
+            end
+        end
+    end)
+    
+    -- Mobile button hover effects (for mouse users)
+    self.MobileButton.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.MobileButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(30, 140, 235)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            mobileBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Transparency = 0.1}
+        )
+        borderTween:Play()
+    end)
+    
+    self.MobileButton.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            self.MobileButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            mobileBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Transparency = 0.3}
+        )
+        borderTween:Play()
+    end)
+    
+    -- Auto-hide when main UI is visible (optional)
+    self.MobileContainer.Visible = not self.ScreenGui.Enabled
+end
+
+function Window:MakeMobileDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        local newPos = UDim2.new(
+            startPos.X.Scale, 
+            startPos.X.Offset + delta.X, 
+            startPos.Y.Scale, 
+            startPos.Y.Offset + delta.Y
+        )
+        
+        -- Keep button within screen bounds
+        local screenSize = workspace.CurrentCamera.ViewportSize
+        local buttonSize = self.MobileContainer.AbsoluteSize
+        
+        local clampedX = math.clamp(newPos.X.Offset, 0, screenSize.X - buttonSize.X)
+        local clampedY = math.clamp(newPos.Y.Offset, 0, screenSize.Y - buttonSize.Y)
+        
+        self.MobileContainer.Position = UDim2.new(0, clampedX, 0, clampedY)
+    end
+    
+    self.MobileContainer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.MobileContainer.Position
+            
+            -- Visual feedback for drag start
+            local scaleTween = TweenService:Create(
+                self.MobileButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(0, 45, 0, 45)}
+            )
+            scaleTween:Play()
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    -- Visual feedback for drag end
+                    local scaleTween = TweenService:Create(
+                        self.MobileButton,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                        {Size = UDim2.new(0, 50, 0, 50)}
+                    )
+                    scaleTween:Play()
+                end
+            end)
+        end
+    end)
+    
+    self.MobileContainer.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+            if dragging then
+                isDragging = true -- Set flag to prevent tap action
+            end
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+end
+
+function Window:MobileButtonFeedback()
+    -- Quick scale animation for tap feedback
+    local scaleTween = TweenService:Create(
+        self.MobileButton,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 45, 0, 45)}
+    )
+    scaleTween:Play()
+    
+    scaleTween.Completed:Connect(function()
+        local returnTween = TweenService:Create(
+            self.MobileButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 50, 0, 50)}
+        )
+        returnTween:Play()
+    end)
+    
+    -- Color flash
+    local colorTween = TweenService:Create(
+        self.MobileButton,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundColor3 = Color3.fromRGB(100, 200, 255)}
+    )
+    colorTween:Play()
+    
+    colorTween.Completed:Connect(function()
+        local returnColorTween = TweenService:Create(
+            self.MobileButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        returnColorTween:Play()
+    end)
+end
+
+function Window:SetupKeybindSystem()
+    local UserInputService = game:GetService("UserInputService")
+    
+    -- Listen for keybind input
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        
+        if self.IsListeningForKeybind then
+            -- Set new keybind
+            self.ToggleKeybind = input.KeyCode
+            self.IsListeningForKeybind = false
+            self:UpdateKeybindDisplay()
+            self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65)
+            return
+        end
+        
+        -- Check if pressed key matches toggle keybind
+        if input.KeyCode == self.ToggleKeybind then
+            self:ToggleVisibility()
+        end
+    end)
+end
+
+function Window:StartKeybindListening()
+    self.IsListeningForKeybind = true
+    self.KeybindButton.Text = "..."
+    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(88, 166, 255) -- Accent color when listening
+end
+
+function Window:UpdateKeybindDisplay()
+    -- Convert KeyCode to readable text
+    local keyName = tostring(self.ToggleKeybind):gsub("Enum.KeyCode.", "")
+    self.KeybindButton.Text = keyName:upper()
+    self.KeybindButton.TextSize = #keyName > 3 and 10 or 12 -- Smaller text for longer keys
+end
+
+function Window:ToggleVisibility()
+    self.ScreenGui.Enabled = not self.ScreenGui.Enabled
+end
+
+function Window:FilterComponents(searchText)
+    if not self.ActiveTab then return end
+    
+    searchText = searchText:lower()
+    
+    -- Get all components in the active tab
+    for _, child in ipairs(self.ActiveTab.Container:GetChildren()) do
+        if child:IsA("Frame") and child.Name:find("Button") or child.Name:find("Toggle") or child.Name:find("TextBox") or child.Name:find("Dropdown") or child.Name:find("Slider") then
+            -- Get the component name from the name label
+            local nameLabel = child:FindFirstChild("Name") or child:FindFirstChild("Text")
+            if nameLabel and nameLabel:IsA("TextLabel") then
+                local componentName = nameLabel.Text:lower()
+                
+                -- Show/hide based on search
+                if searchText == "" or componentName:find(searchText) then
+                    child.Visible = true
+                else
+                    child.Visible = false
+                end
+            end
+        end
+    end
+end
+
+function Window:Show()
+    self.ScreenGui.Enabled = true
+    
+    -- Entrance animation
+    self.MainFrame.Size = UDim2.new(0, 0, 0, 0)
+    local showTween = TweenService:Create(
+        self.MainFrame,
+        TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {Size = self.OriginalSize}
+    )
+    showTween:Play()
+end
+
+function Window:Hide()
+    self.ScreenGui.Enabled = false
+end
+
+function Window:ToggleVisibility()
+    if self.ScreenGui.Enabled then
+        -- Hide main UI
+        self.ScreenGui.Enabled = false
+        if self.MobileContainer then
+            self.MobileContainer.Visible = true
+        end
+        if self.ToggleContainer then
+            self.ToggleContainer.Visible = true
+        end
+        
+        -- Animate mobile button appearance
+        if self.MobileButton then
+            self.MobileButton.Size = UDim2.new(0, 30, 0, 30)
+            local appearTween = TweenService:Create(
+                self.MobileButton,
+                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                {Size = UDim2.new(0, 50, 0, 50)}
+            )
+            appearTween:Play()
+        end
+        
+        -- Animate toggle button appearance
+        if self.ToggleButton then
+            self.ToggleButton.Size = UDim2.new(0, 40, 0, 40)
+            local toggleAppearTween = TweenService:Create(
+                self.ToggleButton,
+                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                {Size = UDim2.new(0, 60, 0, 60)}
+            )
+            toggleAppearTween:Play()
+        end
+    else
+        -- Show main UI
+        self.ScreenGui.Enabled = true
+        if self.MobileContainer then
+            self.MobileContainer.Visible = false
+        end
+        if self.ToggleContainer then
+            self.ToggleContainer.Visible = false
+        end
+        
+        -- Optional: animate main UI appearance
+        self.MainFrame.Size = UDim2.new(0, 600, 0, 500)
+        local showTween = TweenService:Create(
+            self.MainFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 675, 0, 550)}
+        )
+        showTween:Play()
+    end
+end
+
+function Window:CreateMobileToggleButton()
+    -- Create separate mobile toggle controls GUI
+    self.MobileToggleGui = Instance.new("ScreenGui")
+    self.MobileToggleGui.Name = "ProjectMadaraToggleControls"
+    self.MobileToggleGui.ResetOnSpawn = false
+    self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Toggle button container for dragging
+    self.ToggleContainer = Instance.new("Frame")
+    self.ToggleContainer.Name = "ToggleContainer"
+    self.ToggleContainer.Size = UDim2.new(0, 70, 0, 70)
+    self.ToggleContainer.Position = UDim2.new(1, -90, 0, 150) -- Top right corner
+    self.ToggleContainer.BackgroundTransparency = 1
+    self.ToggleContainer.Parent = self.MobileToggleGui
+    
+    -- Toggle button
+    self.ToggleButton = Instance.new("TextButton")
+    self.ToggleButton.Name = "ToggleButton"
+    self.ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+    self.ToggleButton.Position = UDim2.new(0, 5, 0, 5)
+    self.ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) -- Different color from main button
+    self.ToggleButton.Text = "⚡" -- Lightning bolt for toggles/power
+    self.ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.ToggleButton.TextSize = 24
+    self.ToggleButton.Font = Enum.Font.GothamBold
+    self.ToggleButton.BorderSizePixel = 0
+    self.ToggleButton.Parent = self.ToggleContainer
+    
+    -- Toggle button corner radius
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 30) -- Circular
+    toggleCorner.Parent = self.ToggleButton
+    
+    -- Premium border effect for toggle button
+    local toggleBorder = Instance.new("UIStroke")
+    toggleBorder.Color = Color3.fromRGB(255, 165, 0) -- Orange accent for toggles
+    toggleBorder.Thickness = 2
+    toggleBorder.Transparency = 0.3
+    toggleBorder.Parent = self.ToggleButton
+    
+    -- Toggle button shadow effect
+    local toggleShadow = Instance.new("Frame")
+    toggleShadow.Name = "Shadow"
+    toggleShadow.Size = UDim2.new(1, 6, 1, 6)
+    toggleShadow.Position = UDim2.new(0, -3, 0, -3)
+    toggleShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggleShadow.BackgroundTransparency = 0.7
+    toggleShadow.BorderSizePixel = 0
+    toggleShadow.ZIndex = self.ToggleButton.ZIndex - 1
+    toggleShadow.Parent = self.ToggleButton
+    
+    local toggleShadowCorner = Instance.new("UICorner")
+    toggleShadowCorner.CornerRadius = UDim.new(0, 30)
+    toggleShadowCorner.Parent = toggleShadow
+    
+    -- State tracking for toggle button
+    self.ToggleButtonState = "off" -- "off", "on", "auto"
+    self.ToggleStates = {"off", "on", "auto"}
+    self.ToggleIcons = {"⚡", "🔥", "🤖"} -- Lightning, Fire, Robot
+    self.ToggleColors = {
+        Color3.fromRGB(45, 55, 65),   -- Off - Gray
+        Color3.fromRGB(0, 200, 100),  -- On - Green  
+        Color3.fromRGB(255, 165, 0)   -- Auto - Orange
+    }
+    self.ToggleBorderColors = {
+        Color3.fromRGB(100, 110, 120), -- Off border
+        Color3.fromRGB(100, 255, 150), -- On border
+        Color3.fromRGB(255, 200, 100)  -- Auto border
+    }
+    
+    -- Make toggle button draggable
+    self:MakeToggleDraggable()
+    
+    -- Toggle button functionality - cycle through states
+    local tapStartTime = 0
+    local isToggleDragging = false
+    
+    self.ToggleButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            tapStartTime = tick()
+            isToggleDragging = false
+        end
+    end)
+    
+    self.ToggleButton.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local tapDuration = tick() - tapStartTime
+            -- If it was a quick tap (not a drag), cycle toggle state
+            if tapDuration < 0.3 and not isToggleDragging then
+                self:CycleToggleState()
+                self:ToggleButtonFeedback()
+            end
+        end
+    end)
+    
+    -- Toggle button hover effects (for mouse users)
+    self.ToggleButton.MouseEnter:Connect(function()
+        local currentStateIndex = self:GetToggleStateIndex()
+        local hoverColor = self.ToggleColors[currentStateIndex]
+        
+        -- Brighten the current color
+        local r = math.min(255, hoverColor.R * 255 + 30)
+        local g = math.min(255, hoverColor.G * 255 + 30)
+        local b = math.min(255, hoverColor.B * 255 + 30)
+        
+        local hoverTween = TweenService:Create(
+            self.ToggleButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(r, g, b)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            toggleBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Transparency = 0.1}
+        )
+        borderTween:Play()
+    end)
+    
+    self.ToggleButton.MouseLeave:Connect(function()
+        local currentStateIndex = self:GetToggleStateIndex()
+        local leaveTween = TweenService:Create(
+            self.ToggleButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = self.ToggleColors[currentStateIndex]}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            toggleBorder,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Transparency = 0.3}
+        )
+        borderTween:Play()
+    end)
+    
+    -- Initially hide toggle controls when main UI is visible
+    self.ToggleContainer.Visible = not self.ScreenGui.Enabled
+end
+
+function Window:MakeToggleDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        local newPos = UDim2.new(
+            startPos.X.Scale, 
+            startPos.X.Offset + delta.X, 
+            startPos.Y.Scale, 
+            startPos.Y.Offset + delta.Y
+        )
+        
+        -- Keep button within screen bounds
+        local screenSize = workspace.CurrentCamera.ViewportSize
+        local buttonSize = self.ToggleContainer.AbsoluteSize
+        
+        local clampedX = math.clamp(newPos.X.Offset, 0, screenSize.X - buttonSize.X)
+        local clampedY = math.clamp(newPos.Y.Offset, 0, screenSize.Y - buttonSize.Y)
+        
+        self.ToggleContainer.Position = UDim2.new(0, clampedX, 0, clampedY)
+    end
+    
+    self.ToggleContainer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.ToggleContainer.Position
+            
+            -- Visual feedback for drag start
+            local scaleTween = TweenService:Create(
+                self.ToggleButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Size = UDim2.new(0, 55, 0, 55)}
+            )
+            scaleTween:Play()
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    -- Visual feedback for drag end
+                    local scaleTween = TweenService:Create(
+                        self.ToggleButton,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                        {Size = UDim2.new(0, 60, 0, 60)}
+                    )
+                    scaleTween:Play()
+                end
+            end)
+        end
+    end)
+    
+    self.ToggleContainer.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+            if dragging then
+                isToggleDragging = true -- Set flag to prevent tap action
+            end
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+end
+
+function Window:CycleToggleState()
+    -- Find current state index
+    local currentIndex = self:GetToggleStateIndex()
+    
+    -- Cycle to next state
+    local nextIndex = (currentIndex % #self.ToggleStates) + 1
+    self.ToggleButtonState = self.ToggleStates[nextIndex]
+    
+    -- Update button appearance
+    self.ToggleButton.Text = self.ToggleIcons[nextIndex]
+    
+    -- Animate color change
+    local colorTween = TweenService:Create(
+        self.ToggleButton,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {BackgroundColor3 = self.ToggleColors[nextIndex]}
+    )
+    colorTween:Play()
+    
+    -- Animate border color change
+    local borderTween = TweenService:Create(
+        self.ToggleButton.UIStroke,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {Color = self.ToggleBorderColors[nextIndex]}
+    )
+    borderTween:Play()
+    
+    -- Here you can add logic to actually toggle features based on the state
+    self:HandleToggleStateChange(self.ToggleButtonState)
+end
+
+function Window:GetToggleStateIndex()
+    for i, state in ipairs(self.ToggleStates) do
+        if state == self.ToggleButtonState then
+            return i
+        end
+    end
+    return 1 -- Default to first state
+end
+
+function Window:HandleToggleStateChange(newState)
+    -- This is where you'd implement the actual toggle functionality
+    -- For example:
+    if newState == "off" then
+        -- Turn off all toggles/features
+        print("All toggles OFF")
+    elseif newState == "on" then
+        -- Turn on all toggles/features
+        print("All toggles ON")
+    elseif newState == "auto" then
+        -- Set toggles to auto mode
+        print("Toggles set to AUTO")
+    end
+end
+
+function Window:ToggleButtonFeedback()
+    -- Quick scale animation for tap feedback
+    local scaleTween = TweenService:Create(
+        self.ToggleButton,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 55, 0, 55)}
+    )
+    scaleTween:Play()
+    
+    scaleTween.Completed:Connect(function()
+        local returnTween = TweenService:Create(
+            self.ToggleButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 60, 0, 60)}
+        )
+        returnTween:Play()
+    end)
+end
+
+
+
+function Window:FilterComponents(searchText)
+    -- This function will be implemented when tabs/components are added
+    -- For now, it's a placeholder for the search functionality
+    if self.ActiveTab and self.ActiveTab.FilterComponents then
+        self.ActiveTab:FilterComponents(searchText)
+    end
+end
+
+return Window
+end)() end,
+    function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)local assets = {
+	["accessibility"] = "rbxassetid://10709751939",
+	["activity"] = "rbxassetid://10709752035",
+	["air-vent"] = "rbxassetid://10709752131",
+	["airplay"] = "rbxassetid://10709752254",
+	["alarm-check"] = "rbxassetid://10709752405",
+	["alarm-clock"] = "rbxassetid://10709752630",
+	["alarm-clock-off"] = "rbxassetid://10709752508",
+	["alarm-minus"] = "rbxassetid://10709752732",
+	["alarm-plus"] = "rbxassetid://10709752825",
+	["album"] = "rbxassetid://10709752906",
+	["alert-circle"] = "rbxassetid://10709752996",
+	["alert-octagon"] = "rbxassetid://10709753064",
+	["alert-triangle"] = "rbxassetid://10709753149",
+	["align-center"] = "rbxassetid://10709753570",
+	["align-center-horizontal"] = "rbxassetid://10709753272",
+	["align-center-vertical"] = "rbxassetid://10709753421",
+	["align-end-horizontal"] = "rbxassetid://10709753692",
+	["align-end-vertical"] = "rbxassetid://10709753808",
+	["align-horizontal-distribute-center"] = "rbxassetid://10747779791",
+	["align-horizontal-distribute-end"] = "rbxassetid://10747784534",
+	["align-horizontal-distribute-start"] = "rbxassetid://10709754118",
+	["align-horizontal-justify-center"] = "rbxassetid://10709754204",
+	["align-horizontal-justify-end"] = "rbxassetid://10709754317",
+	["align-horizontal-justify-start"] = "rbxassetid://10709754436",
+	["align-horizontal-space-around"] = "rbxassetid://10709754590",
+	["align-horizontal-space-between"] = "rbxassetid://10709754749",
+	["align-justify"] = "rbxassetid://10709759610",
+	["align-left"] = "rbxassetid://10709759764",
+	["align-right"] = "rbxassetid://10709759895",
+	["align-start-horizontal"] = "rbxassetid://10709760051",
+	["align-start-vertical"] = "rbxassetid://10709760244",
+	["align-vertical-distribute-center"] = "rbxassetid://10709760351",
+	["align-vertical-distribute-end"] = "rbxassetid://10709760434",
+	["align-vertical-distribute-start"] = "rbxassetid://10709760612",
+	["align-vertical-justify-center"] = "rbxassetid://10709760814",
+	["align-vertical-justify-end"] = "rbxassetid://10709761003",
+	["align-vertical-justify-start"] = "rbxassetid://10709761176",
+	["align-vertical-space-around"] = "rbxassetid://10709761324",
+	["align-vertical-space-between"] = "rbxassetid://10709761434",
+	["anchor"] = "rbxassetid://10709761530",
+	["angry"] = "rbxassetid://10709761629",
+	["annoyed"] = "rbxassetid://10709761722",
+	["aperture"] = "rbxassetid://10709761813",
+	["apple"] = "rbxassetid://10709761889",
+	["archive"] = "rbxassetid://10709762233",
+	["archive-restore"] = "rbxassetid://10709762058",
+	["armchair"] = "rbxassetid://10709762327",
+	["arrow-big-down"] = "rbxassetid://10747796644",
+	["arrow-big-left"] = "rbxassetid://10709762574",
+	["arrow-big-right"] = "rbxassetid://10709762727",
+	["arrow-big-up"] = "rbxassetid://10709762879",
+	["arrow-down"] = "rbxassetid://10709767827",
+	["arrow-down-circle"] = "rbxassetid://10709763034",
+	["arrow-down-left"] = "rbxassetid://10709767656",
+	["arrow-down-right"] = "rbxassetid://10709767750",
+	["arrow-left"] = "rbxassetid://10709768114",
+	["arrow-left-circle"] = "rbxassetid://10709767936",
+	["arrow-left-right"] = "rbxassetid://10709768019",
+	["arrow-right"] = "rbxassetid://10709768347",
+	["arrow-right-circle"] = "rbxassetid://10709768226",
+	["arrow-up"] = "rbxassetid://10709768939",
+	["arrow-up-circle"] = "rbxassetid://10709768432",
+	["arrow-up-down"] = "rbxassetid://10709768538",
+	["arrow-up-left"] = "rbxassetid://10709768661",
+	["arrow-up-right"] = "rbxassetid://10709768787",
+	["asterisk"] = "rbxassetid://10709769095",
+	["at-sign"] = "rbxassetid://10709769286",
+	["award"] = "rbxassetid://10709769406",
+	["axe"] = "rbxassetid://10709769508",
+	["axis-3d"] = "rbxassetid://10709769598",
+	["baby"] = "rbxassetid://10709769732",
+	["backpack"] = "rbxassetid://10709769841",
+	["baggage-claim"] = "rbxassetid://10709769935",
+	["banana"] = "rbxassetid://10709770005",
+	["banknote"] = "rbxassetid://10709770178",
+	["bar-chart"] = "rbxassetid://10709773755",
+	["bar-chart-2"] = "rbxassetid://10709770317",
+	["bar-chart-3"] = "rbxassetid://10709770431",
+	["bar-chart-4"] = "rbxassetid://10709770560",
+	["bar-chart-horizontal"] = "rbxassetid://10709773669",
+	["barcode"] = "rbxassetid://10747360675",
+	["baseline"] = "rbxassetid://10709773863",
+	["bath"] = "rbxassetid://10709773963",
+	["battery"] = "rbxassetid://10709774640",
+	["battery-charging"] = "rbxassetid://10709774068",
+	["battery-full"] = "rbxassetid://10709774206",
+	["battery-low"] = "rbxassetid://10709774370",
+	["battery-medium"] = "rbxassetid://10709774513",
+	["beaker"] = "rbxassetid://10709774756",
+	["bed"] = "rbxassetid://10709775036",
+	["bed-double"] = "rbxassetid://10709774864",
+	["bed-single"] = "rbxassetid://10709774968",
+	["beer"] = "rbxassetid://10709775167",
+	["bell"] = "rbxassetid://10709775704",
+	["bell-minus"] = "rbxassetid://10709775241",
+	["bell-off"] = "rbxassetid://10709775320",
+	["bell-plus"] = "rbxassetid://10709775448",
+	["bell-ring"] = "rbxassetid://10709775560",
+	["bike"] = "rbxassetid://10709775894",
+	["binary"] = "rbxassetid://10709776050",
+	["bitcoin"] = "rbxassetid://10709776126",
+	["bluetooth"] = "rbxassetid://10709776655",
+	["bluetooth-connected"] = "rbxassetid://10709776240",
+	["bluetooth-off"] = "rbxassetid://10709776344",
+	["bluetooth-searching"] = "rbxassetid://10709776501",
+	["bold"] = "rbxassetid://10747813908",
+	["bomb"] = "rbxassetid://10709781460",
+	["bone"] = "rbxassetid://10709781605",
+	["book"] = "rbxassetid://10709781824",
+	["book-open"] = "rbxassetid://10709781717",
+	["bookmark"] = "rbxassetid://10709782154",
+	["bookmark-minus"] = "rbxassetid://10709781919",
+	["bookmark-plus"] = "rbxassetid://10709782044",
+	["bot"] = "rbxassetid://10709782230",
+	["box"] = "rbxassetid://10709782497",
+	["box-select"] = "rbxassetid://10709782342",
+	["boxes"] = "rbxassetid://10709782582",
+	["briefcase"] = "rbxassetid://10709782662",
+	["brush"] = "rbxassetid://10709782758",
+	["bug"] = "rbxassetid://10709782845",
+	["building"] = "rbxassetid://10709783051",
+	["building-2"] = "rbxassetid://10709782939",
+	["bus"] = "rbxassetid://10709783137",
+	["cake"] = "rbxassetid://10709783217",
+	["calculator"] = "rbxassetid://10709783311",
+	["calendar"] = "rbxassetid://10709789505",
+	["calendar-check"] = "rbxassetid://10709783474",
+	["calendar-check-2"] = "rbxassetid://10709783392",
+	["calendar-clock"] = "rbxassetid://10709783577",
+	["calendar-days"] = "rbxassetid://10709783673",
+	["calendar-heart"] = "rbxassetid://10709783835",
+	["calendar-minus"] = "rbxassetid://10709783959",
+	["calendar-off"] = "rbxassetid://10709788784",
+	["calendar-plus"] = "rbxassetid://10709788937",
+	["calendar-range"] = "rbxassetid://10709789053",
+	["calendar-search"] = "rbxassetid://10709789200",
+	["calendar-x"] = "rbxassetid://10709789407",
+	["calendar-x-2"] = "rbxassetid://10709789329",
+	["camera"] = "rbxassetid://10709789686",
+	["camera-off"] = "rbxassetid://10747822677",
+	["car"] = "rbxassetid://10709789810",
+	["carrot"] = "rbxassetid://10709789960",
+	["cast"] = "rbxassetid://10709790097",
+	["charge"] = "rbxassetid://10709790202",
+	["check"] = "rbxassetid://10709790644",
+	["check-circle"] = "rbxassetid://10709790387",
+	["check-circle-2"] = "rbxassetid://10709790298",
+	["check-square"] = "rbxassetid://10709790537",
+	["chef-hat"] = "rbxassetid://10709790757",
+	["cherry"] = "rbxassetid://10709790875",
+	["chevron-down"] = "rbxassetid://10709790948",
+	["chevron-first"] = "rbxassetid://10709791015",
+	["chevron-last"] = "rbxassetid://10709791130",
+	["chevron-left"] = "rbxassetid://10709791281",
+	["chevron-right"] = "rbxassetid://10709791437",
+	["chevron-up"] = "rbxassetid://10709791523",
+	["chevrons-down"] = "rbxassetid://10709796864",
+	["chevrons-down-up"] = "rbxassetid://10709791632",
+	["chevrons-left"] = "rbxassetid://10709797151",
+	["chevrons-left-right"] = "rbxassetid://10709797006",
+	["chevrons-right"] = "rbxassetid://10709797382",
+	["chevrons-right-left"] = "rbxassetid://10709797274",
+	["chevrons-up"] = "rbxassetid://10709797622",
+	["chevrons-up-down"] = "rbxassetid://10709797508",
+	["chrome"] = "rbxassetid://10709797725",
+	["circle"] = "rbxassetid://10709798174",
+	["circle-dot"] = "rbxassetid://10709797837",
+	["circle-ellipsis"] = "rbxassetid://10709797985",
+	["circle-slashed"] = "rbxassetid://10709798100",
+	["citrus"] = "rbxassetid://10709798276",
+	["clapperboard"] = "rbxassetid://10709798350",
+	["clipboard"] = "rbxassetid://10709799288",
+	["clipboard-check"] = "rbxassetid://10709798443",
+	["clipboard-copy"] = "rbxassetid://10709798574",
+	["clipboard-edit"] = "rbxassetid://10709798682",
+	["clipboard-list"] = "rbxassetid://10709798792",
+	["clipboard-signature"] = "rbxassetid://10709798890",
+	["clipboard-type"] = "rbxassetid://10709798999",
+	["clipboard-x"] = "rbxassetid://10709799124",
+	["clock"] = "rbxassetid://10709805144",
+	["clock-1"] = "rbxassetid://10709799535",
+	["clock-10"] = "rbxassetid://10709799718",
+	["clock-11"] = "rbxassetid://10709799818",
+	["clock-12"] = "rbxassetid://10709799962",
+	["clock-2"] = "rbxassetid://10709803876",
+	["clock-3"] = "rbxassetid://10709803989",
+	["clock-4"] = "rbxassetid://10709804164",
+	["clock-5"] = "rbxassetid://10709804291",
+	["clock-6"] = "rbxassetid://10709804435",
+	["clock-7"] = "rbxassetid://10709804599",
+	["clock-8"] = "rbxassetid://10709804784",
+	["clock-9"] = "rbxassetid://10709804996",
+	["cloud"] = "rbxassetid://10709806740",
+	["cloud-cog"] = "rbxassetid://10709805262",
+	["cloud-drizzle"] = "rbxassetid://10709805371",
+	["cloud-fog"] = "rbxassetid://10709805477",
+	["cloud-hail"] = "rbxassetid://10709805596",
+	["cloud-lightning"] = "rbxassetid://10709805727",
+	["cloud-moon"] = "rbxassetid://10709805942",
+	["cloud-moon-rain"] = "rbxassetid://10709805838",
+	["cloud-off"] = "rbxassetid://10709806060",
+	["cloud-rain"] = "rbxassetid://10709806277",
+	["cloud-rain-wind"] = "rbxassetid://10709806166",
+	["cloud-snow"] = "rbxassetid://10709806374",
+	["cloud-sun"] = "rbxassetid://10709806631",
+	["cloud-sun-rain"] = "rbxassetid://10709806475",
+	["cloudy"] = "rbxassetid://10709806859",
+	["clover"] = "rbxassetid://10709806995",
+	["code"] = "rbxassetid://10709810463",
+	["code-2"] = "rbxassetid://10709807111",
+	["codepen"] = "rbxassetid://10709810534",
+	["codesandbox"] = "rbxassetid://10709810676",
+	["coffee"] = "rbxassetid://10709810814",
+	["cog"] = "rbxassetid://10709810948",
+	["coins"] = "rbxassetid://10709811110",
+	["columns"] = "rbxassetid://10709811261",
+	["command"] = "rbxassetid://10709811365",
+	["compass"] = "rbxassetid://10709811445",
+	["component"] = "rbxassetid://10709811595",
+	["concierge-bell"] = "rbxassetid://10709811706",
+	["connection"] = "rbxassetid://10747361219",
+	["contact"] = "rbxassetid://10709811834",
+	["contrast"] = "rbxassetid://10709811939",
+	["cookie"] = "rbxassetid://10709812067",
+	["copy"] = "rbxassetid://10709812159",
+	["copyleft"] = "rbxassetid://10709812251",
+	["copyright"] = "rbxassetid://10709812311",
+	["corner-down-left"] = "rbxassetid://10709812396",
+	["corner-down-right"] = "rbxassetid://10709812485",
+	["corner-left-down"] = "rbxassetid://10709812632",
+	["corner-left-up"] = "rbxassetid://10709812784",
+	["corner-right-down"] = "rbxassetid://10709812939",
+	["corner-right-up"] = "rbxassetid://10709813094",
+	["corner-up-left"] = "rbxassetid://10709813185",
+	["corner-up-right"] = "rbxassetid://10709813281",
+	["cpu"] = "rbxassetid://10709813383",
+	["croissant"] = "rbxassetid://10709818125",
+	["crop"] = "rbxassetid://10709818245",
+	["cross"] = "rbxassetid://10709818399",
+	["crosshair"] = "rbxassetid://10709818534",
+	["crown"] = "rbxassetid://10709818626",
+	["cup-soda"] = "rbxassetid://10709818763",
+	["curly-braces"] = "rbxassetid://10709818847",
+	["currency"] = "rbxassetid://10709818931",
+	["database"] = "rbxassetid://10709818996",
+	["delete"] = "rbxassetid://10709819059",
+	["diamond"] = "rbxassetid://10709819149",
+	["dice-1"] = "rbxassetid://10709819266",
+	["dice-2"] = "rbxassetid://10709819361",
+	["dice-3"] = "rbxassetid://10709819508",
+	["dice-4"] = "rbxassetid://10709819670",
+	["dice-5"] = "rbxassetid://10709819801",
+	["dice-6"] = "rbxassetid://10709819896",
+	["dices"] = "rbxassetid://10723343321",
+	["diff"] = "rbxassetid://10723343416",
+	["disc"] = "rbxassetid://10723343537",
+	["divide"] = "rbxassetid://10723343805",
+	["divide-circle"] = "rbxassetid://10723343636",
+	["divide-square"] = "rbxassetid://10723343737",
+	["dollar-sign"] = "rbxassetid://10723343958",
+	["download"] = "rbxassetid://10723344270",
+	["download-cloud"] = "rbxassetid://10723344088",
+	["droplet"] = "rbxassetid://10723344432",
+	["droplets"] = "rbxassetid://10734883356",
+	["drumstick"] = "rbxassetid://10723344737",
+	["edit"] = "rbxassetid://10734883598",
+	["edit-2"] = "rbxassetid://10723344885",
+	["edit-3"] = "rbxassetid://10723345088",
+	["egg"] = "rbxassetid://10723345518",
+	["egg-fried"] = "rbxassetid://10723345347",
+	["electricity"] = "rbxassetid://10723345749",
+	["electricity-off"] = "rbxassetid://10723345643",
+	["equal"] = "rbxassetid://10723345990",
+	["equal-not"] = "rbxassetid://10723345866",
+	["eraser"] = "rbxassetid://10723346158",
+	["euro"] = "rbxassetid://10723346372",
+	["expand"] = "rbxassetid://10723346553",
+	["external-link"] = "rbxassetid://10723346684",
+	["eye"] = "rbxassetid://10723346959",
+	["eye-off"] = "rbxassetid://10723346871",
+	["factory"] = "rbxassetid://10723347051",
+	["fan"] = "rbxassetid://10723354359",
+	["fast-forward"] = "rbxassetid://10723354521",
+	["feather"] = "rbxassetid://10723354671",
+	["figma"] = "rbxassetid://10723354801",
+	["file"] = "rbxassetid://10723374641",
+	["file-archive"] = "rbxassetid://10723354921",
+	["file-audio"] = "rbxassetid://10723355148",
+	["file-audio-2"] = "rbxassetid://10723355026",
+	["file-axis-3d"] = "rbxassetid://10723355272",
+	["file-badge"] = "rbxassetid://10723355622",
+	["file-badge-2"] = "rbxassetid://10723355451",
+	["file-bar-chart"] = "rbxassetid://10723355887",
+	["file-bar-chart-2"] = "rbxassetid://10723355746",
+	["file-box"] = "rbxassetid://10723355989",
+	["file-check"] = "rbxassetid://10723356210",
+	["file-check-2"] = "rbxassetid://10723356100",
+	["file-clock"] = "rbxassetid://10723356329",
+	["file-code"] = "rbxassetid://10723356507",
+	["file-cog"] = "rbxassetid://10723356830",
+	["file-cog-2"] = "rbxassetid://10723356676",
+	["file-diff"] = "rbxassetid://10723357039",
+	["file-digit"] = "rbxassetid://10723357151",
+	["file-down"] = "rbxassetid://10723357322",
+	["file-edit"] = "rbxassetid://10723357495",
+	["file-heart"] = "rbxassetid://10723357637",
+	["file-image"] = "rbxassetid://10723357790",
+	["file-input"] = "rbxassetid://10723357933",
+	["file-json"] = "rbxassetid://10723364435",
+	["file-json-2"] = "rbxassetid://10723364361",
+	["file-key"] = "rbxassetid://10723364605",
+	["file-key-2"] = "rbxassetid://10723364515",
+	["file-line-chart"] = "rbxassetid://10723364725",
+	["file-lock"] = "rbxassetid://10723364957",
+	["file-lock-2"] = "rbxassetid://10723364861",
+	["file-minus"] = "rbxassetid://10723365254",
+	["file-minus-2"] = "rbxassetid://10723365086",
+	["file-output"] = "rbxassetid://10723365457",
+	["file-pie-chart"] = "rbxassetid://10723365598",
+	["file-plus"] = "rbxassetid://10723365877",
+	["file-plus-2"] = "rbxassetid://10723365766",
+	["file-question"] = "rbxassetid://10723365987",
+	["file-scan"] = "rbxassetid://10723366167",
+	["file-search"] = "rbxassetid://10723366550",
+	["file-search-2"] = "rbxassetid://10723366340",
+	["file-signature"] = "rbxassetid://10723366741",
+	["file-spreadsheet"] = "rbxassetid://10723366962",
+	["file-symlink"] = "rbxassetid://10723367098",
+	["file-terminal"] = "rbxassetid://10723367244",
+	["file-text"] = "rbxassetid://10723367380",
+	["file-type"] = "rbxassetid://10723367606",
+	["file-type-2"] = "rbxassetid://10723367509",
+	["file-up"] = "rbxassetid://10723367734",
+	["file-video"] = "rbxassetid://10723373884",
+	["file-video-2"] = "rbxassetid://10723367834",
+	["file-volume"] = "rbxassetid://10723374172",
+	["file-volume-2"] = "rbxassetid://10723374030",
+	["file-warning"] = "rbxassetid://10723374276",
+	["file-x"] = "rbxassetid://10723374544",
+	["file-x-2"] = "rbxassetid://10723374378",
+	["files"] = "rbxassetid://10723374759",
+	["film"] = "rbxassetid://10723374981",
+	["filter"] = "rbxassetid://10723375128",
+	["fingerprint"] = "rbxassetid://10723375250",
+	["flag"] = "rbxassetid://10723375890",
+	["flag-off"] = "rbxassetid://10723375443",
+	["flag-triangle-left"] = "rbxassetid://10723375608",
+	["flag-triangle-right"] = "rbxassetid://10723375727",
+	["flame"] = "rbxassetid://10723376114",
+	["flashlight"] = "rbxassetid://10723376471",
+	["flashlight-off"] = "rbxassetid://10723376365",
+	["flask-conical"] = "rbxassetid://10734883986",
+	["flask-round"] = "rbxassetid://10723376614",
+	["flip-horizontal"] = "rbxassetid://10723376884",
+	["flip-horizontal-2"] = "rbxassetid://10723376745",
+	["flip-vertical"] = "rbxassetid://10723377138",
+	["flip-vertical-2"] = "rbxassetid://10723377026",
+	["flower"] = "rbxassetid://10747830374",
+	["flower-2"] = "rbxassetid://10723377305",
+	["focus"] = "rbxassetid://10723377537",
+	["folder"] = "rbxassetid://10723387563",
+	["folder-archive"] = "rbxassetid://10723384478",
+	["folder-check"] = "rbxassetid://10723384605",
+	["folder-clock"] = "rbxassetid://10723384731",
+	["folder-closed"] = "rbxassetid://10723384893",
+	["folder-cog"] = "rbxassetid://10723385213",
+	["folder-cog-2"] = "rbxassetid://10723385036",
+	["folder-down"] = "rbxassetid://10723385338",
+	["folder-edit"] = "rbxassetid://10723385445",
+	["folder-heart"] = "rbxassetid://10723385545",
+	["folder-input"] = "rbxassetid://10723385721",
+	["folder-key"] = "rbxassetid://10723385848",
+	["folder-lock"] = "rbxassetid://10723386005",
+	["folder-minus"] = "rbxassetid://10723386127",
+	["folder-open"] = "rbxassetid://10723386277",
+	["folder-output"] = "rbxassetid://10723386386",
+	["folder-plus"] = "rbxassetid://10723386531",
+	["folder-search"] = "rbxassetid://10723386787",
+	["folder-search-2"] = "rbxassetid://10723386674",
+	["folder-symlink"] = "rbxassetid://10723386930",
+	["folder-tree"] = "rbxassetid://10723387085",
+	["folder-up"] = "rbxassetid://10723387265",
+	["folder-x"] = "rbxassetid://10723387448",
+	["folders"] = "rbxassetid://10723387721",
+	["form-input"] = "rbxassetid://10723387841",
+	["forward"] = "rbxassetid://10723388016",
+	["frame"] = "rbxassetid://10723394389",
+	["framer"] = "rbxassetid://10723394565",
+	["frown"] = "rbxassetid://10723394681",
+	["fuel"] = "rbxassetid://10723394846",
+	["function-square"] = "rbxassetid://10723395041",
+	["gamepad"] = "rbxassetid://10723395457",
+	["gamepad-2"] = "rbxassetid://10723395215",
+	["gauge"] = "rbxassetid://10723395708",
+	["gavel"] = "rbxassetid://10723395896",
+	["gem"] = "rbxassetid://10723396000",
+	["ghost"] = "rbxassetid://10723396107",
+	["gift"] = "rbxassetid://10723396402",
+	["gift-card"] = "rbxassetid://10723396225",
+	["git-branch"] = "rbxassetid://10723396676",
+	["git-branch-plus"] = "rbxassetid://10723396542",
+	["git-commit"] = "rbxassetid://10723396812",
+	["git-compare"] = "rbxassetid://10723396954",
+	["git-fork"] = "rbxassetid://10723397049",
+	["git-merge"] = "rbxassetid://10723397165",
+	["git-pull-request"] = "rbxassetid://10723397431",
+	["git-pull-request-closed"] = "rbxassetid://10723397268",
+	["git-pull-request-draft"] = "rbxassetid://10734884302",
+	["glass"] = "rbxassetid://10723397788",
+	["glass-2"] = "rbxassetid://10723397529",
+	["glass-water"] = "rbxassetid://10723397678",
+	["glasses"] = "rbxassetid://10723397895",
+	["globe"] = "rbxassetid://10723404337",
+	["globe-2"] = "rbxassetid://10723398002",
+	["grab"] = "rbxassetid://10723404472",
+	["graduation-cap"] = "rbxassetid://10723404691",
+	["grape"] = "rbxassetid://10723404822",
+	["grid"] = "rbxassetid://10723404936",
+	["grip-horizontal"] = "rbxassetid://10723405089",
+	["grip-vertical"] = "rbxassetid://10723405236",
+	["hammer"] = "rbxassetid://10723405360",
+	["hand"] = "rbxassetid://10723405649",
+	["hand-metal"] = "rbxassetid://10723405508",
+	["hard-drive"] = "rbxassetid://10723405749",
+	["hard-hat"] = "rbxassetid://10723405859",
+	["hash"] = "rbxassetid://10723405975",
+	["haze"] = "rbxassetid://10723406078",
+	["headphones"] = "rbxassetid://10723406165",
+	["heart"] = "rbxassetid://10723406885",
+	["heart-crack"] = "rbxassetid://10723406299",
+	["heart-handshake"] = "rbxassetid://10723406480",
+	["heart-off"] = "rbxassetid://10723406662",
+	["heart-pulse"] = "rbxassetid://10723406795",
+	["help-circle"] = "rbxassetid://10723406988",
+	["hexagon"] = "rbxassetid://10723407092",
+	["highlighter"] = "rbxassetid://10723407192",
+	["history"] = "rbxassetid://10723407335",
+	["home"] = "rbxassetid://10723407389",
+	["hourglass"] = "rbxassetid://10723407498",
+	["ice-cream"] = "rbxassetid://10723414308",
+	["image"] = "rbxassetid://10723415040",
+	["image-minus"] = "rbxassetid://10723414487",
+	["image-off"] = "rbxassetid://10723414677",
+	["image-plus"] = "rbxassetid://10723414827",
+	["import"] = "rbxassetid://10723415205",
+	["inbox"] = "rbxassetid://10723415335",
+	["indent"] = "rbxassetid://10723415494",
+	["indian-rupee"] = "rbxassetid://10723415642",
+	["infinity"] = "rbxassetid://10723415766",
+	["info"] = "rbxassetid://10723415903",
+	["inspect"] = "rbxassetid://10723416057",
+	["italic"] = "rbxassetid://10723416195",
+	["japanese-yen"] = "rbxassetid://10723416363",
+	["joystick"] = "rbxassetid://10723416527",
+	["key"] = "rbxassetid://10723416652",
+	["keyboard"] = "rbxassetid://10723416765",
+	["lamp"] = "rbxassetid://10723417513",
+	["lamp-ceiling"] = "rbxassetid://10723416922",
+	["lamp-desk"] = "rbxassetid://10723417016",
+	["lamp-floor"] = "rbxassetid://10723417131",
+	["lamp-wall-down"] = "rbxassetid://10723417240",
+	["lamp-wall-up"] = "rbxassetid://10723417356",
+	["landmark"] = "rbxassetid://10723417608",
+	["languages"] = "rbxassetid://10723417703",
+	["laptop"] = "rbxassetid://10723423881",
+	["laptop-2"] = "rbxassetid://10723417797",
+	["lasso"] = "rbxassetid://10723424235",
+	["lasso-select"] = "rbxassetid://10723424058",
+	["laugh"] = "rbxassetid://10723424372",
+	["layers"] = "rbxassetid://10723424505",
+	["layout"] = "rbxassetid://10723425376",
+	["layout-dashboard"] = "rbxassetid://10723424646",
+	["layout-grid"] = "rbxassetid://10723424838",
+	["layout-list"] = "rbxassetid://10723424963",
+	["layout-template"] = "rbxassetid://10723425187",
+	["leaf"] = "rbxassetid://10723425539",
+	["library"] = "rbxassetid://10723425615",
+	["life-buoy"] = "rbxassetid://10723425685",
+	["lightbulb"] = "rbxassetid://10723425852",
+	["lightbulb-off"] = "rbxassetid://10723425762",
+	["line-chart"] = "rbxassetid://10723426393",
+	["link"] = "rbxassetid://10723426722",
+	["link-2"] = "rbxassetid://10723426595",
+	["link-2-off"] = "rbxassetid://10723426513",
+	["list"] = "rbxassetid://10723433811",
+	["list-checks"] = "rbxassetid://10734884548",
+	["list-end"] = "rbxassetid://10723426886",
+	["list-minus"] = "rbxassetid://10723426986",
+	["list-music"] = "rbxassetid://10723427081",
+	["list-ordered"] = "rbxassetid://10723427199",
+	["list-plus"] = "rbxassetid://10723427334",
+	["list-start"] = "rbxassetid://10723427494",
+	["list-video"] = "rbxassetid://10723427619",
+	["list-x"] = "rbxassetid://10723433655",
+	["loader"] = "rbxassetid://10723434070",
+	["loader-2"] = "rbxassetid://10723433935",
+	["locate"] = "rbxassetid://10723434557",
+	["locate-fixed"] = "rbxassetid://10723434236",
+	["locate-off"] = "rbxassetid://10723434379",
+	["lock"] = "rbxassetid://10723434711",
+	["log-in"] = "rbxassetid://10723434830",
+	["log-out"] = "rbxassetid://10723434906",
+	["luggage"] = "rbxassetid://10723434993",
+	["magnet"] = "rbxassetid://10723435069",
+	["mail"] = "rbxassetid://10734885430",
+	["mail-check"] = "rbxassetid://10723435182",
+	["mail-minus"] = "rbxassetid://10723435261",
+	["mail-open"] = "rbxassetid://10723435342",
+	["mail-plus"] = "rbxassetid://10723435443",
+	["mail-question"] = "rbxassetid://10723435515",
+	["mail-search"] = "rbxassetid://10734884739",
+	["mail-warning"] = "rbxassetid://10734885015",
+	["mail-x"] = "rbxassetid://10734885247",
+	["mails"] = "rbxassetid://10734885614",
+	["map"] = "rbxassetid://10734886202",
+	["map-pin"] = "rbxassetid://10734886004",
+	["map-pin-off"] = "rbxassetid://10734885803",
+	["maximize"] = "rbxassetid://10734886735",
+	["maximize-2"] = "rbxassetid://10734886496",
+	["medal"] = "rbxassetid://10734887072",
+	["megaphone"] = "rbxassetid://10734887454",
+	["megaphone-off"] = "rbxassetid://10734887311",
+	["meh"] = "rbxassetid://10734887603",
+	["menu"] = "rbxassetid://10734887784",
+	["message-circle"] = "rbxassetid://10734888000",
+	["message-square"] = "rbxassetid://10734888228",
+	["mic"] = "rbxassetid://10734888864",
+	["mic-2"] = "rbxassetid://10734888430",
+	["mic-off"] = "rbxassetid://10734888646",
+	["microscope"] = "rbxassetid://10734889106",
+	["microwave"] = "rbxassetid://10734895076",
+	["milestone"] = "rbxassetid://10734895310",
+	["minimize"] = "rbxassetid://10734895698",
+	["minimize-2"] = "rbxassetid://10734895530",
+	["minus"] = "rbxassetid://10734896206",
+	["minus-circle"] = "rbxassetid://10734895856",
+	["minus-square"] = "rbxassetid://10734896029",
+	["monitor"] = "rbxassetid://10734896881",
+	["monitor-off"] = "rbxassetid://10734896360",
+	["monitor-speaker"] = "rbxassetid://10734896512",
+	["moon"] = "rbxassetid://10734897102",
+	["more-horizontal"] = "rbxassetid://10734897250",
+	["more-vertical"] = "rbxassetid://10734897387",
+	["mountain"] = "rbxassetid://10734897956",
+	["mountain-snow"] = "rbxassetid://10734897665",
+	["mouse"] = "rbxassetid://10734898592",
+	["mouse-pointer"] = "rbxassetid://10734898476",
+	["mouse-pointer-2"] = "rbxassetid://10734898194",
+	["mouse-pointer-click"] = "rbxassetid://10734898355",
+	["move"] = "rbxassetid://10734900011",
+	["move-3d"] = "rbxassetid://10734898756",
+	["move-diagonal"] = "rbxassetid://10734899164",
+	["move-diagonal-2"] = "rbxassetid://10734898934",
+	["move-horizontal"] = "rbxassetid://10734899414",
+	["move-vertical"] = "rbxassetid://10734899821",
+	["music"] = "rbxassetid://10734905958",
+	["music-2"] = "rbxassetid://10734900215",
+	["music-3"] = "rbxassetid://10734905665",
+	["music-4"] = "rbxassetid://10734905823",
+	["navigation"] = "rbxassetid://10734906744",
+	["navigation-2"] = "rbxassetid://10734906332",
+	["navigation-2-off"] = "rbxassetid://10734906144",
+	["navigation-off"] = "rbxassetid://10734906580",
+	["network"] = "rbxassetid://10734906975",
+	["newspaper"] = "rbxassetid://10734907168",
+	["octagon"] = "rbxassetid://10734907361",
+	["option"] = "rbxassetid://10734907649",
+	["outdent"] = "rbxassetid://10734907933",
+	["package"] = "rbxassetid://10734909540",
+	["package-2"] = "rbxassetid://10734908151",
+	["package-check"] = "rbxassetid://10734908384",
+	["package-minus"] = "rbxassetid://10734908626",
+	["package-open"] = "rbxassetid://10734908793",
+	["package-plus"] = "rbxassetid://10734909016",
+	["package-search"] = "rbxassetid://10734909196",
+	["package-x"] = "rbxassetid://10734909375",
+	["paint-bucket"] = "rbxassetid://10734909847",
+	["paintbrush"] = "rbxassetid://10734910187",
+	["paintbrush-2"] = "rbxassetid://10734910030",
+	["palette"] = "rbxassetid://10734910430",
+	["palmtree"] = "rbxassetid://10734910680",
+	["paperclip"] = "rbxassetid://10734910927",
+	["party-popper"] = "rbxassetid://10734918735",
+	["pause"] = "rbxassetid://10734919336",
+	["pause-circle"] = "rbxassetid://10735024209",
+	["pause-octagon"] = "rbxassetid://10734919143",
+	["pen-tool"] = "rbxassetid://10734919503",
+	["pencil"] = "rbxassetid://10734919691",
+	["percent"] = "rbxassetid://10734919919",
+	["person-standing"] = "rbxassetid://10734920149",
+	["phone"] = "rbxassetid://10734921524",
+	["phone-call"] = "rbxassetid://10734920305",
+	["phone-forwarded"] = "rbxassetid://10734920508",
+	["phone-incoming"] = "rbxassetid://10734920694",
+	["phone-missed"] = "rbxassetid://10734920845",
+	["phone-off"] = "rbxassetid://10734921077",
+	["phone-outgoing"] = "rbxassetid://10734921288",
+	["pie-chart"] = "rbxassetid://10734921727",
+	["piggy-bank"] = "rbxassetid://10734921935",
+	["pin"] = "rbxassetid://10734922324",
+	["pin-off"] = "rbxassetid://10734922180",
+	["pipette"] = "rbxassetid://10734922497",
+	["pizza"] = "rbxassetid://10734922774",
+	["plane"] = "rbxassetid://10734922971",
+	["play"] = "rbxassetid://10734923549",
+	["play-circle"] = "rbxassetid://10734923214",
+	["plus"] = "rbxassetid://10734924532",
+	["plus-circle"] = "rbxassetid://10734923868",
+	["plus-square"] = "rbxassetid://10734924219",
+	["podcast"] = "rbxassetid://10734929553",
+	["pointer"] = "rbxassetid://10734929723",
+	["pound-sterling"] = "rbxassetid://10734929981",
+	["power"] = "rbxassetid://10734930466",
+	["power-off"] = "rbxassetid://10734930257",
+	["printer"] = "rbxassetid://10734930632",
+	["puzzle"] = "rbxassetid://10734930886",
+	["quote"] = "rbxassetid://10734931234",
+	["radio"] = "rbxassetid://10734931596",
+	["radio-receiver"] = "rbxassetid://10734931402",
+	["rectangle-horizontal"] = "rbxassetid://10734931777",
+	["rectangle-vertical"] = "rbxassetid://10734932081",
+	["recycle"] = "rbxassetid://10734932295",
+	["redo"] = "rbxassetid://10734932822",
+	["redo-2"] = "rbxassetid://10734932586",
+	["refresh-ccw"] = "rbxassetid://10734933056",
+	["refresh-cw"] = "rbxassetid://10734933222",
+	["refrigerator"] = "rbxassetid://10734933465",
+	["regex"] = "rbxassetid://10734933655",
+	["repeat"] = "rbxassetid://10734933966",
+	["repeat-1"] = "rbxassetid://10734933826",
+	["reply"] = "rbxassetid://10734934252",
+	["reply-all"] = "rbxassetid://10734934132",
+	["rewind"] = "rbxassetid://10734934347",
+	["rocket"] = "rbxassetid://10734934585",
+	["rocking-chair"] = "rbxassetid://10734939942",
+	["rotate-3d"] = "rbxassetid://10734940107",
+	["rotate-ccw"] = "rbxassetid://10734940376",
+	["rotate-cw"] = "rbxassetid://10734940654",
+	["rss"] = "rbxassetid://10734940825",
+	["ruler"] = "rbxassetid://10734941018",
+	["russian-ruble"] = "rbxassetid://10734941199",
+	["sailboat"] = "rbxassetid://10734941354",
+	["save"] = "rbxassetid://10734941499",
+	["scale"] = "rbxassetid://10734941912",
+	["scale-3d"] = "rbxassetid://10734941739",
+	["scaling"] = "rbxassetid://10734942072",
+	["scan"] = "rbxassetid://10734942565",
+	["scan-face"] = "rbxassetid://10734942198",
+	["scan-line"] = "rbxassetid://10734942351",
+	["scissors"] = "rbxassetid://10734942778",
+	["screen-share"] = "rbxassetid://10734943193",
+	["screen-share-off"] = "rbxassetid://10734942967",
+	["scroll"] = "rbxassetid://10734943448",
+	["search"] = "rbxassetid://10734943674",
+	["send"] = "rbxassetid://10734943902",
+	["separator-horizontal"] = "rbxassetid://10734944115",
+	["separator-vertical"] = "rbxassetid://10734944326",
+	["server"] = "rbxassetid://10734949856",
+	["server-cog"] = "rbxassetid://10734944444",
+	["server-crash"] = "rbxassetid://10734944554",
+	["server-off"] = "rbxassetid://10734944668",
+	["settings"] = "rbxassetid://10734950309",
+	["settings-2"] = "rbxassetid://10734950020",
+	["share"] = "rbxassetid://10734950813",
+	["share-2"] = "rbxassetid://10734950553",
+	["sheet"] = "rbxassetid://10734951038",
+	["shield"] = "rbxassetid://10734951847",
+	["shield-alert"] = "rbxassetid://10734951173",
+	["shield-check"] = "rbxassetid://10734951367",
+	["shield-close"] = "rbxassetid://10734951535",
+	["shield-off"] = "rbxassetid://10734951684",
+	["shirt"] = "rbxassetid://10734952036",
+	["shopping-bag"] = "rbxassetid://10734952273",
+	["shopping-cart"] = "rbxassetid://10734952479",
+	["shovel"] = "rbxassetid://10734952773",
+	["shower-head"] = "rbxassetid://10734952942",
+	["shrink"] = "rbxassetid://10734953073",
+	["shrub"] = "rbxassetid://10734953241",
+	["shuffle"] = "rbxassetid://10734953451",
+	["sidebar"] = "rbxassetid://10734954301",
+	["sidebar-close"] = "rbxassetid://10734953715",
+	["sidebar-open"] = "rbxassetid://10734954000",
+	["sigma"] = "rbxassetid://10734954538",
+	["signal"] = "rbxassetid://10734961133",
+	["signal-high"] = "rbxassetid://10734954807",
+	["signal-low"] = "rbxassetid://10734955080",
+	["signal-medium"] = "rbxassetid://10734955336",
+	["signal-zero"] = "rbxassetid://10734960878",
+	["siren"] = "rbxassetid://10734961284",
+	["skip-back"] = "rbxassetid://10734961526",
+	["skip-forward"] = "rbxassetid://10734961809",
+	["skull"] = "rbxassetid://10734962068",
+	["slack"] = "rbxassetid://10734962339",
+	["slash"] = "rbxassetid://10734962600",
+	["slice"] = "rbxassetid://10734963024",
+	["sliders"] = "rbxassetid://10734963400",
+	["sliders-horizontal"] = "rbxassetid://10734963191",
+	["smartphone"] = "rbxassetid://10734963940",
+	["smartphone-charging"] = "rbxassetid://10734963671",
+	["smile"] = "rbxassetid://10734964441",
+	["smile-plus"] = "rbxassetid://10734964188",
+	["snowflake"] = "rbxassetid://10734964600",
+	["sofa"] = "rbxassetid://10734964852",
+	["sort-asc"] = "rbxassetid://10734965115",
+	["sort-desc"] = "rbxassetid://10734965287",
+	["speaker"] = "rbxassetid://10734965419",
+	["sprout"] = "rbxassetid://10734965572",
+	["square"] = "rbxassetid://10734965702",
+	["star"] = "rbxassetid://10734966248",
+	["star-half"] = "rbxassetid://10734965897",
+	["star-off"] = "rbxassetid://10734966097",
+	["stethoscope"] = "rbxassetid://10734966384",
+	["sticker"] = "rbxassetid://10734972234",
+	["sticky-note"] = "rbxassetid://10734972463",
+	["stop-circle"] = "rbxassetid://10734972621",
+	["stretch-horizontal"] = "rbxassetid://10734972862",
+	["stretch-vertical"] = "rbxassetid://10734973130",
+	["strikethrough"] = "rbxassetid://10734973290",
+	["subscript"] = "rbxassetid://10734973457",
+	["sun"] = "rbxassetid://10734974297",
+	["sun-dim"] = "rbxassetid://10734973645",
+	["sun-medium"] = "rbxassetid://10734973778",
+	["sun-moon"] = "rbxassetid://10734973999",
+	["sun-snow"] = "rbxassetid://10734974130",
+	["sunrise"] = "rbxassetid://10734974522",
+	["sunset"] = "rbxassetid://10734974689",
+	["superscript"] = "rbxassetid://10734974850",
+	["swiss-franc"] = "rbxassetid://10734975024",
+	["switch-camera"] = "rbxassetid://10734975214",
+	["sword"] = "rbxassetid://10734975486",
+	["swords"] = "rbxassetid://10734975692",
+	["syringe"] = "rbxassetid://10734975932",
+	["table"] = "rbxassetid://10734976230",
+	["table-2"] = "rbxassetid://10734976097",
+	["tablet"] = "rbxassetid://10734976394",
+	["tag"] = "rbxassetid://10734976528",
+	["tags"] = "rbxassetid://10734976739",
+	["target"] = "rbxassetid://10734977012",
+	["tent"] = "rbxassetid://10734981750",
+	["terminal"] = "rbxassetid://10734982144",
+	["terminal-square"] = "rbxassetid://10734981995",
+	["text-cursor"] = "rbxassetid://10734982395",
+	["text-cursor-input"] = "rbxassetid://10734982297",
+	["thermometer"] = "rbxassetid://10734983134",
+	["thermometer-snowflake"] = "rbxassetid://10734982571",
+	["thermometer-sun"] = "rbxassetid://10734982771",
+	["thumbs-down"] = "rbxassetid://10734983359",
+	["thumbs-up"] = "rbxassetid://10734983629",
+	["ticket"] = "rbxassetid://10734983868",
+	["timer"] = "rbxassetid://10734984606",
+	["timer-off"] = "rbxassetid://10734984138",
+	["timer-reset"] = "rbxassetid://10734984355",
+	["toggle-left"] = "rbxassetid://10734984834",
+	["toggle-right"] = "rbxassetid://10734985040",
+	["tornado"] = "rbxassetid://10734985247",
+	["toy-brick"] = "rbxassetid://10747361919",
+	["train"] = "rbxassetid://10747362105",
+	["trash"] = "rbxassetid://10747362393",
+	["trash-2"] = "rbxassetid://10747362241",
+	["tree-deciduous"] = "rbxassetid://10747362534",
+	["tree-pine"] = "rbxassetid://10747362748",
+	["trees"] = "rbxassetid://10747363016",
+	["trending-down"] = "rbxassetid://10747363205",
+	["trending-up"] = "rbxassetid://10747363465",
+	["triangle"] = "rbxassetid://10747363621",
+	["trophy"] = "rbxassetid://10747363809",
+	["truck"] = "rbxassetid://10747364031",
+	["tv"] = "rbxassetid://10747364593",
+	["tv-2"] = "rbxassetid://10747364302",
+	["type"] = "rbxassetid://10747364761",
+	["umbrella"] = "rbxassetid://10747364971",
+	["underline"] = "rbxassetid://10747365191",
+	["undo"] = "rbxassetid://10747365484",
+	["undo-2"] = "rbxassetid://10747365359",
+	["unlink"] = "rbxassetid://10747365771",
+	["unlink-2"] = "rbxassetid://10747397871",
+	["unlock"] = "rbxassetid://10747366027",
+	["upload"] = "rbxassetid://10747366434",
+	["upload-cloud"] = "rbxassetid://10747366266",
+	["usb"] = "rbxassetid://10747366606",
+	["user"] = "rbxassetid://10747373176",
+	["user-check"] = "rbxassetid://10747371901",
+	["user-cog"] = "rbxassetid://10747372167",
+	["user-minus"] = "rbxassetid://10747372346",
+	["user-plus"] = "rbxassetid://10747372702",
+	["user-x"] = "rbxassetid://10747372992",
+	["users"] = "rbxassetid://10747373426",
+	["utensils"] = "rbxassetid://10747373821",
+	["utensils-crossed"] = "rbxassetid://10747373629",
+	["venetian-mask"] = "rbxassetid://10747374003",
+	["verified"] = "rbxassetid://10747374131",
+	["vibrate"] = "rbxassetid://10747374489",
+	["vibrate-off"] = "rbxassetid://10747374269",
+	["video"] = "rbxassetid://10747374938",
+	["video-off"] = "rbxassetid://10747374721",
+	["view"] = "rbxassetid://10747375132",
+	["voicemail"] = "rbxassetid://10747375281",
+	["volume"] = "rbxassetid://10747376008",
+	["volume-1"] = "rbxassetid://10747375450",
+	["volume-2"] = "rbxassetid://10747375679",
+	["volume-x"] = "rbxassetid://10747375880",
+	["wallet"] = "rbxassetid://10747376205",
+	["wand"] = "rbxassetid://10747376565",
+	["wand-2"] = "rbxassetid://10747376349",
+	["watch"] = "rbxassetid://10747376722",
+	["waves"] = "rbxassetid://10747376931",
+	["webcam"] = "rbxassetid://10747381992",
+	["wifi"] = "rbxassetid://10747382504",
+	["wifi-off"] = "rbxassetid://10747382268",
+	["wind"] = "rbxassetid://10747382750",
+	["wrap-text"] = "rbxassetid://10747383065",
+	["wrench"] = "rbxassetid://10747383470",
+	["x"] = "rbxassetid://10747384394",
+	["x-circle"] = "rbxassetid://10747383819",
+	["x-octagon"] = "rbxassetid://10747384037",
+	["x-square"] = "rbxassetid://10747384217",
+	["zoom-in"] = "rbxassetid://10747384552",
+	["zoom-out"] = "rbxassetid://10747384679",
+}
+
+return assets
 end)() end
 } -- [RefId] = Closure
 
@@ -9951,756 +7986,126 @@ local ObjectTree = {
         1,
         2,
         {
-            "quake"
+            "ProjectMadara"
         },
         {
             {
-                91,
+                18,
                 2,
                 {
-                    "preservedConfig"
+                    "lucide"
                 }
             },
             {
-                73,
-                1,
-                {
-                    "components"
-                },
-                {
-                    {
-                        76,
-                        2,
-                        {
-                            "newDropdown"
-                        }
-                    },
-                    {
-                        78,
-                        2,
-                        {
-                            "newKeybind"
-                        }
-                    },
-                    {
-                        74,
-                        2,
-                        {
-                            "newButton"
-                        }
-                    },
-                    {
-                        87,
-                        2,
-                        {
-                            "newWindow"
-                        }
-                    },
-                    {
-                        79,
-                        2,
-                        {
-                            "newLabel"
-                        }
-                    },
-                    {
-                        75,
-                        2,
-                        {
-                            "newColorPicker"
-                        }
-                    },
-                    {
-                        86,
-                        2,
-                        {
-                            "newToggle"
-                        }
-                    },
-                    {
-                        77,
-                        2,
-                        {
-                            "newGroup"
-                        }
-                    },
-                    {
-                        85,
-                        2,
-                        {
-                            "newTextBox"
-                        }
-                    },
-                    {
-                        80,
-                        2,
-                        {
-                            "newNotification"
-                        }
-                    },
-                    {
-                        84,
-                        2,
-                        {
-                            "newTab"
-                        }
-                    },
-                    {
-                        81,
-                        2,
-                        {
-                            "newParagraph"
-                        }
-                    },
-                    {
-                        83,
-                        2,
-                        {
-                            "newSlider"
-                        }
-                    },
-                    {
-                        82,
-                        2,
-                        {
-                            "newSection"
-                        }
-                    }
-                }
-            },
-            {
-                92,
+                3,
                 2,
                 {
-                    "project.story"
+                    "Config"
                 }
             },
             {
-                93,
-                1,
+                15,
+                2,
                 {
-                    "utilities"
-                },
-                {
-                    {
-                        96,
-                        2,
-                        {
-                            "customFunctions"
-                        }
-                    },
-                    {
-                        103,
-                        2,
-                        {
-                            "references"
-                        }
-                    },
-                    {
-                        94,
-                        2,
-                        {
-                            "animate"
-                        }
-                    },
-                    {
-                        104,
-                        2,
-                        {
-                            "tween"
-                        }
-                    },
-                    {
-                        102,
-                        2,
-                        {
-                            "randomString"
-                        }
-                    },
-                    {
-                        98,
-                        2,
-                        {
-                            "get"
-                        }
-                    },
-                    {
-                        101,
-                        2,
-                        {
-                            "matchColors"
-                        }
-                    },
-                    {
-                        100,
-                        2,
-                        {
-                            "lerpColor"
-                        }
-                    },
-                    {
-                        99,
-                        2,
-                        {
-                            "getStringBounds"
-                        }
-                    },
-                    {
-                        95,
-                        2,
-                        {
-                            "connections"
-                        }
-                    },
-                    {
-                        97,
-                        2,
-                        {
-                            "drag"
-                        }
-                    }
+                    "TextBox"
                 }
             },
             {
-                88,
-                1,
+                16,
+                2,
                 {
-                    "platforms"
-                },
+                    "Toggle"
+                }
+            },
+            {
+                8,
+                2,
                 {
-                    {
-                        90,
-                        2,
-                        {
-                            "mobile"
-                        }
-                    },
-                    {
-                        89,
-                        2,
-                        {
-                            "computer"
-                        }
-                    }
+                    "Loading"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "Label"
                 }
             },
             {
                 2,
-                1,
+                2,
                 {
-                    "Bundles"
-                },
+                    "Button"
+                }
+            },
+            {
+                4,
+                2,
                 {
-                    {
-                        57,
-                        2,
-                        {
-                            "betterMathModule"
-                        },
-                        {
-                            {
-                                67,
-                                3,
-                                {
-                                    "CLASS_Chance"
-                                }
-                            },
-                            {
-                                59,
-                                3,
-                                {
-                                    "CLASS_Sequence"
-                                }
-                            },
-                            {
-                                66,
-                                3,
-                                {
-                                    "Class_Special"
-                                }
-                            },
-                            {
-                                62,
-                                3,
-                                {
-                                    "CLASS_Check"
-                                }
-                            },
-                            {
-                                64,
-                                3,
-                                {
-                                    "CLASS_Matrix"
-                                }
-                            },
-                            {
-                                60,
-                                3,
-                                {
-                                    "CLASS_String"
-                                }
-                            },
-                            {
-                                63,
-                                3,
-                                {
-                                    "CLASS_Notation"
-                                }
-                            },
-                            {
-                                61,
-                                3,
-                                {
-                                    "CLASS_Convert"
-                                }
-                            },
-                            {
-                                65,
-                                3,
-                                {
-                                    "CLASS_Random"
-                                }
-                            },
-                            {
-                                58,
-                                3,
-                                {
-                                    "CLASS_Value"
-                                }
-                            }
-                        }
-                    },
-                    {
-                        68,
-                        2,
-                        {
-                            "data"
-                        }
-                    },
-                    {
-                        71,
-                        2,
-                        {
-                            "themeSystem"
-                        },
-                        {
-                            {
-                                72,
-                                2,
-                                {
-                                    "default"
-                                }
-                            }
-                        }
-                    },
-                    {
-                        69,
-                        2,
-                        {
-                            "icons"
-                        }
-                    },
-                    {
-                        70,
-                        2,
-                        {
-                            "services"
-                        }
-                    },
-                    {
-                        3,
-                        2,
-                        {
-                            "Fusion"
-                        },
-                        {
-                            {
-                                14,
-                                1,
-                                {
-                                    "Colour"
-                                },
-                                {
-                                    {
-                                        15,
-                                        2,
-                                        {
-                                            "Oklab"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                48,
-                                2,
-                                {
-                                    "Types"
-                                }
-                            },
-                            {
-                                40,
-                                1,
-                                {
-                                    "State"
-                                },
-                                {
-                                    {
-                                        46,
-                                        2,
-                                        {
-                                            "Value"
-                                        }
-                                    },
-                                    {
-                                        42,
-                                        2,
-                                        {
-                                            "ForKeys"
-                                        }
-                                    },
-                                    {
-                                        45,
-                                        2,
-                                        {
-                                            "Observer"
-                                        }
-                                    },
-                                    {
-                                        47,
-                                        2,
-                                        {
-                                            "unwrap"
-                                        }
-                                    },
-                                    {
-                                        43,
-                                        2,
-                                        {
-                                            "ForPairs"
-                                        }
-                                    },
-                                    {
-                                        44,
-                                        2,
-                                        {
-                                            "ForValues"
-                                        }
-                                    },
-                                    {
-                                        41,
-                                        2,
-                                        {
-                                            "Computed"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                4,
-                                1,
-                                {
-                                    "Animation"
-                                },
-                                {
-                                    {
-                                        5,
-                                        2,
-                                        {
-                                            "Spring"
-                                        }
-                                    },
-                                    {
-                                        8,
-                                        2,
-                                        {
-                                            "TweenScheduler"
-                                        }
-                                    },
-                                    {
-                                        11,
-                                        2,
-                                        {
-                                            "packType"
-                                        }
-                                    },
-                                    {
-                                        10,
-                                        2,
-                                        {
-                                            "lerpType"
-                                        }
-                                    },
-                                    {
-                                        13,
-                                        2,
-                                        {
-                                            "unpackType"
-                                        }
-                                    },
-                                    {
-                                        6,
-                                        2,
-                                        {
-                                            "SpringScheduler"
-                                        }
-                                    },
-                                    {
-                                        12,
-                                        2,
-                                        {
-                                            "springCoefficients"
-                                        }
-                                    },
-                                    {
-                                        7,
-                                        2,
-                                        {
-                                            "Tween"
-                                        }
-                                    },
-                                    {
-                                        9,
-                                        2,
-                                        {
-                                            "getTweenRatio"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                33,
-                                1,
-                                {
-                                    "Logging"
-                                },
-                                {
-                                    {
-                                        37,
-                                        2,
-                                        {
-                                            "messages"
-                                        }
-                                    },
-                                    {
-                                        35,
-                                        2,
-                                        {
-                                            "logErrorNonFatal"
-                                        }
-                                    },
-                                    {
-                                        38,
-                                        2,
-                                        {
-                                            "parseError"
-                                        }
-                                    },
-                                    {
-                                        36,
-                                        2,
-                                        {
-                                            "logWarn"
-                                        }
-                                    },
-                                    {
-                                        34,
-                                        2,
-                                        {
-                                            "logError"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                49,
-                                1,
-                                {
-                                    "Utility"
-                                },
-                                {
-                                    {
-                                        52,
-                                        2,
-                                        {
-                                            "doNothing"
-                                        }
-                                    },
-                                    {
-                                        54,
-                                        2,
-                                        {
-                                            "needsDestruction"
-                                        }
-                                    },
-                                    {
-                                        56,
-                                        2,
-                                        {
-                                            "xtypeof"
-                                        }
-                                    },
-                                    {
-                                        50,
-                                        2,
-                                        {
-                                            "None"
-                                        }
-                                    },
-                                    {
-                                        55,
-                                        2,
-                                        {
-                                            "restrictRead"
-                                        }
-                                    },
-                                    {
-                                        51,
-                                        2,
-                                        {
-                                            "cleanup"
-                                        }
-                                    },
-                                    {
-                                        53,
-                                        2,
-                                        {
-                                            "isSimilar"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                22,
-                                1,
-                                {
-                                    "Instances"
-                                },
-                                {
-                                    {
-                                        30,
-                                        2,
-                                        {
-                                            "Ref"
-                                        }
-                                    },
-                                    {
-                                        31,
-                                        2,
-                                        {
-                                            "applyInstanceProps"
-                                        }
-                                    },
-                                    {
-                                        25,
-                                        2,
-                                        {
-                                            "Hydrate"
-                                        }
-                                    },
-                                    {
-                                        28,
-                                        2,
-                                        {
-                                            "OnEvent"
-                                        }
-                                    },
-                                    {
-                                        32,
-                                        2,
-                                        {
-                                            "defaultProps"
-                                        }
-                                    },
-                                    {
-                                        26,
-                                        2,
-                                        {
-                                            "New"
-                                        }
-                                    },
-                                    {
-                                        23,
-                                        2,
-                                        {
-                                            "Children"
-                                        }
-                                    },
-                                    {
-                                        27,
-                                        2,
-                                        {
-                                            "OnChange"
-                                        }
-                                    },
-                                    {
-                                        24,
-                                        2,
-                                        {
-                                            "Cleanup"
-                                        }
-                                    },
-                                    {
-                                        29,
-                                        2,
-                                        {
-                                            "Out"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                16,
-                                1,
-                                {
-                                    "Dependencies"
-                                },
-                                {
-                                    {
-                                        19,
-                                        2,
-                                        {
-                                            "sharedState"
-                                        }
-                                    },
-                                    {
-                                        21,
-                                        2,
-                                        {
-                                            "useDependency"
-                                        }
-                                    },
-                                    {
-                                        20,
-                                        2,
-                                        {
-                                            "updateAll"
-                                        }
-                                    },
-                                    {
-                                        17,
-                                        2,
-                                        {
-                                            "captureDependencies"
-                                        }
-                                    },
-                                    {
-                                        18,
-                                        2,
-                                        {
-                                            "initDependency"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                39,
-                                2,
-                                {
-                                    "PubTypes"
-                                }
-                            }
-                        }
-                    }
+                    "DraggableKeybind"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "MobileFloatingIcon"
                 }
             }
         }
@@ -10710,88 +8115,23 @@ local ObjectTree = {
 -- Line offsets for debugging (only included when minifyTables is false)
 local LineOffsets = {
     8,
-    [3] = 183,
-    [5] = 257,
-    [6] = 475,
-    [7] = 568,
-    [8] = 704,
-    [9] = 779,
-    [10] = 822,
-    [11] = 984,
-    [12] = 1083,
-    [13] = 1169,
-    [15] = 1258,
-    [17] = 1313,
-    [18] = 1370,
-    [19] = 1399,
-    [20] = 1423,
-    [21] = 1483,
-    [23] = 1513,
-    [24] = 1662,
-    [25] = 1683,
-    [26] = 1703,
-    [27] = 1739,
-    [28] = 1774,
-    [29] = 1811,
-    [30] = 1855,
-    [31] = 1885,
-    [32] = 2012,
-    [34] = 2123,
-    [35] = 2156,
-    [36] = 2191,
-    [37] = 2215,
-    [38] = 2261,
-    [39] = 2284,
-    [41] = 2431,
-    [42] = 2545,
-    [43] = 2794,
-    [44] = 3104,
-    [45] = 3351,
-    [46] = 3435,
-    [47] = 3498,
-    [48] = 3514,
-    [50] = 3661,
-    [51] = 3675,
-    [52] = 3729,
-    [53] = 3740,
-    [54] = 3758,
-    [55] = 3771,
-    [56] = 3800,
-    [57] = 3820,
-    [68] = 5202,
-    [69] = 5282,
-    [70] = 5293,
-    [71] = 5305,
-    [72] = 5373,
-    [74] = 5384,
-    [75] = 5574,
-    [76] = 6237,
-    [77] = 6776,
-    [78] = 7037,
-    [79] = 7277,
-    [80] = 7355,
-    [81] = 7553,
-    [82] = 7687,
-    [83] = 7751,
-    [84] = 8098,
-    [85] = 8253,
-    [86] = 8556,
-    [87] = 8773,
-    [89] = 8827,
-    [90] = 9212,
-    [91] = 9523,
-    [92] = 9534,
-    [94] = 9754,
-    [95] = 9761,
-    [96] = 9780,
-    [97] = 9793,
-    [98] = 9839,
-    [99] = 9846,
-    [100] = 9857,
-    [101] = 9871,
-    [102] = 9878,
-    [103] = 9891,
-    [104] = 9939
+    107,
+    474,
+    674,
+    1127,
+    2054,
+    2795,
+    2871,
+    3324,
+    3645,
+    4041,
+    4170,
+    4352,
+    4622,
+    5167,
+    5361,
+    5779,
+    7158
 }
 
 -- Misc AOT variable imports
