@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- version 0.01.
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -7458,3 +7458,4 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
+
