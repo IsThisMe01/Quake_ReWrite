@@ -360,141 +360,170 @@ end
 return Button
 end)() end,
     function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
 local Config = {}
 Config.__index = Config
-function Config.new(gameName)
+
+function Config.new(window)
     local self = setmetatable({}, Config)
-    self.gameName = gameName or "ProjectMadara"
-    self.configFolder = "Project L | V2 By Project L Team"
-    self.configFileName = string.format("[%s].config", self.gameName)
-    self.configPath = string.format("%s/%s", self.configFolder, self.configFileName)
-    self.isFirstTime = false
-    self.isExecutor = isfolder ~= nil and makefolder ~= nil and writefile ~= nil and readfile ~= nil
-    self.isStudio = not self.isExecutor
-    self.configTemplate = {}
-    self:Initialize()
+    self.Window = window
+    self.PlaceId = tostring(game.PlaceId)
+    self.ConfigFolder = "ProjectMadara_" .. self.PlaceId
+    self.ConfigFile = self.ConfigFolder .. "/config.json"
+    self.Data = {}
+    
+    self:CreateConfigFolder()
+    
     return self
 end
-function Config:Initialize()
-    if self.isExecutor then
-        self:InitializeExecutor()
-    else
-        self:InitializeStudio()
-    end
-    if self.isFirstTime then
-        print("[INFO] First-time setup completed. Default configuration applied.")
-    else
-        print("[INFO] Configuration loaded successfully.")
+
+function Config:CreateConfigFolder()
+    if makefolder then
+        makefolder(self.ConfigFolder)
     end
 end
-function Config:InitializeExecutor()
-    print("[INFO] Running in Executor - using file system storage")
-    if not isfolder(self.configFolder) then
-        makefolder(self.configFolder)
-        self.isFirstTime = true
-        print("[DEBUG] Config folder created:", self.configFolder)
+
+function Config:SaveConfig()
+    if not writefile then
+        warn("Config System: writefile function not available")
+        return false
     end
-    if not isfile(self.configPath) then
-        writefile(self.configPath, HttpService:JSONEncode(self.configTemplate))
-        self.isFirstTime = true
-        print("[DEBUG] Config file created:", self.configPath)
-    end
+    
+    local configData = {
+        version = "2.0.0",
+        placeId = self.PlaceId,
+        timestamp = os.time(),
+        data = self.Data
+    }
+    
     local success, result = pcall(function()
-        return HttpService:JSONDecode(readfile(self.configPath))
+        local jsonData = HttpService:JSONEncode(configData)
+        writefile(self.ConfigFile, jsonData)
     end)
-    if success and result then
-        getgenv().config = result
-    else
-        getgenv().config = self.configTemplate
-        print("[WARNING] Failed to load config, using template")
-    end
-    if not getgenv().config then
-        getgenv().config = {}
-    end
-end
-function Config:InitializeStudio()
-    print("[INFO] Running in Roblox Studio - using memory storage")
-    print("[NOTE] Settings will persist until server restart in Studio")
-    if not _G.ProjectMadaraConfig then
-        _G.ProjectMadaraConfig = {}
-        self.isFirstTime = true
-    end
-    if not _G.ProjectMadaraConfig[self.gameName] then
-        _G.ProjectMadaraConfig[self.gameName] = self.configTemplate
-    end
-    getgenv().config = _G.ProjectMadaraConfig[self.gameName]
-end
-function Config:UpdateConfig()
-    if self.isExecutor then
-        self:UpdateConfigExecutor()
-    else
-        self:UpdateConfigStudio()
-    end
-end
-function Config:UpdateConfigExecutor()
-    local success, error = pcall(function()
-        writefile(self.configPath, HttpService:JSONEncode(getgenv().config))
-    end)
-    if not success then
-        warn("[ERROR] Failed to save config:", error)
-    end
-end
-function Config:UpdateConfigStudio()
-    _G.ProjectMadaraConfig[self.gameName] = getgenv().config
-end
-function Config:EnsureTabExists(tabName)
-    if not getgenv().config[tabName] then
-        getgenv().config[tabName] = {}
-    end
-end
-function Config:GetValue(tabName, componentName, defaultValue)
-    self:EnsureTabExists(tabName)
-    if getgenv().config[tabName][componentName] ~= nil then
-        return getgenv().config[tabName][componentName]
-    else
-        getgenv().config[tabName][componentName] = defaultValue
-        self:UpdateConfig()
-        return defaultValue
-    end
-end
-function Config:SetValue(tabName, componentName, value)
-    self:EnsureTabExists(tabName)
-    getgenv().config[tabName][componentName] = value
-    self:UpdateConfig()
-end
-function Config:EnableDataStoreInStudio(dataStoreName)
-    if not self.isStudio then return end
-    local DataStoreService = game:GetService("DataStoreService")
-    local success, dataStore = pcall(function()
-        return DataStoreService:GetDataStore(dataStoreName or "ProjectMadaraConfig")
-    end)
+    
     if success then
-        self.dataStore = dataStore
-        print("[INFO] DataStore enabled for persistent storage in Studio")
-        local loadSuccess, savedData = pcall(function()
-            return self.dataStore:GetAsync(self.gameName)
-        end)
-        if loadSuccess and savedData then
-            getgenv().config = savedData
-            _G.ProjectMadaraConfig[self.gameName] = savedData
-            print("[INFO] Config loaded from DataStore")
-        end
+        print("Config saved successfully to:", self.ConfigFile)
+        return true
     else
-        warn("[WARNING] Failed to enable DataStore:", dataStore)
+        warn("Config System: Failed to save config:", result)
+        return false
     end
 end
-function Config:UpdateConfigStudio()
-    _G.ProjectMadaraConfig[self.gameName] = getgenv().config
-    if self.dataStore then
-        local success, error = pcall(function()
-            self.dataStore:SetAsync(self.gameName, getgenv().config)
-        end)
-        if not success then
-            warn("[WARNING] Failed to save to DataStore:", error)
+
+function Config:LoadConfig()
+    if not readfile or not isfile then
+        warn("Config System: readfile or isfile function not available")
+        return false
+    end
+    
+    if not isfile(self.ConfigFile) then
+        print("Config System: No existing config found, creating new one")
+        return false
+    end
+    
+    local success, result = pcall(function()
+        local jsonData = readfile(self.ConfigFile)
+        local configData = HttpService:JSONDecode(jsonData)
+        
+        if configData.placeId == self.PlaceId then
+            self.Data = configData.data or {}
+            return true
+        else
+            warn("Config System: PlaceId mismatch, creating new config")
+            return false
+        end
+    end)
+    
+    if success and result then
+        print("Config loaded successfully from:", self.ConfigFile)
+        self:ApplyConfig()
+        return true
+    else
+        warn("Config System: Failed to load config:", result)
+        return false
+    end
+end
+
+function Config:ApplyConfig()
+    -- Apply config to all tabs and their components
+    for _, tab in ipairs(self.Window.Tabs) do
+        self:ApplyTabConfig(tab)
+    end
+end
+
+function Config:ApplyTabConfig(tab)
+    local tabData = self.Data[tab.Name] or {}
+    
+    -- Apply config to all components in the tab
+    for _, component in ipairs(tab.Components) do
+        local componentKey = component.Name
+        local savedValue = tabData[componentKey]
+        
+        if savedValue ~= nil then
+            self:ApplyComponentConfig(component, savedValue)
         end
     end
 end
+
+function Config:ApplyComponentConfig(component, value)
+    if component.Type == "Toggle" then
+        component:SetValue(value)
+    elseif component.Type == "Slider" then
+        component:SetValue(value)
+    elseif component.Type == "Dropdown" then
+        if component.Multiselect then
+            -- For multiselect dropdowns, value should be a table
+            if type(value) == "table" then
+                component.Selected = {}
+                for _, item in ipairs(value) do
+                    component.Selected[item] = true
+                end
+                component:UpdateSelectedText()
+                component:UpdateSelectAllButtonText()
+            end
+        else
+            -- For single select dropdowns
+            component:SetValue(value)
+        end
+    elseif component.Type == "TextBox" then
+        component:SetValue(value)
+    end
+end
+
+function Config:SaveComponentValue(tabName, componentName, value)
+    if not self.Data[tabName] then
+        self.Data[tabName] = {}
+    end
+    
+    self.Data[tabName][componentName] = value
+    
+    -- Auto-save after each change
+    self:SaveConfig()
+end
+
+function Config:GetComponentValue(tabName, componentName, defaultValue)
+    if self.Data[tabName] and self.Data[tabName][componentName] ~= nil then
+        return self.Data[tabName][componentName]
+    end
+    return defaultValue
+end
+
+function Config:ClearConfig()
+    self.Data = {}
+    self:SaveConfig()
+    print("Config System: Configuration cleared")
+end
+
+function Config:DeleteConfig()
+    if delfile and isfile and isfile(self.ConfigFile) then
+        delfile(self.ConfigFile)
+        print("Config System: Configuration file deleted")
+    end
+    if delfolder and isfolder and isfolder(self.ConfigFolder) then
+        delfolder(self.ConfigFolder)
+        print("Config System: Configuration folder deleted")
+    end
+end
+
 return Config
 end)() end,
     function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
@@ -1361,6 +1390,7 @@ function Dropdown.new(options, tab)
     local self = setmetatable({}, Dropdown)
     self.Tab = tab
     self.Library = tab.Library
+    self.Type = "Dropdown"
     self.Name = options.Name or "Dropdown"
     self.Description = options.Description or ""
     self.Items = options.Items or {}
@@ -1822,6 +1852,10 @@ function Dropdown:SelectItem(item)
                 table.insert(selectedItems, selectedItem)
             end
         end
+        -- Save to config if enabled
+        if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+            self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, selectedItems)
+        end
         self.Callback(selectedItems)
     else
         local oldSelected = self.Selected
@@ -1849,6 +1883,10 @@ function Dropdown:SelectItem(item)
         end
         self:UpdateSelectedText()
         self:Toggle(false)
+        -- Save to config if enabled
+        if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+            self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, item)
+        end
         self.Callback(item)
     end
 end
@@ -2034,6 +2072,10 @@ function Dropdown:ClearAllSelections()
     end
     self:UpdateSelectedText()
     self:UpdateSelectAllButtonText()
+    -- Save to config if enabled
+    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, {})
+    end
     self.Callback({})
 end
 function Dropdown:SelectAllItems()
@@ -2079,6 +2121,10 @@ function Dropdown:SelectAllItems()
             table.insert(selectedItems, item)
         end
     end
+    -- Save to config if enabled
+    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, selectedItems)
+    end
     self.Callback(selectedItems)
 end
 function Dropdown:ToggleSelectAll()
@@ -2103,6 +2149,23 @@ function Dropdown:ToggleSelectAll()
     
     -- Update the button text based on new state
     self:UpdateSelectAllButtonText()
+end
+function Dropdown:SetValue(value)
+    if self.Multiselect then
+        self.Selected = {}
+        if type(value) == "table" then
+            for _, item in ipairs(value) do
+                self.Selected[item] = true
+            end
+        end
+    else
+        self.Selected = value
+    end
+    self:UpdateSelectedText()
+    if self.Multiselect then
+        self:UpdateSelectAllButtonText()
+    end
+    return self
 end
 function Dropdown:UpdateSelectAllButtonText()
     if not self.Multiselect or not self.SelectAllButton then return end
@@ -3907,6 +3970,7 @@ function Slider.new(options, tab)
     local self = setmetatable({}, Slider)
     self.Tab = tab
     self.Library = tab.Library
+    self.Type = "Slider"
     self.Name = options.Name or "Slider"
     self.Description = options.Description or "" 
     self.Min = options.Min or 0
@@ -4081,7 +4145,21 @@ function Slider:UpdateValue(value)
     local percent = (value - self.Min) / (self.Max - self.Min)
     self.SliderFill.Size = UDim2.new(percent, 0, 1, 0)
     self.SliderIndicator.Position = UDim2.new(percent, 0, 0.5, 0)
+    -- Save to config if enabled
+    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, value)
+    end
     self.Callback(value)
+    return self
+end
+function Slider:SetValue(value)
+    value = math.clamp(value, self.Min, self.Max)
+    value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
+    self.Value = value
+    self.ValueLabel.Text = self:FormatValue(value)
+    local percent = (value - self.Min) / (self.Max - self.Min)
+    self.SliderFill.Size = UDim2.new(percent, 0, 1, 0)
+    self.SliderIndicator.Position = UDim2.new(percent, 0, 0.5, 0)
     return self
 end
 return Slider
@@ -4097,6 +4175,7 @@ function Tab.new(options, window)
     self.Color = options.tabColor or self.Library.Colors.Accent
     self.Icon = options.Icon or ""
     self.Elements = {}
+    self.Components = {} -- Track components for config system
     self.OptionsManager = options.OptionsManager
     self:Create()
     return self
@@ -4436,6 +4515,7 @@ function Tab:Toggle(options)
     options.Callback = options.Callback or function() end
     local toggle = require(script.Parent.Toggle).new(options, self)
     table.insert(self.Elements, toggle)
+    table.insert(self.Components, toggle) -- Track for config system
     if self.OptionsManager then
         self.OptionsManager:RegisterToggle(options.Name, toggle)
     end
@@ -4456,6 +4536,7 @@ function Tab:TextBox(options)
     options.Callback = options.Callback or function() end
     local textbox = require(script.Parent.TextBox).new(options, self)
     table.insert(self.Elements, textbox)
+    table.insert(self.Components, textbox) -- Track for config system
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, textbox)
     end
@@ -4471,6 +4552,7 @@ function Tab:Slider(options)
     options.Callback = options.Callback or function() end
     local slider = require(script.Parent.Slider).new(options, self)
     table.insert(self.Elements, slider)
+    table.insert(self.Components, slider) -- Track for config system
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, slider)
     end
@@ -4485,6 +4567,7 @@ function Tab:Dropdown(options)
     options.Callback = options.Callback or function() end
     local dropdown = require(script.Parent.Dropdown).new(options, self)
     table.insert(self.Elements, dropdown)
+    table.insert(self.Components, dropdown) -- Track for config system
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, dropdown)
     end
@@ -4524,6 +4607,7 @@ function TextBox.new(options, tab)
     local self = setmetatable({}, TextBox)
     self.Tab = tab
     self.Library = tab.Library
+    self.Type = "TextBox"
     self.Name = options.Name or "TextBox"
     self.Placeholder = options.Placeholder or "Type here..."
     self.Value = ""
@@ -4625,6 +4709,10 @@ function TextBox:Create()
         )
         borderTween:Play()
         self.Value = self.Input.Text
+        -- Save to config if enabled
+        if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+            self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, self.Value)
+        end
         self.Callback(self.Value)
     end)
     self.Container.MouseEnter:Connect(function()
@@ -4660,6 +4748,10 @@ end
 function TextBox:SetValue(value)
     self.Value = value
     self.Input.Text = value
+    -- Save to config if enabled
+    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, value)
+    end
     self.Callback(value)
     return self
 end
@@ -4672,6 +4764,7 @@ function Toggle.new(options, tab)
     local self = setmetatable({}, Toggle)
     self.Tab = tab
     self.Library = tab.Library
+    self.Type = "Toggle"
     self.Name = options.Name or "Toggle"
     self.Description = options.Description or "" 
     self.HasKeybind = options.Keybind or false 
@@ -4926,6 +5019,12 @@ function Toggle:SetValue(value, callCallback)
         )
         bgTween:Play()
     end
+    
+    -- Save to config if enabled
+    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, self.Value)
+    end
+    
     if callCallback then
         self.Callback(self.Value)
     end
@@ -4989,7 +5088,21 @@ function Window.new(options, library)
     self.Tabs = {}
     self.ActiveTab = nil
     self.OptionsManager = options.OptionsManager
+    self.ConfigEnabled = options.Config or false
+    
+    -- Initialize config system if enabled
+    if self.ConfigEnabled then
+        local Config = require(script.Parent.Config)
+        self.Config = Config.new(self)
+    end
+    
     self:CreateGui()
+    
+    -- Load config after GUI is created
+    if self.ConfigEnabled and self.Config then
+        self.Config:LoadConfig()
+    end
+    
     return self
 end
 function Window:CreateGui()
@@ -6024,6 +6137,20 @@ function Window:FilterComponents(searchText)
         self.ActiveTab:FilterComponents(searchText)
     end
 end
+
+function Window:SaveComponentConfig(tabName, componentName, value)
+    if self.ConfigEnabled and self.Config then
+        self.Config:SaveComponentValue(tabName, componentName, value)
+    end
+end
+
+function Window:GetComponentConfig(tabName, componentName, defaultValue)
+    if self.ConfigEnabled and self.Config then
+        return self.Config:GetComponentValue(tabName, componentName, defaultValue)
+    end
+    return defaultValue
+end
+
 return Window
 end)() end,
     function()local wax,script,require=ImportGlobals(19)local ImportGlobals return (function(...)local assets = {
@@ -6861,10 +6988,66 @@ local ObjectTree = {
         },
         {
             {
-                6,
+                3,
                 2,
                 {
-                    "Dropdown"
+                    "Config"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
                 }
             },
             {
@@ -6872,6 +7055,34 @@ local ObjectTree = {
                 2,
                 {
                     "MobileFloatingIcon"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
                 }
             },
             {
@@ -6889,48 +7100,6 @@ local ObjectTree = {
                 }
             },
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
                 11,
                 2,
                 {
@@ -6938,52 +7107,10 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                7,
                 2,
                 {
-                    "Loading"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
+                    "FloatingControls"
                 }
             }
         }
@@ -6995,22 +7122,22 @@ local LineOffsets = {
     8,
     88,
     362,
-    500,
-    1018,
-    1356,
-    2128,
-    2710,
-    2764,
-    3108,
-    3355,
-    3658,
-    3755,
-    3893,
-    4089,
-    4519,
-    4668,
-    4979,
-    6029
+    530,
+    1048,
+    1386,
+    2192,
+    2774,
+    2828,
+    3172,
+    3419,
+    3722,
+    3819,
+    3957,
+    4168,
+    4603,
+    4761,
+    5079,
+    6157
 }
 
 -- Misc AOT variable imports
