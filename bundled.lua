@@ -497,7 +497,525 @@ function Config:UpdateConfigStudio()
 end
 return Config
 end)() end,
-    function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local Credits = {}
+Credits.__index = Credits
+
+function Credits.new(options, tab)
+    local self = setmetatable({}, Credits)
+    self.Tab = tab
+    self.Library = tab.Library
+    self.Title = options.Title or "Credits"
+    self.Subtitle = options.Subtitle or "Meet the amazing team behind this project"
+    self.Developers = options.Developers or {}
+    self.DiscordInvite = options.DiscordInvite or ""
+    self.ProjectInfo = options.ProjectInfo or {}
+    self:Create()
+    return self
+end
+
+function Credits:Create()
+    -- Main Credits Container
+    self.Container = Instance.new("Frame")
+    self.Container.Name = "CreditsContainer"
+    self.Container.Size = UDim2.new(1, 0, 0, 0)
+    self.Container.BackgroundTransparency = 1
+    self.Container.BorderSizePixel = 0
+    self.Container.AutomaticSize = Enum.AutomaticSize.Y
+    self.Container.Parent = self.Tab.Container
+
+    local layout = Instance.new("UIListLayout")
+    layout.FillDirection = Enum.FillDirection.Vertical
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 12)
+    layout.Parent = self.Container
+
+    -- Header Section
+    self:CreateHeader()
+    
+    -- Project Info Section
+    if next(self.ProjectInfo) then
+        self:CreateProjectInfo()
+    end
+    
+    -- Developers Section
+    if #self.Developers > 0 then
+        self:CreateDevelopersSection()
+    end
+    
+    -- Discord Section
+    if self.DiscordInvite ~= "" then
+        self:CreateDiscordSection()
+    end
+    
+    -- Footer
+    self:CreateFooter()
+    
+    return self
+end
+
+function Credits:CreateHeader()
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Name = "Header"
+    headerFrame.Size = UDim2.new(1, 0, 0, 80)
+    headerFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 30)
+    headerFrame.BorderSizePixel = 0
+    headerFrame.LayoutOrder = 1
+    headerFrame.Parent = self.Container
+
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 12)
+    headerCorner.Parent = headerFrame
+
+    local headerBorder = Instance.new("UIStroke")
+    headerBorder.Color = Color3.fromRGB(0, 120, 215)
+    headerBorder.Thickness = 1
+    headerBorder.Transparency = 0.7
+    headerBorder.Parent = headerFrame
+
+    -- Animated gradient background
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 50, 200)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 120, 215))
+    }
+    gradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.9),
+        NumberSequenceKeypoint.new(0.5, 0.95),
+        NumberSequenceKeypoint.new(1, 0.9)
+    }
+    gradient.Rotation = 45
+    gradient.Parent = headerFrame
+
+    -- Animate gradient
+    local gradientTween = TweenService:Create(
+        gradient,
+        TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Rotation = 225}
+    )
+    gradientTween:Play()
+
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "Title"
+    titleLabel.Size = UDim2.new(1, -24, 0, 32)
+    titleLabel.Position = UDim2.new(0, 12, 0, 12)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = self.Title
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 24
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    titleLabel.Parent = headerFrame
+
+    -- Subtitle
+    local subtitleLabel = Instance.new("TextLabel")
+    subtitleLabel.Name = "Subtitle"
+    subtitleLabel.Size = UDim2.new(1, -24, 0, 20)
+    subtitleLabel.Position = UDim2.new(0, 12, 0, 48)
+    subtitleLabel.BackgroundTransparency = 1
+    subtitleLabel.Text = self.Subtitle
+    subtitleLabel.TextColor3 = Color3.fromRGB(180, 200, 220)
+    subtitleLabel.TextSize = 14
+    subtitleLabel.Font = Enum.Font.Gotham
+    subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    subtitleLabel.Parent = headerFrame
+end
+
+function Credits:CreateProjectInfo()
+    local infoFrame = Instance.new("Frame")
+    infoFrame.Name = "ProjectInfo"
+    infoFrame.Size = UDim2.new(1, 0, 0, 0)
+    infoFrame.BackgroundTransparency = 1
+    infoFrame.BorderSizePixel = 0
+    infoFrame.AutomaticSize = Enum.AutomaticSize.Y
+    infoFrame.LayoutOrder = 2
+    infoFrame.Parent = self.Container
+
+    local infoLayout = Instance.new("UIListLayout")
+    infoLayout.FillDirection = Enum.FillDirection.Vertical
+    infoLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    infoLayout.Padding = UDim.new(0, 8)
+    infoLayout.Parent = infoFrame
+
+    for key, value in pairs(self.ProjectInfo) do
+        local infoItem = Instance.new("Frame")
+        infoItem.Name = key
+        infoItem.Size = UDim2.new(1, 0, 0, 36)
+        infoItem.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
+        infoItem.BorderSizePixel = 0
+        infoItem.Parent = infoFrame
+
+        local itemCorner = Instance.new("UICorner")
+        itemCorner.CornerRadius = UDim.new(0, 8)
+        itemCorner.Parent = infoItem
+
+        local keyLabel = Instance.new("TextLabel")
+        keyLabel.Name = "Key"
+        keyLabel.Size = UDim2.new(0.4, -12, 1, 0)
+        keyLabel.Position = UDim2.new(0, 12, 0, 0)
+        keyLabel.BackgroundTransparency = 1
+        keyLabel.Text = key .. ":"
+        keyLabel.TextColor3 = Color3.fromRGB(160, 180, 200)
+        keyLabel.TextSize = 13
+        keyLabel.Font = Enum.Font.GothamSemibold
+        keyLabel.TextXAlignment = Enum.TextXAlignment.Left
+        keyLabel.Parent = infoItem
+
+        local valueLabel = Instance.new("TextLabel")
+        valueLabel.Name = "Value"
+        valueLabel.Size = UDim2.new(0.6, -12, 1, 0)
+        valueLabel.Position = UDim2.new(0.4, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = tostring(value)
+        valueLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+        valueLabel.TextSize = 13
+        valueLabel.Font = Enum.Font.Gotham
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+        valueLabel.Parent = infoItem
+    end
+end
+
+function Credits:CreateDevelopersSection()
+    -- Section Title
+    local sectionTitle = Instance.new("TextLabel")
+    sectionTitle.Name = "DevelopersTitle"
+    sectionTitle.Size = UDim2.new(1, 0, 0, 24)
+    sectionTitle.BackgroundTransparency = 1
+    sectionTitle.Text = "👨‍💻 Development Team"
+    sectionTitle.TextColor3 = Color3.fromRGB(240, 245, 250)
+    sectionTitle.TextSize = 16
+    sectionTitle.Font = Enum.Font.GothamBold
+    sectionTitle.TextXAlignment = Enum.TextXAlignment.Left
+    sectionTitle.LayoutOrder = 3
+    sectionTitle.Parent = self.Container
+
+    -- Developers Grid
+    local devsFrame = Instance.new("Frame")
+    devsFrame.Name = "Developers"
+    devsFrame.Size = UDim2.new(1, 0, 0, 0)
+    devsFrame.BackgroundTransparency = 1
+    devsFrame.BorderSizePixel = 0
+    devsFrame.AutomaticSize = Enum.AutomaticSize.Y
+    devsFrame.LayoutOrder = 4
+    devsFrame.Parent = self.Container
+
+    local devsLayout = Instance.new("UIListLayout")
+    devsLayout.FillDirection = Enum.FillDirection.Vertical
+    devsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    devsLayout.Padding = UDim.new(0, 8)
+    devsLayout.Parent = devsFrame
+
+    for i, dev in ipairs(self.Developers) do
+        self:CreateDeveloperCard(dev, devsFrame, i)
+    end
+end
+
+function Credits:CreateDeveloperCard(dev, parent, order)
+    local devCard = Instance.new("Frame")
+    devCard.Name = "DevCard" .. order
+    devCard.Size = UDim2.new(1, 0, 0, 72)
+    devCard.BackgroundColor3 = Color3.fromRGB(28, 32, 38)
+    devCard.BorderSizePixel = 0
+    devCard.LayoutOrder = order
+    devCard.Parent = parent
+
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 12)
+    cardCorner.Parent = devCard
+
+    local cardBorder = Instance.new("UIStroke")
+    cardBorder.Color = Color3.fromRGB(45, 50, 58)
+    cardBorder.Thickness = 1
+    cardBorder.Parent = devCard
+
+    -- Avatar/Icon
+    local avatarFrame = Instance.new("Frame")
+    avatarFrame.Name = "Avatar"
+    avatarFrame.Size = UDim2.new(0, 48, 0, 48)
+    avatarFrame.Position = UDim2.new(0, 12, 0.5, 0)
+    avatarFrame.AnchorPoint = Vector2.new(0, 0.5)
+    avatarFrame.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    avatarFrame.BorderSizePixel = 0
+    avatarFrame.Parent = devCard
+
+    local avatarCorner = Instance.new("UICorner")
+    avatarCorner.CornerRadius = UDim.new(1, 0)
+    avatarCorner.Parent = avatarFrame
+
+    -- Avatar gradient
+    local avatarGradient = Instance.new("UIGradient")
+    avatarGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, dev.Color or Color3.fromRGB(0, 120, 215)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 50, 200))
+    }
+    avatarGradient.Rotation = 45
+    avatarGradient.Parent = avatarFrame
+
+    -- Avatar Text/Initial
+    local avatarText = Instance.new("TextLabel")
+    avatarText.Name = "AvatarText"
+    avatarText.Size = UDim2.new(1, 0, 1, 0)
+    avatarText.BackgroundTransparency = 1
+    avatarText.Text = dev.Initial or string.sub(dev.Name or "?", 1, 1):upper()
+    avatarText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    avatarText.TextSize = 20
+    avatarText.Font = Enum.Font.GothamBold
+    avatarText.TextXAlignment = Enum.TextXAlignment.Center
+    avatarText.TextYAlignment = Enum.TextYAlignment.Center
+    avatarText.Parent = avatarFrame
+
+    -- Developer Info
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Name = "Name"
+    nameLabel.Size = UDim2.new(0, 200, 0, 20)
+    nameLabel.Position = UDim2.new(0, 72, 0, 16)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = dev.Name or "Unknown Developer"
+    nameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
+    nameLabel.TextSize = 15
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = devCard
+
+    local roleLabel = Instance.new("TextLabel")
+    roleLabel.Name = "Role"
+    roleLabel.Size = UDim2.new(0, 200, 0, 16)
+    roleLabel.Position = UDim2.new(0, 72, 0, 38)
+    roleLabel.BackgroundTransparency = 1
+    roleLabel.Text = dev.Role or "Developer"
+    roleLabel.TextColor3 = Color3.fromRGB(160, 180, 200)
+    roleLabel.TextSize = 12
+    roleLabel.Font = Enum.Font.Gotham
+    roleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    roleLabel.Parent = devCard
+
+    -- Status Badge
+    if dev.Status then
+        local statusBadge = Instance.new("Frame")
+        statusBadge.Name = "StatusBadge"
+        statusBadge.Size = UDim2.new(0, 8, 0, 8)
+        statusBadge.Position = UDim2.new(1, -16, 0, 16)
+        statusBadge.BackgroundColor3 = dev.Status == "Online" and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(120, 120, 120)
+        statusBadge.BorderSizePixel = 0
+        statusBadge.Parent = devCard
+
+        local statusCorner = Instance.new("UICorner")
+        statusCorner.CornerRadius = UDim.new(1, 0)
+        statusCorner.Parent = statusBadge
+    end
+
+    -- Hover Effects
+    local button = Instance.new("TextButton")
+    button.Name = "HoverButton"
+    button.Size = UDim2.new(1, 0, 1, 0)
+    button.BackgroundTransparency = 1
+    button.Text = ""
+    button.Parent = devCard
+
+    button.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            devCard,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(35, 40, 48)}
+        )
+        hoverTween:Play()
+        
+        local borderTween = TweenService:Create(
+            cardBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215)}
+        )
+        borderTween:Play()
+    end)
+
+    button.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            devCard,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 32, 38)}
+        )
+        leaveTween:Play()
+        
+        local borderTween = TweenService:Create(
+            cardBorder,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(45, 50, 58)}
+        )
+        borderTween:Play()
+    end)
+end
+
+function Credits:CreateDiscordSection()
+    -- Section Title
+    local sectionTitle = Instance.new("TextLabel")
+    sectionTitle.Name = "CommunityTitle"
+    sectionTitle.Size = UDim2.new(1, 0, 0, 24)
+    sectionTitle.BackgroundTransparency = 1
+    sectionTitle.Text = "💬 Join Our Community"
+    sectionTitle.TextColor3 = Color3.fromRGB(240, 245, 250)
+    sectionTitle.TextSize = 16
+    sectionTitle.Font = Enum.Font.GothamBold
+    sectionTitle.TextXAlignment = Enum.TextXAlignment.Left
+    sectionTitle.LayoutOrder = 5
+    sectionTitle.Parent = self.Container
+
+    -- Discord Button
+    local discordButton = Instance.new("TextButton")
+    discordButton.Name = "DiscordButton"
+    discordButton.Size = UDim2.new(1, 0, 0, 56)
+    discordButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+    discordButton.BorderSizePixel = 0
+    discordButton.Text = ""
+    discordButton.LayoutOrder = 6
+    discordButton.Parent = self.Container
+
+    local discordCorner = Instance.new("UICorner")
+    discordCorner.CornerRadius = UDim.new(0, 12)
+    discordCorner.Parent = discordButton
+
+    -- Discord gradient
+    local discordGradient = Instance.new("UIGradient")
+    discordGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(88, 101, 242)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(114, 137, 218))
+    }
+    discordGradient.Rotation = 45
+    discordGradient.Parent = discordButton
+
+    -- Discord Icon
+    local discordIcon = Instance.new("TextLabel")
+    discordIcon.Name = "Icon"
+    discordIcon.Size = UDim2.new(0, 32, 0, 32)
+    discordIcon.Position = UDim2.new(0, 16, 0.5, 0)
+    discordIcon.AnchorPoint = Vector2.new(0, 0.5)
+    discordIcon.BackgroundTransparency = 1
+    discordIcon.Text = "🎮"
+    discordIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+    discordIcon.TextSize = 24
+    discordIcon.Font = Enum.Font.GothamBold
+    discordIcon.TextXAlignment = Enum.TextXAlignment.Center
+    discordIcon.TextYAlignment = Enum.TextYAlignment.Center
+    discordIcon.Parent = discordButton
+
+    -- Discord Text
+    local discordText = Instance.new("TextLabel")
+    discordText.Name = "Text"
+    discordText.Size = UDim2.new(1, -64, 0, 20)
+    discordText.Position = UDim2.new(0, 56, 0, 12)
+    discordText.BackgroundTransparency = 1
+    discordText.Text = "Join Discord Server"
+    discordText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    discordText.TextSize = 16
+    discordText.Font = Enum.Font.GothamBold
+    discordText.TextXAlignment = Enum.TextXAlignment.Left
+    discordText.Parent = discordButton
+
+    local discordSubtext = Instance.new("TextLabel")
+    discordSubtext.Name = "Subtext"
+    discordSubtext.Size = UDim2.new(1, -64, 0, 16)
+    discordSubtext.Position = UDim2.new(0, 56, 0, 32)
+    discordSubtext.BackgroundTransparency = 1
+    discordSubtext.Text = "Connect with the community and get support"
+    discordSubtext.TextColor3 = Color3.fromRGB(220, 230, 240)
+    discordSubtext.TextSize = 12
+    discordSubtext.Font = Enum.Font.Gotham
+    discordSubtext.TextXAlignment = Enum.TextXAlignment.Left
+    discordSubtext.Parent = discordButton
+
+    -- Click to copy invite
+    discordButton.MouseButton1Click:Connect(function()
+        if setclipboard then
+            setclipboard(self.DiscordInvite)
+            -- Show feedback
+            discordText.Text = "✅ Invite Copied!"
+            wait(2)
+            discordText.Text = "Join Discord Server"
+        end
+    end)
+
+    -- Hover effects
+    discordButton.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            discordButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 0, 60)}
+        )
+        hoverTween:Play()
+    end)
+
+    discordButton.MouseLeave:Connect(function()
+        local leaveTween = TweenService:Create(
+            discordButton,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 0, 56)}
+        )
+        leaveTween:Play()
+    end)
+end
+
+function Credits:CreateFooter()
+    local footerFrame = Instance.new("Frame")
+    footerFrame.Name = "Footer"
+    footerFrame.Size = UDim2.new(1, 0, 0, 48)
+    footerFrame.BackgroundColor3 = Color3.fromRGB(18, 22, 28)
+    footerFrame.BorderSizePixel = 0
+    footerFrame.LayoutOrder = 7
+    footerFrame.Parent = self.Container
+
+    local footerCorner = Instance.new("UICorner")
+    footerCorner.CornerRadius = UDim.new(0, 8)
+    footerCorner.Parent = footerFrame
+
+    local footerText = Instance.new("TextLabel")
+    footerText.Name = "FooterText"
+    footerText.Size = UDim2.new(1, -24, 1, 0)
+    footerText.Position = UDim2.new(0, 12, 0, 0)
+    footerText.BackgroundTransparency = 1
+    footerText.Text = "Made with ❤️ using ProjectMadara UI Library"
+    footerText.TextColor3 = Color3.fromRGB(140, 160, 180)
+    footerText.TextSize = 12
+    footerText.Font = Enum.Font.GothamMedium
+    footerText.TextXAlignment = Enum.TextXAlignment.Center
+    footerText.TextYAlignment = Enum.TextYAlignment.Center
+    footerText.Parent = footerFrame
+
+    -- Sparkle animation
+    spawn(function()
+        while footerFrame.Parent do
+            local sparkle = Instance.new("Frame")
+            sparkle.Name = "Sparkle"
+            sparkle.Size = UDim2.new(0, 2, 0, 2)
+            sparkle.Position = UDim2.new(math.random(0, 100) / 100, 0, math.random(0, 100) / 100, 0)
+            sparkle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            sparkle.BorderSizePixel = 0
+            sparkle.Parent = footerFrame
+
+            local sparkleCorner = Instance.new("UICorner")
+            sparkleCorner.CornerRadius = UDim.new(1, 0)
+            sparkleCorner.Parent = sparkle
+
+            local sparkleTween = TweenService:Create(
+                sparkle,
+                TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 1, Size = UDim2.new(0, 8, 0, 8)}
+            )
+            sparkleTween:Play()
+            
+            sparkleTween.Completed:Connect(function()
+                sparkle:Destroy()
+            end)
+            
+            wait(math.random(1, 3))
+        end
+    end)
+end
+
+return Credits
+end)() end,
+    function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local DraggableKeybind = {}
@@ -835,7 +1353,7 @@ function DraggableKeybind.RemoveAll()
 end
 return DraggableKeybind
 end)() end,
-    function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Dropdown = {}
 Dropdown.__index = Dropdown
@@ -1558,7 +2076,7 @@ function Dropdown:SelectAllItems()
 end
 return Dropdown
 end)() end,
-    function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -2140,7 +2658,7 @@ function FloatingControls:AddButton(options)
 end
 return FloatingControls
 end)() end,
-    function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)local Label = {}
+    function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)local Label = {}
 Label.__index = Label
 function Label.new(options, tab)
     local self = setmetatable({}, Label)
@@ -2194,7 +2712,7 @@ function Label:SetText(text)
 end
 return Label
 end)() end,
-    function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Loading = {}
@@ -2538,7 +3056,7 @@ function Loading:CompleteLoading()
 end
 return Loading
 end)() end,
-    function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local MobileFloatingIcon = {}
@@ -2785,7 +3303,7 @@ function MobileFloatingIcon:Hide()
 end
 return MobileFloatingIcon
 end)() end,
-    function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local Notifications = {}
 Notifications.__index = Notifications
@@ -3088,7 +3606,7 @@ function Notifications:Info(title, content, duration)
 end
 return Notifications
 end)() end,
-    function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)local OptionsManager = {}
+    function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)local OptionsManager = {}
 OptionsManager.__index = OptionsManager
 
 function OptionsManager.new()
@@ -3185,7 +3703,7 @@ end
 
 return OptionsManager
 end)() end,
-    function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Paragraph = {}
 Paragraph.__index = Paragraph
 function Paragraph.new(options, tab)
@@ -3323,7 +3841,7 @@ function Paragraph:SetContent(content)
 end
 return Paragraph
 end)() end,
-    function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
+    function()local wax,script,require=ImportGlobals(14)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Slider = {}
 Slider.__index = Slider
@@ -3519,7 +4037,7 @@ function Slider:UpdateValue(value)
 end
 return Slider
 end)() end,
-    function()local wax,script,require=ImportGlobals(14)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Tab = {}
 Tab.__index = Tab
 function Tab.new(options, window)
@@ -3936,9 +4454,20 @@ function Tab:Paragraph(options)
     table.insert(self.Elements, paragraph)
     return paragraph
 end
+function Tab:Credits(options)
+    options = options or {}
+    options.Title = options.Title or "Credits"
+    options.Subtitle = options.Subtitle or "Meet the amazing team behind this project"
+    options.Developers = options.Developers or {}
+    options.DiscordInvite = options.DiscordInvite or ""
+    options.ProjectInfo = options.ProjectInfo or {}
+    local credits = require(script.Parent.Credits).new(options, self)
+    table.insert(self.Elements, credits)
+    return credits
+end
 return Tab
 end)() end,
-    function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
+    function()local wax,script,require=ImportGlobals(16)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local TextBox = {}
 TextBox.__index = TextBox
@@ -4087,7 +4616,7 @@ function TextBox:SetValue(value)
 end
 return TextBox
 end)() end,
-    function()local wax,script,require=ImportGlobals(16)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Toggle = {}
 Toggle.__index = Toggle
 function Toggle.new(options, tab)
@@ -4398,7 +4927,7 @@ function Toggle:CreateDraggableKeybind()
 end
 return Toggle
 end)() end,
-    function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Window = {}
@@ -5448,7 +5977,7 @@ function Window:FilterComponents(searchText)
 end
 return Window
 end)() end,
-    function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)local assets = {
+    function()local wax,script,require=ImportGlobals(19)local ImportGlobals return (function(...)local assets = {
 	["accessibility"] = "rbxassetid://10709751939",
 	["activity"] = "rbxassetid://10709752035",
 	["air-vent"] = "rbxassetid://10709752131",
@@ -6283,21 +6812,28 @@ local ObjectTree = {
         },
         {
             {
-                8,
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                9,
                 2,
                 {
                     "Loading"
                 }
             },
             {
-                11,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                13,
+                14,
                 2,
                 {
                     "Slider"
@@ -6307,49 +6843,49 @@ local ObjectTree = {
                 10,
                 2,
                 {
-                    "Notifications"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "Toggle"
+                    "MobileFloatingIcon"
                 }
             },
             {
                 12,
                 2,
                 {
+                    "OptionsManager"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                13,
+                2,
+                {
                     "Paragraph"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             },
             {
@@ -6360,45 +6896,45 @@ local ObjectTree = {
                 }
             },
             {
-                15,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
                 4,
                 2,
                 {
-                    "DraggableKeybind"
+                    "Credits"
                 }
             },
             {
-                14,
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                15,
                 2,
                 {
                     "Tab"
                 }
             },
             {
-                6,
+                19,
                 2,
                 {
-                    "FloatingControls"
+                    "lucide"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
                 }
             }
         }
@@ -6411,20 +6947,21 @@ local LineOffsets = {
     88,
     362,
     500,
-    838,
-    1561,
-    2143,
-    2197,
-    2541,
-    2788,
-    3091,
-    3188,
-    3326,
-    3522,
-    3941,
-    4090,
-    4401,
-    5451
+    1018,
+    1356,
+    2079,
+    2661,
+    2715,
+    3059,
+    3306,
+    3609,
+    3706,
+    3844,
+    4040,
+    4470,
+    4619,
+    4930,
+    5980
 }
 
 -- Misc AOT variable imports
