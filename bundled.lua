@@ -5,48 +5,35 @@ local ImportGlobals
 
 -- Holds direct closure data (defining this before the DOM tree for line debugging etc)
 local ClosureBindings = {
-    function()local wax,script,require=ImportGlobals(1)local ImportGlobals return (function(...)--[[
-    ProjectMadara UI Library
-    A modern UI library for Roblox
-]]
-
-local ProjectMadara = {}
+    function()local wax,script,require=ImportGlobals(1)local ImportGlobals return (function(...)local ProjectMadara = {}
 local Components = {}
 
--- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local TextService = game:GetService("TextService")
 
--- Constants
 local TWEEN_INFO = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local COLORS = {
-    Background = Color3.fromRGB(32, 37, 44), -- Main background - Darius style
-    DarkBackground = Color3.fromRGB(28, 32, 38), -- Component backgrounds - darker
-    LightText = Color3.fromRGB(255, 255, 255), -- Primary text
-    DarkText = Color3.fromRGB(170, 175, 185), -- Secondary text - better contrast
-    Accent = Color3.fromRGB(88, 166, 255), -- Modern blue accent like Darius
-    Toggle = Color3.fromRGB(88, 166, 255), -- Toggle active color - modern blue
-    Hover = Color3.fromRGB(38, 43, 50), -- Hover state - subtle
-    Border = Color3.fromRGB(45, 50, 57), -- Borders - modern
-    Red = Color3.fromRGB(255, 85, 85), -- Close button - modern red
+    Background = Color3.fromRGB(32, 37, 44),
+    DarkBackground = Color3.fromRGB(28, 32, 38),
+    LightText = Color3.fromRGB(255, 255, 255),
+    DarkText = Color3.fromRGB(170, 175, 185),
+    Accent = Color3.fromRGB(88, 166, 255),
+    Toggle = Color3.fromRGB(88, 166, 255),
+    Hover = Color3.fromRGB(38, 43, 50),
+    Border = Color3.fromRGB(45, 50, 57),
+    Red = Color3.fromRGB(255, 85, 85),
 }
 
--- Load components
 for _, componentName in ipairs({"Window", "Tab", "Toggle", "Button", "TextBox", "Slider", "Dropdown", "Label", "Paragraph", "Loading", "FloatingControls", "MobileFloatingIcon", "DraggableKeybind"}) do
     Components[componentName] = require(script:WaitForChild(componentName))
 end
 
--- Load notification system
 Components.Notifications = require(script:WaitForChild("Notifications"))
--- Load options manager
 Components.OptionsManager = require(script:WaitForChild("OptionsManager"))
--- Config system disabled for now
--- Components.Config = require(script:WaitForChild("Config"))
 
--- Create a new window
 function ProjectMadara:Window(options)
     options = options or {}
     options.Title = options.Title or "ProjectMadara UI"
@@ -54,29 +41,24 @@ function ProjectMadara:Window(options)
     return Components.Window.new(options, self)
 end
 
--- Create options manager
 function ProjectMadara:CreateOptionsManager()
     return Components.OptionsManager.new()
 end
 
--- Create a loading screen
 function ProjectMadara:Loading(options)
     options = options or {}
     
     return Components.Loading.new(options, self)
 end
 
--- Create floating controls
 function ProjectMadara:FloatingControls(options)
     options = options or {}
     
     return Components.FloatingControls.new(options, self)
 end
 
--- Initialize global notification system
 ProjectMadara.Notifications = Components.Notifications.new()
 
--- Notification convenience methods
 function ProjectMadara:ShowNotification(options)
     return self.Notifications:Show(options)
 end
@@ -97,71 +79,48 @@ function ProjectMadara:Info(title, content, duration)
     return self.Notifications:Info(title, content, duration)
 end
 
--- Expose components and utilities
 ProjectMadara.Components = Components
 ProjectMadara.Colors = COLORS
 ProjectMadara.TweenInfo = TWEEN_INFO
 
 return ProjectMadara
 end)() end,
-    function()local wax,script,require=ImportGlobals(2)local ImportGlobals return (function(...)--[[
-    Button Component
-    A clickable button UI element
-]]
-
-local TweenService = game:GetService("TweenService")
-
+    function()local wax,script,require=ImportGlobals(2)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Button = {}
 Button.__index = Button
-
 function Button.new(options, tab)
     local self = setmetatable({}, Button)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "Button"
-    self.Description = options.Description or "" -- Add subtitle support
-    self.HasKeybind = options.Keybind or false -- Keybind support
-    self.Keybind = nil -- Will be set by user
+    self.Description = options.Description or "" 
+    self.HasKeybind = options.Keybind or false 
+    self.Keybind = nil 
     self.IsListeningForKeybind = false
     self.Callback = options.Callback or function() end
-    
-    -- Create the button UI
     self:Create()
-    
-    -- Setup keybind system if enabled
     if self.HasKeybind then
         self:SetupKeybindSystem()
     end
-    
     return self
 end
-
 function Button:Create()
-    -- Main container with modern styling
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Button"
     self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Modern border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(55, 60, 67)
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = self.Container
-    
-    -- Button left icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
     self.ButtonLeftIcon.Size = UDim2.new(0, 22, 0, 22)
@@ -170,8 +129,6 @@ function Button:Create()
     self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
     self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.ButtonLeftIcon.Parent = self.Container
-    
-    -- Button text
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
     self.ButtonText.Size = UDim2.new(0, 200, 0, 22)
@@ -183,8 +140,6 @@ function Button:Create()
     self.ButtonText.Font = Enum.Font.GothamSemibold
     self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
     self.ButtonText.Parent = self.Container
-    
-    -- Button description
     if self.Description ~= "" then
         self.ButtonDescription = Instance.new("TextLabel")
         self.ButtonDescription.Name = "Description"
@@ -198,8 +153,6 @@ function Button:Create()
         self.ButtonDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.ButtonDescription.Parent = self.Container
     end
-    
-    -- Keybind button (if enabled)
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
@@ -213,66 +166,44 @@ function Button:Create()
         self.KeybindButton.Font = Enum.Font.GothamBold
         self.KeybindButton.BorderSizePixel = 0
         self.KeybindButton.Parent = self.Container
-
-        -- Keybind button corner radius
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = self.KeybindButton
-        
-        -- Keybind button functionality handled by drag detection below
-        -- Stop event propagation to prevent button activation
         self.KeybindButton.MouseButton1Down:Connect(function()
-            -- This prevents the click from bubbling to the main button
         end)
-        
-        -- Drag out functionality for all platforms
         local UserInputService = game:GetService("UserInputService")
         local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        
-        -- Variables for drag detection
         local isDragging = false
         local dragStart = nil
         local pressTime = 0
         local hasMovedEnough = false
         local dragConnection = nil
-        
-        -- Variables for connections
         local releaseConnection = nil
-        
-        -- Mouse/Touch down
         self.KeybindButton.MouseButton1Down:Connect(function()
             isDragging = true
             dragStart = UserInputService:GetMouseLocation()
             pressTime = tick()
             hasMovedEnough = false
-            print("Button keybind drag started") -- Debug
-            
-            -- Clean up any existing connections
+            print("Button keybind drag started") 
             if dragConnection then
                 dragConnection:Disconnect()
             end
             if releaseConnection then
                 releaseConnection:Disconnect()
             end
-            
-            -- Connect to mouse movement
             dragConnection = UserInputService.InputChanged:Connect(function(input)
                 if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
                     local currentPos = Vector2.new(input.Position.X, input.Position.Y)
                     local distance = (currentPos - dragStart).Magnitude
-                    if distance > 15 then -- Reduced threshold
+                    if distance > 15 then 
                         hasMovedEnough = true
-                        print("Button keybind moved enough:", distance) -- Debug
+                        print("Button keybind moved enough:", distance) 
                     end
                 end
             end)
-            
-            -- Connect to global mouse release
             releaseConnection = UserInputService.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
-                    print("Button keybind mouse released") -- Debug
-                    
-                    -- Clean up connections
+                    print("Button keybind mouse released") 
                     if releaseConnection then
                         releaseConnection:Disconnect()
                         releaseConnection = nil
@@ -281,69 +212,52 @@ function Button:Create()
                         dragConnection:Disconnect()
                         dragConnection = nil
                     end
-                    
                     local holdTime = tick() - pressTime
-                    print("Button keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) -- Debug
-                    
-                    -- Create draggable if: moved enough OR held long enough
+                    print("Button keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) 
                     if hasMovedEnough or holdTime > 0.5 then
-                        print("Creating draggable button keybind") -- Debug
+                        print("Creating draggable button keybind") 
                         self:CreateDraggableKeybind()
                     elseif holdTime < 0.3 then
-                        -- Quick click - start keybind listening
-                        print("Starting keybind listening") -- Debug
+                        print("Starting keybind listening") 
                         self:StartKeybindListening()
                     end
-                    
                     isDragging = false
                     dragStart = nil
                     hasMovedEnough = false
                 end
             end)
         end)
-        
-        -- Right click for PC users (alternative method)
         self.KeybindButton.MouseButton2Click:Connect(function()
-            print("Right click - creating draggable button keybind") -- Debug
+            print("Right click - creating draggable button keybind") 
             self:CreateDraggableKeybind()
         end)
-        
-        -- Keybind button hover effects
         self.KeybindButton.MouseEnter:Connect(function()
             if not self.IsListeningForKeybind then
                 self.KeybindButton.BackgroundColor3 = Color3.fromRGB(65, 70, 77)
             end
         end)
-        
         self.KeybindButton.MouseLeave:Connect(function()
             if not self.IsListeningForKeybind then
                 self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
             end
         end)
     end
-    
-    -- Button right icon (fingerprint)
     self.ButtonIcon = Instance.new("ImageLabel")
     self.ButtonIcon.Name = "Icon"
     self.ButtonIcon.Size = UDim2.new(0, 24, 0, 24)
-    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -84 or -34, 0.5, 0) -- Adjust position if keybind exists
+    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -84 or -34, 0.5, 0) 
     self.ButtonIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.ButtonIcon.BackgroundTransparency = 1
-    self.ButtonIcon.Image = (success and Lucide and Lucide["fingerprint"]) or "rbxassetid://10723375250" -- fallback fingerprint icon
+    self.ButtonIcon.Image = (success and Lucide and Lucide["fingerprint"]) or "rbxassetid://10723375250" 
     self.ButtonIcon.ImageColor3 = self.Library.Colors.LightText
     self.ButtonIcon.Parent = self.Container
-    
-    -- Button for interaction (exclude keybind area)
     self.ButtonInteraction = Instance.new("TextButton")
     self.ButtonInteraction.Name = "Interaction"
-    self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -50 or 0, 1, 0) -- Exclude keybind button area
+    self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -50 or 0, 1, 0) 
     self.ButtonInteraction.BackgroundTransparency = 1
     self.ButtonInteraction.Text = ""
     self.ButtonInteraction.Parent = self.Container
-    
-    -- Click effect
     local clickEffect = function()
-        -- Create a ripple effect
         local ripple = Instance.new("Frame")
         ripple.Name = "Ripple"
         ripple.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -353,32 +267,23 @@ function Button:Create()
         ripple.BorderSizePixel = 0
         ripple.Size = UDim2.new(0, 0, 0, 0)
         ripple.Parent = self.Container
-        
-        -- Apply corner radius to ripple
         local rippleCorner = Instance.new("UICorner")
         rippleCorner.CornerRadius = UDim.new(1, 0)
         rippleCorner.Parent = ripple
-        
-        -- Animate the ripple
         local expandTween = TweenService:Create(
             ripple,
             TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = UDim2.new(1.5, 0, 1.5, 0), BackgroundTransparency = 1}
         )
         expandTween:Play()
-        
         expandTween.Completed:Connect(function()
             ripple:Destroy()
         end)
     end
-    
-    -- Button click handler
     self.ButtonInteraction.MouseButton1Click:Connect(function()
         clickEffect()
         self.Callback()
     end)
-    
-    -- Modern hover effects
     self.ButtonInteraction.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
@@ -386,7 +291,6 @@ function Button:Create()
             {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -394,7 +298,6 @@ function Button:Create()
         )
         borderTween:Play()
     end)
-    
     self.ButtonInteraction.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
@@ -402,7 +305,6 @@ function Button:Create()
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -410,54 +312,41 @@ function Button:Create()
         )
         borderTween:Play()
     end)
-    
     return self
 end
-
 function Button:SetupKeybindSystem()
     local UserInputService = game:GetService("UserInputService")
-    
-    -- Listen for keybind input
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
-        
         if self.IsListeningForKeybind then
-            -- Set new keybind
             self.Keybind = input.KeyCode
             self.IsListeningForKeybind = false
             self:UpdateKeybindDisplay()
             self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
             return
         end
-        
-        -- Check if pressed key matches button keybind
         if self.Keybind and input.KeyCode == self.Keybind then
             self.Callback()
         end
     end)
 end
-
 function Button:StartKeybindListening()
     self.IsListeningForKeybind = true
     self.KeybindButton.Text = "..."
-    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent -- Accent color when listening
+    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent 
 end
-
 function Button:UpdateKeybindDisplay()
     if self.Keybind then
-        -- Convert KeyCode to readable text
         local keyName = tostring(self.Keybind):gsub("Enum.KeyCode.", "")
         self.KeybindButton.Text = keyName:upper()
-        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 -- Bigger text for all keys
+        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 
     else
         self.KeybindButton.Text = "⌨"
     end
 end
-
 function Button:CreateDraggableKeybind()
-    print("Button:CreateDraggableKeybind called for:", self.Name) -- Debug
+    print("Button:CreateDraggableKeybind called for:", self.Name) 
     local DraggableKeybind = require(script.Parent.DraggableKeybind)
-    
     local draggable = DraggableKeybind.CreateFromButton(
         self.KeybindButton,
         "Button",
@@ -466,115 +355,76 @@ function Button:CreateDraggableKeybind()
         nil,
         nil
     )
-    print("Draggable button created:", draggable) -- Debug
+    print("Draggable button created:", draggable) 
 end
-
 return Button
 end)() end,
-    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)--[[
-    Config System for ProjectMadara UI Library
-    Automatically saves and loads component settings
-    Works in both Roblox Studio and Executors
-]]
-
-local HttpService = game:GetService("HttpService")
+    function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-
 local Config = {}
 Config.__index = Config
-
 function Config.new(gameName)
     local self = setmetatable({}, Config)
-    
     self.gameName = gameName or "ProjectMadara"
     self.configFolder = "Project L | V2 By Project L Team"
     self.configFileName = string.format("[%s].config", self.gameName)
     self.configPath = string.format("%s/%s", self.configFolder, self.configFileName)
     self.isFirstTime = false
-    
-    -- Detect environment (Studio vs Executor)
     self.isExecutor = isfolder ~= nil and makefolder ~= nil and writefile ~= nil and readfile ~= nil
     self.isStudio = not self.isExecutor
-    
-    -- Initialize config template
     self.configTemplate = {}
-    
-    -- Initialize the config system
     self:Initialize()
-    
     return self
 end
-
 function Config:Initialize()
     if self.isExecutor then
         self:InitializeExecutor()
     else
         self:InitializeStudio()
     end
-    
     if self.isFirstTime then
         print("[INFO] First-time setup completed. Default configuration applied.")
     else
         print("[INFO] Configuration loaded successfully.")
     end
 end
-
 function Config:InitializeExecutor()
-    -- Executor environment - use file system
     print("[INFO] Running in Executor - using file system storage")
-    
-    -- Create folder if it doesn't exist
     if not isfolder(self.configFolder) then
         makefolder(self.configFolder)
         self.isFirstTime = true
         print("[DEBUG] Config folder created:", self.configFolder)
     end
-    
-    -- Create config file if it doesn't exist
     if not isfile(self.configPath) then
         writefile(self.configPath, HttpService:JSONEncode(self.configTemplate))
         self.isFirstTime = true
         print("[DEBUG] Config file created:", self.configPath)
     end
-    
-    -- Load existing config
     local success, result = pcall(function()
         return HttpService:JSONDecode(readfile(self.configPath))
     end)
-    
     if success and result then
         getgenv().config = result
     else
         getgenv().config = self.configTemplate
         print("[WARNING] Failed to load config, using template")
     end
-    
-    -- Ensure getgenv().config exists
     if not getgenv().config then
         getgenv().config = {}
     end
 end
-
 function Config:InitializeStudio()
-    -- Studio environment - use DataStore or simple memory storage
     print("[INFO] Running in Roblox Studio - using memory storage")
     print("[NOTE] Settings will persist until server restart in Studio")
-    
-    -- Use _G for persistent storage in Studio (resets on server restart)
     if not _G.ProjectMadaraConfig then
         _G.ProjectMadaraConfig = {}
         self.isFirstTime = true
     end
-    
-    -- Use _G instead of getgenv() in Studio
     if not _G.ProjectMadaraConfig[self.gameName] then
         _G.ProjectMadaraConfig[self.gameName] = self.configTemplate
     end
-    
-    -- Create a reference for easier access
     getgenv().config = _G.ProjectMadaraConfig[self.gameName]
 end
-
 function Config:UpdateConfig()
     if self.isExecutor then
         self:UpdateConfigExecutor()
@@ -582,66 +432,49 @@ function Config:UpdateConfig()
         self:UpdateConfigStudio()
     end
 end
-
 function Config:UpdateConfigExecutor()
     local success, error = pcall(function()
         writefile(self.configPath, HttpService:JSONEncode(getgenv().config))
     end)
-    
     if not success then
         warn("[ERROR] Failed to save config:", error)
     end
 end
-
 function Config:UpdateConfigStudio()
-    -- In Studio, just update the _G storage
     _G.ProjectMadaraConfig[self.gameName] = getgenv().config
-    -- Note: This will persist until server restart in Studio
 end
-
 function Config:EnsureTabExists(tabName)
     if not getgenv().config[tabName] then
         getgenv().config[tabName] = {}
     end
 end
-
 function Config:GetValue(tabName, componentName, defaultValue)
     self:EnsureTabExists(tabName)
-    
     if getgenv().config[tabName][componentName] ~= nil then
         return getgenv().config[tabName][componentName]
     else
-        -- Set default value if it doesn't exist
         getgenv().config[tabName][componentName] = defaultValue
         self:UpdateConfig()
         return defaultValue
     end
 end
-
 function Config:SetValue(tabName, componentName, value)
     self:EnsureTabExists(tabName)
     getgenv().config[tabName][componentName] = value
     self:UpdateConfig()
 end
-
--- Optional: Add DataStore support for Studio (for persistent storage across server restarts)
 function Config:EnableDataStoreInStudio(dataStoreName)
     if not self.isStudio then return end
-    
     local DataStoreService = game:GetService("DataStoreService")
     local success, dataStore = pcall(function()
         return DataStoreService:GetDataStore(dataStoreName or "ProjectMadaraConfig")
     end)
-    
     if success then
         self.dataStore = dataStore
         print("[INFO] DataStore enabled for persistent storage in Studio")
-        
-        -- Try to load from DataStore
         local loadSuccess, savedData = pcall(function()
             return self.dataStore:GetAsync(self.gameName)
         end)
-        
         if loadSuccess and savedData then
             getgenv().config = savedData
             _G.ProjectMadaraConfig[self.gameName] = savedData
@@ -651,85 +484,57 @@ function Config:EnableDataStoreInStudio(dataStoreName)
         warn("[WARNING] Failed to enable DataStore:", dataStore)
     end
 end
-
--- Override UpdateConfigStudio to use DataStore if available
 function Config:UpdateConfigStudio()
-    -- Update _G storage
     _G.ProjectMadaraConfig[self.gameName] = getgenv().config
-    
-    -- Also save to DataStore if available
     if self.dataStore then
         local success, error = pcall(function()
             self.dataStore:SetAsync(self.gameName, getgenv().config)
         end)
-        
         if not success then
             warn("[WARNING] Failed to save to DataStore:", error)
         end
     end
 end
-
 return Config
 end)() end,
-    function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)--[[
-    Draggable Keybind Component
-    Allows keybind buttons to be dragged out of the main UI and used as floating buttons
-]]
-
-local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(4)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
 local DraggableKeybind = {}
 DraggableKeybind.__index = DraggableKeybind
-
--- Global storage for dragged keybinds
 local DraggedKeybinds = {}
 local DraggedKeybindsGui = nil
-
 function DraggableKeybind.new(options)
     local self = setmetatable({}, DraggableKeybind)
-    
     self.Name = options.Name or "Keybind"
     self.Callback = options.Callback or function() end
-    self.OriginalButton = options.OriginalButton -- Reference to the original keybind button
-    self.ComponentType = options.ComponentType or "Button" -- "Button" or "Toggle"
-    self.ToggleValue = options.ToggleValue -- For toggles
-    self.SetToggleValue = options.SetToggleValue -- For toggles
+    self.OriginalButton = options.OriginalButton 
+    self.ComponentType = options.ComponentType or "Button" 
+    self.ToggleValue = options.ToggleValue 
+    self.SetToggleValue = options.SetToggleValue 
     self.IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    
-    -- Create the dragged keybind GUI if it doesn't exist
     if not DraggedKeybindsGui then
         self:CreateDraggedKeybindsGui()
     end
-    
-    -- Create the floating keybind
     self:CreateFloatingKeybind()
-    
     return self
 end
-
 function DraggableKeybind:CreateDraggedKeybindsGui()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
     DraggedKeybindsGui = Instance.new("ScreenGui")
     DraggedKeybindsGui.Name = "DraggedKeybinds"
     DraggedKeybindsGui.ResetOnSpawn = false
     DraggedKeybindsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     DraggedKeybindsGui.Parent = playerGui
 end
-
 function DraggableKeybind:CreateFloatingKeybind()
-    -- Create floating keybind container
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "FloatingKeybind"
     self.Container.Size = UDim2.new(0, self.IsMobile and 70 or 60, 0, self.IsMobile and 70 or 60)
     self.Container.Position = UDim2.new(0, math.random(100, 300), 0, math.random(150, 400))
     self.Container.BackgroundTransparency = 1
     self.Container.Parent = DraggedKeybindsGui
-    
-    -- Main floating button
     self.FloatingButton = Instance.new("TextButton")
     self.FloatingButton.Name = "FloatingButton"
     self.FloatingButton.Size = UDim2.new(1, -6, 1, -6)
@@ -738,20 +543,14 @@ function DraggableKeybind:CreateFloatingKeybind()
     self.FloatingButton.Text = ""
     self.FloatingButton.BorderSizePixel = 0
     self.FloatingButton.Parent = self.Container
-    
-    -- Circular shape
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(1, 0)
     corner.Parent = self.FloatingButton
-    
-    -- Premium border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(255, 255, 255)
     border.Thickness = 2
     border.Transparency = 0.6
     border.Parent = self.FloatingButton
-    
-    -- Shadow effect
     local shadow = Instance.new("Frame")
     shadow.Name = "Shadow"
     shadow.Size = UDim2.new(1, 8, 1, 8)
@@ -761,24 +560,19 @@ function DraggableKeybind:CreateFloatingKeybind()
     shadow.BorderSizePixel = 0
     shadow.ZIndex = self.FloatingButton.ZIndex - 1
     shadow.Parent = self.FloatingButton
-    
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(1, 0)
     shadowCorner.Parent = shadow
-    
-    -- Icon using first letter of the component name
     self.Icon = Instance.new("TextLabel")
     self.Icon.Size = UDim2.new(1, 0, 1, 0)
     self.Icon.BackgroundTransparency = 1
-    self.Icon.Text = string.upper(string.sub(self.Name, 1, 1)) -- First letter of name
+    self.Icon.Text = string.upper(string.sub(self.Name, 1, 1)) 
     self.Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.Icon.TextSize = self.IsMobile and 28 or 24
     self.Icon.Font = Enum.Font.GothamBold
     self.Icon.TextXAlignment = Enum.TextXAlignment.Center
     self.Icon.TextYAlignment = Enum.TextYAlignment.Center
     self.Icon.Parent = self.FloatingButton
-    
-    -- Name label (appears on hover/touch)
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "NameLabel"
     self.NameLabel.Size = UDim2.new(0, 120, 0, 24)
@@ -794,72 +588,51 @@ function DraggableKeybind:CreateFloatingKeybind()
     self.NameLabel.BorderSizePixel = 0
     self.NameLabel.Visible = false
     self.NameLabel.Parent = self.Container
-    
     local labelCorner = Instance.new("UICorner")
     labelCorner.CornerRadius = UDim.new(0, 6)
     labelCorner.Parent = self.NameLabel
-    
     local labelBorder = Instance.new("UIStroke")
     labelBorder.Color = Color3.fromRGB(40, 45, 52)
     labelBorder.Thickness = 1
     labelBorder.Parent = self.NameLabel
-    
-    -- Toggle state indicator (for toggles only)
     if self.ComponentType == "Toggle" then
         self.StateIndicator = Instance.new("Frame")
         self.StateIndicator.Size = UDim2.new(0, 12, 0, 12)
         self.StateIndicator.Position = UDim2.new(1, -8, 0, -4)
-        self.StateIndicator.BackgroundColor3 = Color3.fromRGB(255, 60, 60) -- Red for off
+        self.StateIndicator.BackgroundColor3 = Color3.fromRGB(255, 60, 60) 
         self.StateIndicator.BorderSizePixel = 0
         self.StateIndicator.Parent = self.FloatingButton
-        
         local stateCorner = Instance.new("UICorner")
         stateCorner.CornerRadius = UDim.new(1, 0)
         stateCorner.Parent = self.StateIndicator
-        
-        -- Update state indicator
         self:UpdateToggleState()
     end
-    
-    -- Close button (much bigger and easier to click)
     self.CloseButton = Instance.new("TextButton")
-    self.CloseButton.Size = UDim2.new(0, 30, 0, 30) -- Even bigger
-    self.CloseButton.Position = UDim2.new(1, -20, 0, -10) -- Closer to the main button
-    self.CloseButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Center it properly
+    self.CloseButton.Size = UDim2.new(0, 30, 0, 30) 
+    self.CloseButton.Position = UDim2.new(1, -20, 0, -10) 
+    self.CloseButton.AnchorPoint = Vector2.new(0.5, 0.5) 
     self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
     self.CloseButton.Text = "×"
     self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.CloseButton.TextSize = 18 -- Bigger text
+    self.CloseButton.TextSize = 18 
     self.CloseButton.Font = Enum.Font.GothamBold
     self.CloseButton.BorderSizePixel = 0
-    self.CloseButton.Visible = true -- Always visible for now so you can see it
-    self.CloseButton.ZIndex = 100 -- Make sure it's on top
+    self.CloseButton.Visible = true 
+    self.CloseButton.ZIndex = 100 
     self.CloseButton.Parent = self.Container
-    
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(1, 0)
     closeCorner.Parent = self.CloseButton
-    
-    -- Close button border for better visibility
     local closeBorder = Instance.new("UIStroke")
     closeBorder.Color = Color3.fromRGB(255, 255, 255)
-    closeBorder.Thickness = 3 -- Thicker border
+    closeBorder.Thickness = 3 
     closeBorder.Parent = self.CloseButton
-    
-    -- Make draggable
     self:MakeDraggable()
-    
-    -- Setup interactions
     self:SetupInteractions()
-    
-    -- Add to global storage
     table.insert(DraggedKeybinds, self)
-    
     return self
 end
-
 function DraggableKeybind:MakeDraggable()
-    -- Combined drag and click detection
     local isDragging = false
     local dragStart = nil
     local startPos = nil
@@ -867,42 +640,30 @@ function DraggableKeybind:MakeDraggable()
     local hasMovedEnough = false
     local dragConnection = nil
     local releaseConnection = nil
-    
     self.FloatingButton.MouseButton1Down:Connect(function()
         isDragging = true
         dragStart = UserInputService:GetMouseLocation()
         startPos = self.Container.Position
         pressTime = tick()
         hasMovedEnough = false
-        print("Floating button pressed:", self.Name) -- Debug
-        
-        -- Close button is always visible now
-        
-        -- Clean up existing connections
+        print("Floating button pressed:", self.Name) 
         if dragConnection then dragConnection:Disconnect() end
         if releaseConnection then releaseConnection:Disconnect() end
-        
-        -- Connect to mouse movement
         dragConnection = UserInputService.InputChanged:Connect(function(input)
             if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
                 local currentPos = Vector2.new(input.Position.X, input.Position.Y)
                 local distance = (currentPos - dragStart).Magnitude
-                
-                if distance > 10 then -- Start dragging after 10 pixels
+                if distance > 10 then 
                     hasMovedEnough = true
                     local delta = currentPos - dragStart
                     self.Container.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
                 end
             end
         end)
-        
-        -- Connect to mouse release
         releaseConnection = UserInputService.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
                 local holdTime = tick() - pressTime
-                print("Floating button released:", self.Name, "moved:", hasMovedEnough, "holdTime:", holdTime) -- Debug
-                
-                -- Clean up connections
+                print("Floating button released:", self.Name, "moved:", hasMovedEnough, "holdTime:", holdTime) 
                 if dragConnection then
                     dragConnection:Disconnect()
                     dragConnection = nil
@@ -911,33 +672,23 @@ function DraggableKeybind:MakeDraggable()
                     releaseConnection:Disconnect()
                     releaseConnection = nil
                 end
-                
-                -- If it was a quick click without much movement, activate the button
                 if not hasMovedEnough and holdTime < 0.3 then
-                    print("Activating floating button:", self.Name) -- Debug
+                    print("Activating floating button:", self.Name) 
                     self:OnActivated()
                 end
-                
                 isDragging = false
                 hasMovedEnough = false
-                
-                -- Close button stays visible
             end
         end)
     end)
 end
-
 function DraggableKeybind:SetupInteractions()
-    
-    -- Close button click
     self.CloseButton.MouseButton1Click:Connect(function()
-        print("Close button clicked for:", self.Name) -- Debug
+        print("Close button clicked for:", self.Name) 
         self:Remove()
     end)
-    
-    -- Close button hover effects to make it more obvious
     self.CloseButton.MouseEnter:Connect(function()
-        print("Hovering over close button") -- Debug
+        print("Hovering over close button") 
         local scaleTween = TweenService:Create(
             self.CloseButton,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -945,7 +696,6 @@ function DraggableKeybind:SetupInteractions()
         )
         scaleTween:Play()
     end)
-    
     self.CloseButton.MouseLeave:Connect(function()
         local scaleTween = TweenService:Create(
             self.CloseButton,
@@ -954,13 +704,10 @@ function DraggableKeybind:SetupInteractions()
         )
         scaleTween:Play()
     end)
-    
-    -- Hover effects (PC only)
     if not self.IsMobile then
         self.FloatingButton.MouseEnter:Connect(function()
             self.NameLabel.Visible = true
             self.CloseButton.Visible = true
-            
             local scaleTween = TweenService:Create(
                 self.FloatingButton,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -968,11 +715,9 @@ function DraggableKeybind:SetupInteractions()
             )
             scaleTween:Play()
         end)
-        
         self.FloatingButton.MouseLeave:Connect(function()
             self.NameLabel.Visible = false
             self.CloseButton.Visible = false
-            
             local scaleTween = TweenService:Create(
                 self.FloatingButton,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -981,10 +726,8 @@ function DraggableKeybind:SetupInteractions()
             scaleTween:Play()
         end)
     else
-        -- Mobile: Show name on touch
         self.FloatingButton.MouseButton1Down:Connect(function()
             self.NameLabel.Visible = true
-            
             local scaleTween = TweenService:Create(
                 self.FloatingButton,
                 TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -992,11 +735,9 @@ function DraggableKeybind:SetupInteractions()
             )
             scaleTween:Play()
         end)
-        
         self.FloatingButton.MouseButton1Up:Connect(function()
             wait(1)
             self.NameLabel.Visible = false
-            
             local scaleTween = TweenService:Create(
                 self.FloatingButton,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1006,16 +747,13 @@ function DraggableKeybind:SetupInteractions()
         end)
     end
 end
-
 function DraggableKeybind:OnActivated()
-    -- Pulse effect
     local pulseTween = TweenService:Create(
         self.FloatingButton,
         TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {Size = UDim2.new(1, 8, 1, 8)}
     )
     pulseTween:Play()
-    
     pulseTween.Completed:Connect(function()
         local returnTween = TweenService:Create(
             self.FloatingButton,
@@ -1024,32 +762,24 @@ function DraggableKeybind:OnActivated()
         )
         returnTween:Play()
     end)
-    
-    -- Handle different component types
     if self.ComponentType == "Toggle" then
-        -- Toggle the value
         local newValue = not self.ToggleValue()
         self.SetToggleValue(newValue)
         self:UpdateToggleState()
     else
-        -- Regular button
         self.Callback()
     end
 end
-
 function DraggableKeybind:UpdateToggleState()
     if self.ComponentType == "Toggle" and self.StateIndicator then
         local isOn = self.ToggleValue()
         local color = isOn and Color3.fromRGB(60, 255, 60) or Color3.fromRGB(255, 60, 60)
-        
         local colorTween = TweenService:Create(
             self.StateIndicator,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = color}
         )
         colorTween:Play()
-        
-        -- Update main button color
         local buttonColor = isOn and Color3.fromRGB(60, 200, 60) or Color3.fromRGB(88, 166, 255)
         local buttonTween = TweenService:Create(
             self.FloatingButton,
@@ -1059,43 +789,30 @@ function DraggableKeybind:UpdateToggleState()
         buttonTween:Play()
     end
 end
-
 function DraggableKeybind:Remove()
-    -- Remove from global storage
     for i, keybind in ipairs(DraggedKeybinds) do
         if keybind == self then
             table.remove(DraggedKeybinds, i)
             break
         end
     end
-    
-    -- Animate removal
     local fadeTween = TweenService:Create(
         self.Container,
         TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}
     )
     fadeTween:Play()
-    
     fadeTween.Completed:Connect(function()
         self.Container:Destroy()
     end)
-    
-    -- Re-enable the original keybind button
     if self.OriginalButton then
         self.OriginalButton.Visible = true
     end
 end
-
--- Static method to create draggable keybind from existing button
 function DraggableKeybind.CreateFromButton(button, componentType, name, callback, toggleValue, setToggleValue)
-    print("DraggableKeybind.CreateFromButton called:", name, componentType) -- Debug
-    
-    -- Hide the original button
+    print("DraggableKeybind.CreateFromButton called:", name, componentType) 
     button.Visible = false
-    print("Original button hidden") -- Debug
-    
-    -- Create draggable keybind
+    print("Original button hidden") 
     local draggableKeybind = DraggableKeybind.new({
         Name = name,
         Callback = callback,
@@ -1104,40 +821,26 @@ function DraggableKeybind.CreateFromButton(button, componentType, name, callback
         ToggleValue = toggleValue,
         SetToggleValue = setToggleValue
     })
-    
-    print("DraggableKeybind created successfully") -- Debug
+    print("DraggableKeybind created successfully") 
     return draggableKeybind
 end
-
--- Static method to get all dragged keybinds
 function DraggableKeybind.GetAll()
     return DraggedKeybinds
 end
-
--- Static method to remove all dragged keybinds
 function DraggableKeybind.RemoveAll()
     for _, keybind in ipairs(DraggedKeybinds) do
         keybind:Remove()
     end
     DraggedKeybinds = {}
 end
-
 return DraggableKeybind
 end)() end,
-    function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)--[[
-    Dropdown Component - Redesigned
-    A modern dropdown menu UI element with proper checkmarks, icons, and smooth animations
-]]
-
-local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-
 local Dropdown = {}
 Dropdown.__index = Dropdown
-
 function Dropdown.new(options, tab)
     local self = setmetatable({}, Dropdown)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "Dropdown"
@@ -1146,16 +849,11 @@ function Dropdown.new(options, tab)
     self.Multiselect = options.Multiselect or false
     self.Open = false
     self.FilteredItems = {}
-    
-    -- Initialize filtered items
     for _, item in ipairs(self.Items) do
         table.insert(self.FilteredItems, item)
     end
-    
-    -- For single select
     if not self.Multiselect then
         self.Selected = options.Default or (self.Items[1] or "")
-    -- For multiselect
     else
         self.Selected = {}
         if options.Default then
@@ -1168,48 +866,33 @@ function Dropdown.new(options, tab)
             end
         end
     end
-    
     self.Callback = options.Callback or function() end
-    
-    -- Create the dropdown UI
     self:Create()
-    
     return self
 end
-
 function Dropdown:Create()
-    -- Main container with modern styling
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Dropdown"
     self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
-    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Match content container
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
     self.Container.Parent = self.Tab.Container
-    
-    -- Modern border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(40, 45, 52)
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12) -- Match window corner radius
+    corner.CornerRadius = UDim.new(0, 12) 
     corner.Parent = self.Container
-    
-    -- Header container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
     self.Header.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
-    
-    -- Modern dropdown icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.DropdownIcon = Instance.new("ImageLabel")
     self.DropdownIcon.Name = "Icon"
     self.DropdownIcon.Size = UDim2.new(0, 22, 0, 22)
@@ -1218,8 +901,6 @@ function Dropdown:Create()
     self.DropdownIcon.Image = (success and Lucide and Lucide["list"]) or "rbxassetid://10723433811"
     self.DropdownIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.DropdownIcon.Parent = self.Header
-    
-    -- Title label
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
@@ -1231,8 +912,6 @@ function Dropdown:Create()
     self.NameLabel.Font = Enum.Font.GothamSemibold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Header
-    
-    -- Description label
     if self.Description ~= "" then
         self.DescriptionLabel = Instance.new("TextLabel")
         self.DescriptionLabel.Name = "Description"
@@ -1246,8 +925,6 @@ function Dropdown:Create()
         self.DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescriptionLabel.Parent = self.Header
     end
-    
-    -- Clear all button for multiselect (modern design)
     if self.Multiselect then
         self.ClearButton = Instance.new("TextButton")
         self.ClearButton.Name = "ClearButton"
@@ -1261,17 +938,12 @@ function Dropdown:Create()
         self.ClearButton.Font = Enum.Font.GothamBold
         self.ClearButton.BorderSizePixel = 0
         self.ClearButton.Parent = self.Header
-        
         local clearCorner = Instance.new("UICorner")
         clearCorner.CornerRadius = UDim.new(0, 6)
         clearCorner.Parent = self.ClearButton
-        
-        -- Clear button functionality
         self.ClearButton.MouseButton1Click:Connect(function()
             self:ClearAllSelections()
         end)
-        
-        -- Clear button hover effects
         self.ClearButton.MouseEnter:Connect(function()
             local hoverTween = TweenService:Create(
                 self.ClearButton,
@@ -1280,7 +952,6 @@ function Dropdown:Create()
             )
             hoverTween:Play()
         end)
-        
         self.ClearButton.MouseLeave:Connect(function()
             local leaveTween = TweenService:Create(
                 self.ClearButton,
@@ -1290,8 +961,6 @@ function Dropdown:Create()
             leaveTween:Play()
         end)
     end
-    
-    -- Selected value display
     self.SelectedLabel = Instance.new("TextLabel")
     self.SelectedLabel.Name = "Selected"
     self.SelectedLabel.Size = UDim2.new(1, self.Multiselect and -120 or -90, 1, 0)
@@ -1304,11 +973,7 @@ function Dropdown:Create()
     self.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
     self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.SelectedLabel.Parent = self.Header
-    
-    -- Update the selected display
     self:UpdateSelectedText()
-    
-    -- Modern chevron arrow
     self.ArrowIcon = Instance.new("ImageLabel")
     self.ArrowIcon.Name = "Arrow"
     self.ArrowIcon.Size = UDim2.new(0, 16, 0, 16)
@@ -1318,16 +983,12 @@ function Dropdown:Create()
     self.ArrowIcon.Image = (success and Lucide and Lucide["chevron-down"]) or "rbxassetid://10709790948"
     self.ArrowIcon.ImageColor3 = Color3.fromRGB(140, 150, 160)
     self.ArrowIcon.Parent = self.Header
-    
-    -- Interaction button
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
     self.DropdownButton.Size = UDim2.new(1, 0, 1, 0)
     self.DropdownButton.BackgroundTransparency = 1
     self.DropdownButton.Text = ""
     self.DropdownButton.Parent = self.Header
-    
-    -- Modern search box (always show for better UX)
     self.SearchContainer = Instance.new("Frame")
     self.SearchContainer.Name = "SearchContainer"
     self.SearchContainer.Size = UDim2.new(1, -20, 0, 36)
@@ -1336,17 +997,13 @@ function Dropdown:Create()
     self.SearchContainer.BorderSizePixel = 0
     self.SearchContainer.Visible = false
     self.SearchContainer.Parent = self.Container
-    
     local searchBorder = Instance.new("UIStroke")
     searchBorder.Color = Color3.fromRGB(50, 55, 62)
     searchBorder.Thickness = 1
     searchBorder.Parent = self.SearchContainer
-    
     local searchCorner = Instance.new("UICorner")
     searchCorner.CornerRadius = UDim.new(0, 6)
     searchCorner.Parent = self.SearchContainer
-    
-    -- Search icon
     self.SearchIcon = Instance.new("ImageLabel")
     self.SearchIcon.Name = "SearchIcon"
     self.SearchIcon.Size = UDim2.new(0, 16, 0, 16)
@@ -1356,8 +1013,6 @@ function Dropdown:Create()
     self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10709761530"
     self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 130, 140)
     self.SearchIcon.Parent = self.SearchContainer
-    
-    -- Select All button for multiselect (positioned on the right side of search)
     if self.Multiselect then
         self.SelectAllButton = Instance.new("TextButton")
         self.SelectAllButton.Name = "SelectAllButton"
@@ -1371,17 +1026,12 @@ function Dropdown:Create()
         self.SelectAllButton.Font = Enum.Font.GothamBold
         self.SelectAllButton.BorderSizePixel = 0
         self.SelectAllButton.Parent = self.SearchContainer
-        
         local selectAllCorner = Instance.new("UICorner")
         selectAllCorner.CornerRadius = UDim.new(0, 4)
         selectAllCorner.Parent = self.SelectAllButton
-        
-        -- Select All button functionality
         self.SelectAllButton.MouseButton1Click:Connect(function()
             self:SelectAllItems()
         end)
-        
-        -- Select All button hover effects
         self.SelectAllButton.MouseEnter:Connect(function()
             local hoverTween = TweenService:Create(
                 self.SelectAllButton,
@@ -1390,7 +1040,6 @@ function Dropdown:Create()
             )
             hoverTween:Play()
         end)
-        
         self.SelectAllButton.MouseLeave:Connect(function()
             local leaveTween = TweenService:Create(
                 self.SelectAllButton,
@@ -1400,10 +1049,9 @@ function Dropdown:Create()
             leaveTween:Play()
         end)
     end
-    
     self.SearchBox = Instance.new("TextBox")
     self.SearchBox.Name = "SearchBox"
-    self.SearchBox.Size = UDim2.new(1, self.Multiselect and -110 or -40, 1, 0) -- Adjust size if Select All button exists
+    self.SearchBox.Size = UDim2.new(1, self.Multiselect and -110 or -40, 1, 0) 
     self.SearchBox.Position = UDim2.new(0, 36, 0, 0)
     self.SearchBox.BackgroundTransparency = 1
     self.SearchBox.Text = ""
@@ -1414,18 +1062,14 @@ function Dropdown:Create()
     self.SearchBox.Font = Enum.Font.Gotham
     self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
     self.SearchBox.Parent = self.SearchContainer
-    
-    -- Search functionality
     self.SearchBox.Changed:Connect(function(property)
         if property == "Text" then
             self:FilterItems(self.SearchBox.Text)
         end
     end)
-    
-    -- Dropdown content container
     self.Content = Instance.new("ScrollingFrame")
     self.Content.Name = "Content"
-    self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) -- Updated from 34 to 44 for larger items
+    self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) 
     self.Content.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and 68 or 52) + 52)
     self.Content.BackgroundTransparency = 1
     self.Content.BorderSizePixel = 0
@@ -1435,23 +1079,15 @@ function Dropdown:Create()
     self.Content.AutomaticCanvasSize = Enum.AutomaticSize.Y
     self.Content.Visible = false
     self.Content.Parent = self.Container
-    
-    -- Content layout
     self.ContentLayout = Instance.new("UIListLayout")
     self.ContentLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContentLayout.Padding = UDim.new(0, 4) -- Increased from 1 to 4 for better spacing
+    self.ContentLayout.Padding = UDim.new(0, 4) 
     self.ContentLayout.Parent = self.Content
-    
-    -- Create dropdown items
     self:CreateItems()
-    
-    -- Dropdown button click handler
     self.DropdownButton.MouseButton1Click:Connect(function()
         self:Toggle()
     end)
-    
-    -- Modern hover effects
     self.DropdownButton.MouseEnter:Connect(function()
         if not self.Open then
             local hoverTween = TweenService:Create(
@@ -1460,7 +1096,6 @@ function Dropdown:Create()
                 {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
             )
             hoverTween:Play()
-            
             local borderTween = TweenService:Create(
                 border,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1469,7 +1104,6 @@ function Dropdown:Create()
             borderTween:Play()
         end
     end)
-    
     self.DropdownButton.MouseLeave:Connect(function()
         if not self.Open then
             local leaveTween = TweenService:Create(
@@ -1478,7 +1112,6 @@ function Dropdown:Create()
                 {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
             )
             leaveTween:Play()
-            
             local borderTween = TweenService:Create(
                 border,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1487,58 +1120,43 @@ function Dropdown:Create()
             borderTween:Play()
         end
     end)
-    
-    -- Close dropdown when clicking outside
     UserInputService.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 and self.Open then
             local mouse = game.Players.LocalPlayer:GetMouse()
             local containerPos = self.Container.AbsolutePosition
             local containerSize = self.Container.AbsoluteSize
-            
             if mouse.X < containerPos.X or mouse.X > containerPos.X + containerSize.X or
                mouse.Y < containerPos.Y or mouse.Y > containerPos.Y + containerSize.Y then
                 self:Toggle(false)
             end
         end
     end)
-    
     return self
 end
-
 function Dropdown:CreateItems()
-    -- Clear existing items
     for _, child in ipairs(self.Content:GetChildren()) do
         if child:IsA("Frame") and child.Name:find("Item_") then
             child:Destroy()
         end
     end
-    
-    -- Create items from filtered list
     local itemsToShow = #self.FilteredItems > 0 and self.FilteredItems or self.Items
-    
     for i, item in ipairs(itemsToShow) do
-        -- Main item container with more spacing
         local itemContainer = Instance.new("Frame")
         itemContainer.Name = "Item_" .. i
-        itemContainer.Size = UDim2.new(1, 0, 0, 40) -- Increased from 32 to 40 for more space
+        itemContainer.Size = UDim2.new(1, 0, 0, 40) 
         itemContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
         itemContainer.BorderSizePixel = 0
         itemContainer.LayoutOrder = i
         itemContainer.Parent = self.Content
-        
         local itemCorner = Instance.new("UICorner")
         itemCorner.CornerRadius = UDim.new(0, 6)
         itemCorner.Parent = itemContainer
-        
-        -- Item button for interaction
         local itemButton = Instance.new("TextButton")
         itemButton.Name = "Button"
         itemButton.Size = UDim2.new(1, 0, 1, 0)
         itemButton.BackgroundTransparency = 1
         itemButton.Text = ""
         itemButton.Parent = itemContainer
-        
-        -- Item text
         local itemText = Instance.new("TextLabel")
         itemText.Name = "Text"
         itemText.Size = UDim2.new(1, self.Multiselect and -50 or -40, 1, 0)
@@ -1551,10 +1169,7 @@ function Dropdown:CreateItems()
         itemText.TextXAlignment = Enum.TextXAlignment.Left
         itemText.TextYAlignment = Enum.TextYAlignment.Center
         itemText.Parent = itemContainer
-        
-        -- Selection indicator
         if self.Multiselect then
-            -- Modern checkbox for multiselect
             local checkboxContainer = Instance.new("Frame")
             checkboxContainer.Name = "CheckboxContainer"
             checkboxContainer.Size = UDim2.new(0, 20, 0, 20)
@@ -1563,18 +1178,13 @@ function Dropdown:CreateItems()
             checkboxContainer.BackgroundColor3 = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 65, 72)
             checkboxContainer.BorderSizePixel = 0
             checkboxContainer.Parent = itemContainer
-            
             local checkboxCorner = Instance.new("UICorner")
             checkboxCorner.CornerRadius = UDim.new(0, 4)
             checkboxCorner.Parent = checkboxContainer
-            
-            -- Checkbox border
             local checkboxBorder = Instance.new("UIStroke")
             checkboxBorder.Color = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)
             checkboxBorder.Thickness = 1
             checkboxBorder.Parent = checkboxContainer
-            
-            -- Checkmark (simple text, no icon)
             local checkmark = Instance.new("TextLabel")
             checkmark.Name = "Checkmark"
             checkmark.Size = UDim2.new(1, 0, 1, 0)
@@ -1588,7 +1198,6 @@ function Dropdown:CreateItems()
             checkmark.Visible = self.Selected[item] == true
             checkmark.Parent = checkboxContainer
         else
-            -- Radio button for single select
             local radioContainer = Instance.new("Frame")
             radioContainer.Name = "RadioContainer"
             radioContainer.Size = UDim2.new(0, 18, 0, 18)
@@ -1597,17 +1206,13 @@ function Dropdown:CreateItems()
             radioContainer.BackgroundColor3 = Color3.fromRGB(60, 65, 72)
             radioContainer.BorderSizePixel = 0
             radioContainer.Parent = itemContainer
-            
             local radioCorner = Instance.new("UICorner")
             radioCorner.CornerRadius = UDim.new(1, 0)
             radioCorner.Parent = radioContainer
-            
             local radioBorder = Instance.new("UIStroke")
             radioBorder.Color = self.Selected == item and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 105, 112)
             radioBorder.Thickness = 1
             radioBorder.Parent = radioContainer
-            
-            -- Radio dot
             local radioDot = Instance.new("Frame")
             radioDot.Name = "RadioDot"
             radioDot.Size = UDim2.new(0, 8, 0, 8)
@@ -1617,18 +1222,13 @@ function Dropdown:CreateItems()
             radioDot.BorderSizePixel = 0
             radioDot.Visible = self.Selected == item
             radioDot.Parent = radioContainer
-            
             local dotCorner = Instance.new("UICorner")
             dotCorner.CornerRadius = UDim.new(1, 0)
             dotCorner.Parent = radioDot
         end
-        
-        -- Click handler
         itemButton.MouseButton1Click:Connect(function()
             self:SelectItem(item)
         end)
-        
-        -- Hover effects
         itemButton.MouseEnter:Connect(function()
             local hoverTween = TweenService:Create(
                 itemContainer,
@@ -1636,7 +1236,6 @@ function Dropdown:CreateItems()
                 {BackgroundColor3 = Color3.fromRGB(40, 45, 52)}
             )
             hoverTween:Play()
-            
             local textTween = TweenService:Create(
                 itemText,
                 TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1644,7 +1243,6 @@ function Dropdown:CreateItems()
             )
             textTween:Play()
         end)
-        
         itemButton.MouseLeave:Connect(function()
             local leaveTween = TweenService:Create(
                 itemContainer,
@@ -1652,7 +1250,6 @@ function Dropdown:CreateItems()
                 {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
             )
             leaveTween:Play()
-            
             local textTween = TweenService:Create(
                 itemText,
                 TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1662,36 +1259,28 @@ function Dropdown:CreateItems()
         end)
     end
 end
-
 function Dropdown:SelectItem(item)
     if self.Multiselect then
-        -- Toggle selection for multiselect
         if self.Selected[item] then
-            self.Selected[item] = nil -- Remove from table instead of setting to false
+            self.Selected[item] = nil 
         else
-            self.Selected[item] = true -- Add to table
+            self.Selected[item] = true 
         end
-        
-        -- Update checkbox visual with animation
         for _, child in ipairs(self.Content:GetChildren()) do
             if child:IsA("Frame") and child.Name:find("Item_") and child.Text.Text == item then
                 local checkboxContainer = child:FindFirstChild("CheckboxContainer")
                 if checkboxContainer then
                     local checkmark = checkboxContainer:FindFirstChild("Checkmark")
                     local border = checkboxContainer:FindFirstChild("UIStroke")
-                    
                     if checkmark then
                         checkmark.Visible = self.Selected[item] == true
                     end
-                    
-                    -- Animate checkbox colors
                     local bgTween = TweenService:Create(
                         checkboxContainer,
                         TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                         {BackgroundColor3 = self.Selected[item] == true and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 65, 72)}
                     )
                     bgTween:Play()
-                    
                     if border then
                         local borderTween = TweenService:Create(
                             border,
@@ -1704,24 +1293,17 @@ function Dropdown:SelectItem(item)
                 break
             end
         end
-        
-        -- Update selected text
         self:UpdateSelectedText()
-        
-        -- Call callback with selected items
         local selectedItems = {}
         for selectedItem, selected in pairs(self.Selected) do
-            if selected == true then -- Only include items that are explicitly true
+            if selected == true then 
                 table.insert(selectedItems, selectedItem)
             end
         end
         self.Callback(selectedItems)
     else
-        -- Single select
         local oldSelected = self.Selected
         self.Selected = item
-        
-        -- Update radio button visuals
         for _, child in ipairs(self.Content:GetChildren()) do
             if child:IsA("Frame") and child.Name:find("Item_") then
                 local radioContainer = child:FindFirstChild("RadioContainer")
@@ -1729,11 +1311,9 @@ function Dropdown:SelectItem(item)
                     local radioDot = radioContainer:FindFirstChild("RadioDot")
                     local border = radioContainer:FindFirstChild("UIStroke")
                     local isSelected = child.Text.Text == item
-                    
                     if radioDot then
                         radioDot.Visible = isSelected
                     end
-                    
                     if border then
                         local borderTween = TweenService:Create(
                             border,
@@ -1745,31 +1325,22 @@ function Dropdown:SelectItem(item)
                 end
             end
         end
-        
-        -- Update selected text
         self:UpdateSelectedText()
-        
-        -- Close dropdown after selection for single select
         self:Toggle(false)
-        
-        -- Call callback with selected item
         self.Callback(item)
     end
 end
-
 function Dropdown:UpdateSelectedText()
     if self.Multiselect then
         local count = 0
         local selectedText = ""
         local selectedItems = {}
-        
         for item, selected in pairs(self.Selected) do
-            if selected == true then -- Only count items that are explicitly true
+            if selected == true then 
                 count = count + 1
                 table.insert(selectedItems, item)
             end
         end
-        
         if count == 0 then
             selectedText = "Select options..."
             self.SelectedLabel.TextColor3 = Color3.fromRGB(120, 130, 140)
@@ -1783,7 +1354,6 @@ function Dropdown:UpdateSelectedText()
             selectedText = selectedItems[1] .. ", " .. selectedItems[2] .. " (+" .. (count - 2) .. " more)"
             self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
         end
-        
         self.SelectedLabel.Text = selectedText
     else
         if self.Selected == "" then
@@ -1795,91 +1365,67 @@ function Dropdown:UpdateSelectedText()
         end
     end
 end
-
 function Dropdown:Toggle(state)
     if state ~= nil then
         self.Open = state
     else
         self.Open = not self.Open
     end
-    
     local baseHeight = self.Description ~= "" and 68 or 52
     local searchHeight = 44
-    local contentHeight = math.min(240, #self.Items * 44) -- Updated from 34 to 44 for larger items
-    
+    local contentHeight = math.min(240, #self.Items * 44) 
     if self.Open then
-        -- Show search and content
         self.SearchContainer.Visible = true
         self.Content.Visible = true
-        
-        -- Expand container
         local expandTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Size = UDim2.new(1, 0, 0, baseHeight + searchHeight + contentHeight + 16)}
         )
         expandTween:Play()
-        
-        -- Rotate arrow up
         local arrowTween = TweenService:Create(
             self.ArrowIcon,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Rotation = 180}
         )
         arrowTween:Play()
-        
-        -- Highlight container
         local bgTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
         )
         bgTween:Play()
-        
-        -- Focus search box
         wait(0.1)
         self.SearchBox:CaptureFocus()
     else
-        -- Collapse container
         local collapseTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Size = UDim2.new(1, 0, 0, baseHeight)}
         )
         collapseTween:Play()
-        
-        -- Rotate arrow down
         local arrowTween = TweenService:Create(
             self.ArrowIcon,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Rotation = 0}
         )
         arrowTween:Play()
-        
-        -- Reset container color
         local bgTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         bgTween:Play()
-        
-        -- Hide search and content after animation
         wait(0.25)
         self.SearchContainer.Visible = false
         self.Content.Visible = false
-        
-        -- Clear search
         self.SearchBox.Text = ""
         self:FilterItems("")
     end
 end
-
 function Dropdown:SetItems(items)
     self.Items = items
     self:CreateItems()
-    
-    -- Reset selection for single select if current selection is not in new items
     if not self.Multiselect then
         local found = false
         for _, item in ipairs(items) do
@@ -1888,7 +1434,6 @@ function Dropdown:SetItems(items)
                 break
             end
         end
-        
         if not found and #items > 0 then
             self.Selected = items[1]
             self:UpdateSelectedText()
@@ -1897,7 +1442,6 @@ function Dropdown:SetItems(items)
             self:UpdateSelectedText()
         end
     else
-        -- For multiselect, remove selections that are no longer in the items list
         local newSelected = {}
         for _, item in ipairs(items) do
             if self.Selected[item] then
@@ -1907,29 +1451,20 @@ function Dropdown:SetItems(items)
         self.Selected = newSelected
         self:UpdateSelectedText()
     end
-    
     return self
 end
-
 function Dropdown:FilterItems(searchText)
     searchText = searchText:lower()
     self.FilteredItems = {}
-    
-    -- Filter items based on search
     for _, item in ipairs(self.Items) do
         if searchText == "" or item:lower():find(searchText) then
             table.insert(self.FilteredItems, item)
         end
     end
-    
-    -- Recreate items with filtered list
     self:CreateItems()
-    
-    -- Update content size
-    local contentHeight = math.min(240, #self.FilteredItems * 44) -- Updated from 34 to 44 for larger items
+    local contentHeight = math.min(240, #self.FilteredItems * 44) 
     local baseHeight = self.Description ~= "" and 68 or 52
     local searchHeight = 44
-    
     if self.Open then
         local sizeTween = TweenService:Create(
             self.Container,
@@ -1937,7 +1472,6 @@ function Dropdown:FilterItems(searchText)
             {Size = UDim2.new(1, 0, 0, baseHeight + searchHeight + contentHeight + 16)}
         )
         sizeTween:Play()
-        
         local contentSizeTween = TweenService:Create(
             self.Content,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -1946,33 +1480,24 @@ function Dropdown:FilterItems(searchText)
         contentSizeTween:Play()
     end
 end
-
 function Dropdown:ClearAllSelections()
     if not self.Multiselect then return end
-    
-    -- Clear all selections
     self.Selected = {}
-    
-    -- Update all checkboxes
     for _, child in ipairs(self.Content:GetChildren()) do
         if child:IsA("Frame") and child.Name:find("Item_") then
             local checkboxContainer = child:FindFirstChild("CheckboxContainer")
             if checkboxContainer then
                 local checkmark = checkboxContainer:FindFirstChild("Checkmark")
                 local border = checkboxContainer:FindFirstChild("UIStroke")
-                
                 if checkmark then
                     checkmark.Visible = false
                 end
-                
-                -- Animate checkbox colors
                 local bgTween = TweenService:Create(
                     checkboxContainer,
                     TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                     {BackgroundColor3 = Color3.fromRGB(60, 65, 72)}
                 )
                 bgTween:Play()
-                
                 if border then
                     local borderTween = TweenService:Create(
                         border,
@@ -1984,23 +1509,14 @@ function Dropdown:ClearAllSelections()
             end
         end
     end
-    
-    -- Update selected text
     self:UpdateSelectedText()
-    
-    -- Call callback
     self.Callback({})
 end
-
 function Dropdown:SelectAllItems()
     if not self.Multiselect then return end
-    
-    -- Select all items
     for _, item in ipairs(self.Items) do
         self.Selected[item] = true
     end
-    
-    -- Update all checkboxes
     for _, child in ipairs(self.Content:GetChildren()) do
         if child:IsA("Frame") and child.Name:find("Item_") then
             local itemText = child:FindFirstChild("Text")
@@ -2010,19 +1526,15 @@ function Dropdown:SelectAllItems()
                 if checkboxContainer then
                     local checkmark = checkboxContainer:FindFirstChild("Checkmark")
                     local border = checkboxContainer:FindFirstChild("UIStroke")
-                    
                     if checkmark then
                         checkmark.Visible = true
                     end
-                    
-                    -- Animate checkbox colors
                     local bgTween = TweenService:Create(
                         checkboxContainer,
                         TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                         {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
                     )
                     bgTween:Play()
-                    
                     if border then
                         local borderTween = TweenService:Create(
                             border,
@@ -2035,49 +1547,32 @@ function Dropdown:SelectAllItems()
             end
         end
     end
-    
-    -- Update selected text
     self:UpdateSelectedText()
-    
-    -- Call callback with all selected items
     local selectedItems = {}
     for item, selected in pairs(self.Selected) do
-        if selected == true then -- Only include items that are explicitly true
+        if selected == true then 
             table.insert(selectedItems, item)
         end
     end
     self.Callback(selectedItems)
 end
-
 return Dropdown
 end)() end,
-    function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)--[[
-    Floating Controls Component
-    A draggable overlay with toggles and buttons for quick access
-]]
-
-local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-
 local FloatingControls = {}
 FloatingControls.__index = FloatingControls
-
 function FloatingControls.new(options, library)
     local self = setmetatable({}, FloatingControls)
-    
     self.Library = library
     self.Title = options.Title or "Quick Controls"
     self.Controls = {}
     self.IsVisible = true
     self.IsMinimized = false
     self.IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    
-    -- Create the floating UI
     self:CreateGui()
-    
-    -- Create mobile icon if on mobile device
     if self.IsMobile then
         local MobileFloatingIcon = require(script.Parent.MobileFloatingIcon)
         self.MobileIcon = MobileFloatingIcon.new({
@@ -2085,47 +1580,33 @@ function FloatingControls.new(options, library)
             IconColor = options.IconColor or Color3.fromRGB(0, 120, 215),
             Size = options.IconSize or 60
         }, self)
-        
-        -- Start with floating controls hidden on mobile
         self:Hide()
     end
-    
     return self
 end
-
 function FloatingControls:CreateGui()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
-    -- Create ScreenGui for floating controls
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "FloatingControls"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.Parent = playerGui
-    
-    -- Main floating container
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "FloatingPanel"
-    self.MainFrame.Size = UDim2.new(0, 280, 0, 60) -- Start minimized
-    self.MainFrame.Position = UDim2.new(0, 20, 0, 200) -- Left side of screen
-    self.MainFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 32) -- Dark background
+    self.MainFrame.Size = UDim2.new(0, 280, 0, 60) 
+    self.MainFrame.Position = UDim2.new(0, 20, 0, 200) 
+    self.MainFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 32) 
     self.MainFrame.BorderSizePixel = 0
     self.MainFrame.Parent = self.ScreenGui
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = self.MainFrame
-    
-    -- Premium border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(0, 120, 215)
     border.Thickness = 2
     border.Transparency = 0.3
     border.Parent = self.MainFrame
-    
-    -- Shadow effect
     local shadow = Instance.new("Frame")
     shadow.Name = "Shadow"
     shadow.Size = UDim2.new(1, 8, 1, 8)
@@ -2135,33 +1616,24 @@ function FloatingControls:CreateGui()
     shadow.BorderSizePixel = 0
     shadow.ZIndex = self.MainFrame.ZIndex - 1
     shadow.Parent = self.MainFrame
-    
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(0, 12)
     shadowCorner.Parent = shadow
-    
-    -- Header bar for dragging and controls
     self.HeaderBar = Instance.new("Frame")
     self.HeaderBar.Name = "HeaderBar"
     self.HeaderBar.Size = UDim2.new(1, 0, 0, 40)
     self.HeaderBar.BackgroundColor3 = Color3.fromRGB(15, 20, 27)
     self.HeaderBar.BorderSizePixel = 0
     self.HeaderBar.Parent = self.MainFrame
-    
-    -- Header corner radius (top only)
     local headerCorner = Instance.new("UICorner")
     headerCorner.CornerRadius = UDim.new(0, 12)
     headerCorner.Parent = self.HeaderBar
-    
-    -- Mask to hide bottom corners of header
     local headerMask = Instance.new("Frame")
     headerMask.Size = UDim2.new(1, 0, 0, 12)
     headerMask.Position = UDim2.new(0, 0, 1, -12)
     headerMask.BackgroundColor3 = Color3.fromRGB(15, 20, 27)
     headerMask.BorderSizePixel = 0
     headerMask.Parent = self.HeaderBar
-    
-    -- App icon
     self.AppIcon = Instance.new("Frame")
     self.AppIcon.Size = UDim2.new(0, 30, 0, 30)
     self.AppIcon.Position = UDim2.new(0, 12, 0.5, 0)
@@ -2169,12 +1641,9 @@ function FloatingControls:CreateGui()
     self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     self.AppIcon.BorderSizePixel = 0
     self.AppIcon.Parent = self.HeaderBar
-
     local iconCorner = Instance.new("UICorner")
     iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.AppIcon
-
-    -- App icon text
     local iconText = Instance.new("TextLabel")
     iconText.Size = UDim2.new(1, 0, 1, 0)
     iconText.BackgroundTransparency = 1
@@ -2185,8 +1654,6 @@ function FloatingControls:CreateGui()
     iconText.TextXAlignment = Enum.TextXAlignment.Center
     iconText.TextYAlignment = Enum.TextYAlignment.Center
     iconText.Parent = self.AppIcon
-    
-    -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Size = UDim2.new(0, 120, 1, 0)
     self.TitleLabel.Position = UDim2.new(0, 44, 0, 0)
@@ -2198,8 +1665,6 @@ function FloatingControls:CreateGui()
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TitleLabel.Parent = self.HeaderBar
-    
-    -- Expand/Collapse button
     self.ExpandButton = Instance.new("TextButton")
     self.ExpandButton.Size = UDim2.new(0, 28, 0, 28)
     self.ExpandButton.Position = UDim2.new(1, -70, 0.5, 0)
@@ -2211,12 +1676,9 @@ function FloatingControls:CreateGui()
     self.ExpandButton.Font = Enum.Font.GothamBold
     self.ExpandButton.BorderSizePixel = 0
     self.ExpandButton.Parent = self.HeaderBar
-    
     local expandCorner = Instance.new("UICorner")
     expandCorner.CornerRadius = UDim.new(0, 6)
     expandCorner.Parent = self.ExpandButton
-    
-    -- Hide/Show button
     self.HideButton = Instance.new("TextButton")
     self.HideButton.Size = UDim2.new(0, 28, 0, 28)
     self.HideButton.Position = UDim2.new(1, -36, 0.5, 0)
@@ -2228,12 +1690,9 @@ function FloatingControls:CreateGui()
     self.HideButton.Font = Enum.Font.GothamBold
     self.HideButton.BorderSizePixel = 0
     self.HideButton.Parent = self.HeaderBar
-    
     local hideCorner = Instance.new("UICorner")
     hideCorner.CornerRadius = UDim.new(0, 6)
     hideCorner.Parent = self.HideButton
-    
-    -- Content container (initially hidden)
     self.ContentContainer = Instance.new("ScrollingFrame")
     self.ContentContainer.Name = "ContentContainer"
     self.ContentContainer.Size = UDim2.new(1, 0, 1, -40)
@@ -2247,54 +1706,38 @@ function FloatingControls:CreateGui()
     self.ContentContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
     self.ContentContainer.Visible = false
     self.ContentContainer.Parent = self.MainFrame
-    
-    -- Content layout
     self.ContentLayout = Instance.new("UIListLayout")
     self.ContentLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
     self.ContentLayout.Padding = UDim.new(0, 8)
     self.ContentLayout.Parent = self.ContentContainer
-    
-    -- Content padding
     local contentPadding = Instance.new("UIPadding")
     contentPadding.PaddingAll = UDim.new(0, 12)
     contentPadding.Parent = self.ContentContainer
-    
-    -- Make draggable
     self:MakeDraggable()
-    
-    -- Button functionality
     self.ExpandButton.MouseButton1Click:Connect(function()
         self:ToggleExpanded()
     end)
-    
     self.HideButton.MouseButton1Click:Connect(function()
         self:Hide()
     end)
-    
-    -- Hover effects
     self:SetupHoverEffects()
-    
     return self
 end
-
 function FloatingControls:MakeDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
-    
     local function updateInput(input)
         local delta = input.Position - dragStart
         self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-    
     self.HeaderBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.MainFrame.Position
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -2302,22 +1745,18 @@ function FloatingControls:MakeDraggable()
             end)
         end
     end)
-    
     self.HeaderBar.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
         end
     end)
 end
-
 function FloatingControls:SetupHoverEffects()
-    -- Expand button hover
     self.ExpandButton.MouseEnter:Connect(function()
         local tween = TweenService:Create(
             self.ExpandButton,
@@ -2326,7 +1765,6 @@ function FloatingControls:SetupHoverEffects()
         )
         tween:Play()
     end)
-    
     self.ExpandButton.MouseLeave:Connect(function()
         local tween = TweenService:Create(
             self.ExpandButton,
@@ -2335,8 +1773,6 @@ function FloatingControls:SetupHoverEffects()
         )
         tween:Play()
     end)
-    
-    -- Hide button hover
     self.HideButton.MouseEnter:Connect(function()
         local tween = TweenService:Create(
             self.HideButton,
@@ -2345,7 +1781,6 @@ function FloatingControls:SetupHoverEffects()
         )
         tween:Play()
     end)
-    
     self.HideButton.MouseLeave:Connect(function()
         local tween = TweenService:Create(
             self.HideButton,
@@ -2355,17 +1790,12 @@ function FloatingControls:SetupHoverEffects()
         tween:Play()
     end)
 end
-
 function FloatingControls:ToggleExpanded()
     if self.IsMinimized then
-        -- Expand
         self.IsMinimized = false
         self.ExpandButton.Text = "▼"
         self.ContentContainer.Visible = true
-        
-        -- Calculate content height
         local contentHeight = math.max(200, math.min(400, self.ContentLayout.AbsoluteContentSize.Y + 64))
-        
         local expandTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -2373,33 +1803,27 @@ function FloatingControls:ToggleExpanded()
         )
         expandTween:Play()
     else
-        -- Minimize
         self.IsMinimized = true
         self.ExpandButton.Text = "▲"
-        
         local minimizeTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Size = UDim2.new(0, 280, 0, 40)}
         )
         minimizeTween:Play()
-        
         minimizeTween.Completed:Connect(function()
             self.ContentContainer.Visible = false
         end)
     end
 end
-
 function FloatingControls:Show()
     self.IsVisible = true
     self.ScreenGui.Enabled = true
 end
-
 function FloatingControls:Hide()
     self.IsVisible = false
     self.ScreenGui.Enabled = false
 end
-
 function FloatingControls:Toggle()
     if self.IsVisible then
         self:Hide()
@@ -2407,8 +1831,6 @@ function FloatingControls:Toggle()
         self:Show()
     end
 end
-
--- Add a toggle control
 function FloatingControls:AddToggle(options)
     options = options or {}
     local name = options.Name or "Toggle"
@@ -2416,25 +1838,19 @@ function FloatingControls:AddToggle(options)
     local default = options.Default or false
     local keybind = options.Keybind
     local callback = options.Callback or function() end
-    
-    -- Create toggle container
     local container = Instance.new("Frame")
     container.Name = name .. "Toggle"
     container.Size = UDim2.new(1, 0, 0, description ~= "" and 60 or 44)
     container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     container.BorderSizePixel = 0
     container.Parent = self.ContentContainer
-    
     local containerCorner = Instance.new("UICorner")
     containerCorner.CornerRadius = UDim.new(0, 8)
     containerCorner.Parent = container
-    
     local containerBorder = Instance.new("UIStroke")
     containerBorder.Color = Color3.fromRGB(40, 45, 52)
     containerBorder.Thickness = 1
     containerBorder.Parent = container
-    
-    -- Toggle icon
     local icon = Instance.new("TextLabel")
     icon.Size = UDim2.new(0, 32, 0, 32)
     icon.Position = UDim2.new(0, 12, 0, description ~= "" and 6 or 6)
@@ -2446,8 +1862,6 @@ function FloatingControls:AddToggle(options)
     icon.TextXAlignment = Enum.TextXAlignment.Center
     icon.TextYAlignment = Enum.TextYAlignment.Center
     icon.Parent = container
-    
-    -- Toggle name
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(0, 120, 0, 18)
     nameLabel.Position = UDim2.new(0, 40, 0, description ~= "" and 6 or 13)
@@ -2458,8 +1872,6 @@ function FloatingControls:AddToggle(options)
     nameLabel.Font = Enum.Font.GothamSemibold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = container
-    
-    -- Toggle description
     if description ~= "" then
         local descLabel = Instance.new("TextLabel")
         descLabel.Size = UDim2.new(0, 150, 0, 14)
@@ -2472,8 +1884,6 @@ function FloatingControls:AddToggle(options)
         descLabel.TextXAlignment = Enum.TextXAlignment.Left
         descLabel.Parent = container
     end
-    
-    -- Keybind display (if provided)
     local keybindLabel
     if keybind then
         keybindLabel = Instance.new("TextLabel")
@@ -2489,13 +1899,10 @@ function FloatingControls:AddToggle(options)
         keybindLabel.TextYAlignment = Enum.TextYAlignment.Center
         keybindLabel.BorderSizePixel = 0
         keybindLabel.Parent = container
-
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = keybindLabel
     end
-    
-    -- Toggle switch
     local toggleBg = Instance.new("Frame")
     toggleBg.Size = UDim2.new(0, 36, 0, 20)
     toggleBg.Position = UDim2.new(1, keybind and -40 or -46, 0.5, 0)
@@ -2503,11 +1910,9 @@ function FloatingControls:AddToggle(options)
     toggleBg.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
     toggleBg.BorderSizePixel = 0
     toggleBg.Parent = container
-    
     local toggleCorner = Instance.new("UICorner")
     toggleCorner.CornerRadius = UDim.new(1, 0)
     toggleCorner.Parent = toggleBg
-    
     local toggleIndicator = Instance.new("Frame")
     toggleIndicator.Size = UDim2.new(0, 16, 0, 16)
     toggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
@@ -2515,18 +1920,13 @@ function FloatingControls:AddToggle(options)
     toggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     toggleIndicator.BorderSizePixel = 0
     toggleIndicator.Parent = toggleBg
-    
     local indicatorCorner = Instance.new("UICorner")
     indicatorCorner.CornerRadius = UDim.new(1, 0)
     indicatorCorner.Parent = toggleIndicator
-    
-    -- Toggle state
     local isToggled = default
-    
     local function updateToggle(value, animate)
         if animate == nil then animate = true end
         isToggled = value
-        
         if animate then
             local bgTween = TweenService:Create(
                 toggleBg,
@@ -2534,7 +1934,6 @@ function FloatingControls:AddToggle(options)
                 {BackgroundColor3 = isToggled and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 60, 65)}
             )
             bgTween:Play()
-            
             local indicatorTween = TweenService:Create(
                 toggleIndicator,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -2545,25 +1944,17 @@ function FloatingControls:AddToggle(options)
             toggleBg.BackgroundColor3 = isToggled and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(60, 60, 65)
             toggleIndicator.Position = UDim2.new(0, isToggled and 18 or 2, 0.5, 0)
         end
-        
         callback(isToggled)
     end
-    
-    -- Set initial state
     updateToggle(default, false)
-    
-    -- Toggle button
     local toggleButton = Instance.new("TextButton")
     toggleButton.Size = UDim2.new(1, keybind and -40 or 0, 1, 0)
     toggleButton.BackgroundTransparency = 1
     toggleButton.Text = ""
     toggleButton.Parent = container
-    
     toggleButton.MouseButton1Click:Connect(function()
         updateToggle(not isToggled)
     end)
-    
-    -- Keybind functionality
     if keybind then
         UserInputService.InputBegan:Connect(function(input, gameProcessed)
             if gameProcessed then return end
@@ -2572,8 +1963,6 @@ function FloatingControls:AddToggle(options)
             end
         end)
     end
-    
-    -- Hover effects
     toggleButton.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             container,
@@ -2582,7 +1971,6 @@ function FloatingControls:AddToggle(options)
         )
         hoverTween:Play()
     end)
-    
     toggleButton.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             container,
@@ -2591,8 +1979,6 @@ function FloatingControls:AddToggle(options)
         )
         leaveTween:Play()
     end)
-    
-    -- Store control reference
     local control = {
         Type = "Toggle",
         Name = name,
@@ -2600,46 +1986,34 @@ function FloatingControls:AddToggle(options)
         GetValue = function() return isToggled end,
         SetValue = updateToggle
     }
-    
     table.insert(self.Controls, control)
-    
-    -- Update mobile badge when toggle changes
     if self.MobileIcon then
         spawn(function()
-            wait(0.1) -- Small delay to ensure state is updated
+            wait(0.1) 
             self.MobileIcon:UpdateBadge()
         end)
     end
-    
     return control
 end
-
--- Add a button control
 function FloatingControls:AddButton(options)
     options = options or {}
     local name = options.Name or "Button"
     local description = options.Description or ""
     local keybind = options.Keybind
     local callback = options.Callback or function() end
-    
-    -- Create button container
     local container = Instance.new("Frame")
     container.Name = name .. "Button"
     container.Size = UDim2.new(1, 0, 0, description ~= "" and 60 or 44)
     container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     container.BorderSizePixel = 0
     container.Parent = self.ContentContainer
-    
     local containerCorner = Instance.new("UICorner")
     containerCorner.CornerRadius = UDim.new(0, 8)
     containerCorner.Parent = container
-    
     local containerBorder = Instance.new("UIStroke")
     containerBorder.Color = Color3.fromRGB(55, 60, 67)
     containerBorder.Thickness = 1
     containerBorder.Parent = container
-    
-    -- Button icon
     local icon = Instance.new("TextLabel")
     icon.Size = UDim2.new(0, 32, 0, 32)
     icon.Position = UDim2.new(0, 12, 0, description ~= "" and 6 or 6)
@@ -2651,8 +2025,6 @@ function FloatingControls:AddButton(options)
     icon.TextXAlignment = Enum.TextXAlignment.Center
     icon.TextYAlignment = Enum.TextYAlignment.Center
     icon.Parent = container
-    
-    -- Button name
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(0, 120, 0, 18)
     nameLabel.Position = UDim2.new(0, 40, 0, description ~= "" and 6 or 13)
@@ -2663,8 +2035,6 @@ function FloatingControls:AddButton(options)
     nameLabel.Font = Enum.Font.GothamSemibold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = container
-    
-    -- Button description
     if description ~= "" then
         local descLabel = Instance.new("TextLabel")
         descLabel.Size = UDim2.new(0, 150, 0, 14)
@@ -2677,8 +2047,6 @@ function FloatingControls:AddButton(options)
         descLabel.TextXAlignment = Enum.TextXAlignment.Left
         descLabel.Parent = container
     end
-    
-    -- Keybind display (if provided)
     if keybind then
         local keybindLabel = Instance.new("TextLabel")
         keybindLabel.Size = UDim2.new(0, 44, 0, 26)
@@ -2693,13 +2061,10 @@ function FloatingControls:AddButton(options)
         keybindLabel.TextYAlignment = Enum.TextYAlignment.Center
         keybindLabel.BorderSizePixel = 0
         keybindLabel.Parent = container
-
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = keybindLabel
     end
-    
-    -- Action indicator
     local actionIcon = Instance.new("TextLabel")
     actionIcon.Size = UDim2.new(0, 20, 0, 20)
     actionIcon.Position = UDim2.new(1, keybind and -22 or -28, 0.5, 0)
@@ -2712,16 +2077,12 @@ function FloatingControls:AddButton(options)
     actionIcon.TextXAlignment = Enum.TextXAlignment.Center
     actionIcon.TextYAlignment = Enum.TextYAlignment.Center
     actionIcon.Parent = container
-    
-    -- Button interaction
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, 0, 1, 0)
     button.BackgroundTransparency = 1
     button.Text = ""
     button.Parent = container
-    
     button.MouseButton1Click:Connect(function()
-        -- Click effect
         local ripple = Instance.new("Frame")
         ripple.AnchorPoint = Vector2.new(0.5, 0.5)
         ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -2730,26 +2091,20 @@ function FloatingControls:AddButton(options)
         ripple.BorderSizePixel = 0
         ripple.Size = UDim2.new(0, 0, 0, 0)
         ripple.Parent = container
-        
         local rippleCorner = Instance.new("UICorner")
         rippleCorner.CornerRadius = UDim.new(1, 0)
         rippleCorner.Parent = ripple
-        
         local expandTween = TweenService:Create(
             ripple,
             TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = UDim2.new(1.5, 0, 1.5, 0), BackgroundTransparency = 1}
         )
         expandTween:Play()
-        
         expandTween.Completed:Connect(function()
             ripple:Destroy()
         end)
-        
         callback()
     end)
-    
-    -- Keybind functionality
     if keybind then
         UserInputService.InputBegan:Connect(function(input, gameProcessed)
             if gameProcessed then return end
@@ -2758,8 +2113,6 @@ function FloatingControls:AddButton(options)
             end
         end)
     end
-    
-    -- Hover effects
     button.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             container,
@@ -2768,7 +2121,6 @@ function FloatingControls:AddButton(options)
         )
         hoverTween:Play()
     end)
-    
     button.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             container,
@@ -2777,61 +2129,40 @@ function FloatingControls:AddButton(options)
         )
         leaveTween:Play()
     end)
-    
-    -- Store control reference
     local control = {
         Type = "Button",
         Name = name,
         Container = container,
         Trigger = callback
     }
-    
     table.insert(self.Controls, control)
     return control
 end
-
 return FloatingControls
 end)() end,
-    function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)--[[
-    Label Component
-    A simple text display UI element
-]]
-
-local Label = {}
+    function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)local Label = {}
 Label.__index = Label
-
 function Label.new(options, tab)
     local self = setmetatable({}, Label)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Text = options.Text or ""
-    
-    -- Create the label UI
     self:Create()
-    
     return self
 end
-
 function Label:Create()
-    -- Main container with subtle styling (no border for labels)
     self.Container = Instance.new("Frame")
     self.Container.Name = "Label"
     self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = self.Container
-    
-    -- Label icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.LabelIcon = Instance.new("ImageLabel")
     self.LabelIcon.Name = "Icon"
     self.LabelIcon.Size = UDim2.new(0, 18, 0, 18)
@@ -2841,8 +2172,6 @@ function Label:Create()
     self.LabelIcon.Image = (success and Lucide and Lucide["tag"]) or "rbxassetid://10723416057"
     self.LabelIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.LabelIcon.Parent = self.Container
-    
-    -- Label text
     self.TextLabel = Instance.new("TextLabel")
     self.TextLabel.Name = "Text"
     self.TextLabel.Size = UDim2.new(1, -50, 1, 0)
@@ -2856,72 +2185,53 @@ function Label:Create()
     self.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TextLabel.TextWrapped = true
     self.TextLabel.Parent = self.Container
-    
     return self
 end
-
 function Label:SetText(text)
     self.Text = text
     self.TextLabel.Text = text
     return self
 end
-
 return Label
 end)() end,
-    function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)
-local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(8)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-
 local Loading = {}
 Loading.__index = Loading
-
 function Loading.new(options, library)
     local self = setmetatable({}, Loading)
-    
     self.Library = library
     self.Title = options.Title or "Loading"
     self.Subtitle = options.Subtitle or "Please wait..."
     self.Duration = options.Duration or 3
-    self.ShowProgress = options.ShowProgress ~= false -- Default true
-    self.ShowPercentage = options.ShowPercentage ~= false -- Default true
+    self.ShowProgress = options.ShowProgress ~= false 
+    self.ShowPercentage = options.ShowPercentage ~= false 
     self.OnComplete = options.OnComplete or function() end
-    
-    -- Animation state
     self.Progress = 0
     self.IsComplete = false
     self.StartTime = tick()
-    
-    -- Create the loading screen
     self:Create()
     self:StartLoading()
-    
     return self
 end
-
 function Loading:Create()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
-    -- 🎭 MAIN LOADING SCREEN GUI 🎭
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "ProjectMadaraLoading"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.DisplayOrder = 999 -- Always on top
+    self.ScreenGui.DisplayOrder = 999 
     self.ScreenGui.Parent = playerGui
-    
-    -- 🌌 SEMI-TRANSPARENT PREMIUM BACKGROUND WITH GRADIENT 🌌
     self.Background = Instance.new("Frame")
     self.Background.Name = "Background"
     self.Background.Size = UDim2.new(1, 0, 1, 0)
     self.Background.Position = UDim2.new(0, 0, 0, 0)
-    self.Background.BackgroundColor3 = Color3.fromRGB(8, 12, 18) -- Ultra-dark premium
-    self.Background.BackgroundTransparency = 0.3 -- Semi-transparent overlay
+    self.Background.BackgroundColor3 = Color3.fromRGB(8, 12, 18) 
+    self.Background.BackgroundTransparency = 0.3 
     self.Background.BorderSizePixel = 0
     self.Background.Parent = self.ScreenGui
-    
-    -- Animated gradient background (semi-transparent)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(8, 12, 18)),
@@ -2929,25 +2239,19 @@ function Loading:Create()
         ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 12, 18))
     }
     gradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.3), -- Semi-transparent edges
-        NumberSequenceKeypoint.new(0.5, 0.2), -- Slightly more opaque center
-        NumberSequenceKeypoint.new(1, 0.3) -- Semi-transparent edges
+        NumberSequenceKeypoint.new(0, 0.3), 
+        NumberSequenceKeypoint.new(0.5, 0.2), 
+        NumberSequenceKeypoint.new(1, 0.3) 
     }
     gradient.Rotation = 45
     gradient.Parent = self.Background
-    
-    -- Animate gradient rotation
     local gradientTween = TweenService:Create(
         gradient,
         TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
         {Rotation = 405}
     )
     gradientTween:Play()
-    
-    -- 🌟 FLOATING PARTICLES EFFECT 🌟
     self:CreateParticles()
-    
-    -- 💎 MAIN LOADING CONTAINER 💎
     self.LoadingContainer = Instance.new("Frame")
     self.LoadingContainer.Name = "LoadingContainer"
     self.LoadingContainer.Size = UDim2.new(0, 500, 0, 300)
@@ -2955,8 +2259,6 @@ function Loading:Create()
     self.LoadingContainer.AnchorPoint = Vector2.new(0.5, 0.5)
     self.LoadingContainer.BackgroundTransparency = 1
     self.LoadingContainer.Parent = self.Background
-    
-    -- 🎨 PREMIUM LOGO/ICON AREA 🎨
     self.LogoContainer = Instance.new("Frame")
     self.LogoContainer.Name = "LogoContainer"
     self.LogoContainer.Size = UDim2.new(0, 120, 0, 120)
@@ -2965,33 +2267,25 @@ function Loading:Create()
     self.LogoContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     self.LogoContainer.BorderSizePixel = 0
     self.LogoContainer.Parent = self.LoadingContainer
-    
-    -- Premium logo styling
     local logoCorner = Instance.new("UICorner")
     logoCorner.CornerRadius = UDim.new(0, 25)
     logoCorner.Parent = self.LogoContainer
-    
-    -- Glowing border effect
     local logoBorder = Instance.new("UIStroke")
     logoBorder.Color = Color3.fromRGB(100, 180, 255)
     logoBorder.Thickness = 3
     logoBorder.Transparency = 0.3
     logoBorder.Parent = self.LogoContainer
-    
-    -- Logo text/symbol
     self.LogoText = Instance.new("TextLabel")
     self.LogoText.Name = "LogoText"
     self.LogoText.Size = UDim2.new(1, 0, 1, 0)
     self.LogoText.BackgroundTransparency = 1
-    self.LogoText.Text = "M" -- Project Madara
+    self.LogoText.Text = "M" 
     self.LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.LogoText.TextSize = 48
     self.LogoText.Font = Enum.Font.GothamBold
     self.LogoText.TextXAlignment = Enum.TextXAlignment.Center
     self.LogoText.TextYAlignment = Enum.TextYAlignment.Center
     self.LogoText.Parent = self.LogoContainer
-    
-    -- 🌟 PREMIUM TITLE TEXT 🌟
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "TitleLabel"
     self.TitleLabel.Size = UDim2.new(1, 0, 0, 40)
@@ -3003,15 +2297,11 @@ function Loading:Create()
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.TitleLabel.Parent = self.LoadingContainer
-    
-    -- Title glow effect
     local titleGlow = Instance.new("UIStroke")
     titleGlow.Color = Color3.fromRGB(100, 180, 255)
     titleGlow.Thickness = 1
     titleGlow.Transparency = 0.7
     titleGlow.Parent = self.TitleLabel
-    
-    -- 💫 SUBTITLE TEXT 💫
     self.SubtitleLabel = Instance.new("TextLabel")
     self.SubtitleLabel.Name = "SubtitleLabel"
     self.SubtitleLabel.Size = UDim2.new(1, 0, 0, 24)
@@ -3023,9 +2313,7 @@ function Loading:Create()
     self.SubtitleLabel.Font = Enum.Font.Gotham
     self.SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.SubtitleLabel.Parent = self.LoadingContainer
-    
     if self.ShowProgress then
-        -- 🎯 ULTRA-MODERN PROGRESS BAR 🎯
         self.ProgressContainer = Instance.new("Frame")
         self.ProgressContainer.Name = "ProgressContainer"
         self.ProgressContainer.Size = UDim2.new(0, 400, 0, 8)
@@ -3034,19 +2322,13 @@ function Loading:Create()
         self.ProgressContainer.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
         self.ProgressContainer.BorderSizePixel = 0
         self.ProgressContainer.Parent = self.LoadingContainer
-        
-        -- Progress bar styling
         local progressCorner = Instance.new("UICorner")
         progressCorner.CornerRadius = UDim.new(1, 0)
         progressCorner.Parent = self.ProgressContainer
-        
-        -- Progress bar border
         local progressBorder = Instance.new("UIStroke")
         progressBorder.Color = Color3.fromRGB(45, 55, 65)
         progressBorder.Thickness = 1
         progressBorder.Parent = self.ProgressContainer
-        
-        -- 🌈 ANIMATED PROGRESS FILL 🌈
         self.ProgressFill = Instance.new("Frame")
         self.ProgressFill.Name = "ProgressFill"
         self.ProgressFill.Size = UDim2.new(0, 0, 1, 0)
@@ -3054,13 +2336,9 @@ function Loading:Create()
         self.ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
         self.ProgressFill.BorderSizePixel = 0
         self.ProgressFill.Parent = self.ProgressContainer
-        
-        -- Progress fill styling
         local fillCorner = Instance.new("UICorner")
         fillCorner.CornerRadius = UDim.new(1, 0)
         fillCorner.Parent = self.ProgressFill
-        
-        -- Animated gradient on progress bar
         local progressGradient = Instance.new("UIGradient")
         progressGradient.Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
@@ -3068,16 +2346,12 @@ function Loading:Create()
             ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255))
         }
         progressGradient.Parent = self.ProgressFill
-        
-        -- Animate progress gradient
         local progressGradientTween = TweenService:Create(
             progressGradient,
             TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
             {Offset = Vector2.new(1, 0)}
         )
         progressGradientTween:Play()
-        
-        -- 🔥 PROGRESS GLOW EFFECT 🔥
         self.ProgressGlow = Instance.new("Frame")
         self.ProgressGlow.Name = "ProgressGlow"
         self.ProgressGlow.Size = UDim2.new(1, 20, 1, 20)
@@ -3087,14 +2361,11 @@ function Loading:Create()
         self.ProgressGlow.BorderSizePixel = 0
         self.ProgressGlow.ZIndex = self.ProgressContainer.ZIndex - 1
         self.ProgressGlow.Parent = self.ProgressContainer
-        
         local glowCorner = Instance.new("UICorner")
         glowCorner.CornerRadius = UDim.new(1, 0)
         glowCorner.Parent = self.ProgressGlow
     end
-    
     if self.ShowPercentage then
-        -- 📊 PERCENTAGE DISPLAY 📊
         self.PercentageLabel = Instance.new("TextLabel")
         self.PercentageLabel.Name = "PercentageLabel"
         self.PercentageLabel.Size = UDim2.new(0, 100, 0, 30)
@@ -3108,13 +2379,9 @@ function Loading:Create()
         self.PercentageLabel.TextXAlignment = Enum.TextXAlignment.Center
         self.PercentageLabel.Parent = self.LoadingContainer
     end
-    
-    -- 🎭 ENTRANCE ANIMATIONS 🎭
     self:PlayEntranceAnimations()
 end
-
 function Loading:CreateParticles()
-    -- Create floating particles for extra premium feel
     for i = 1, 15 do
         local particle = Instance.new("Frame")
         particle.Name = "Particle" .. i
@@ -3124,13 +2391,9 @@ function Loading:CreateParticles()
         particle.BackgroundTransparency = math.random(30, 80) / 100
         particle.BorderSizePixel = 0
         particle.Parent = self.Background
-        
-        -- Make particles circular
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(1, 0)
         corner.Parent = particle
-        
-        -- Animate particles floating
         local floatTween = TweenService:Create(
             particle,
             TweenInfo.new(math.random(8, 15), Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true),
@@ -3142,29 +2405,20 @@ function Loading:CreateParticles()
         floatTween:Play()
     end
 end
-
 function Loading:PlayEntranceAnimations()
-    -- Start everything invisible/scaled down
     self.LoadingContainer.Size = UDim2.new(0, 0, 0, 0)
     self.LogoContainer.Rotation = -180
     self.TitleLabel.TextTransparency = 1
     self.SubtitleLabel.TextTransparency = 1
-    
     if self.ProgressContainer then
         self.ProgressContainer.Size = UDim2.new(0, 0, 0, 8)
     end
-    
-    -- 🎬 EPIC ENTRANCE SEQUENCE 🎬
-    
-    -- 1. Scale in main container
     local containerTween = TweenService:Create(
         self.LoadingContainer,
         TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
         {Size = UDim2.new(0, 500, 0, 300)}
     )
     containerTween:Play()
-    
-    -- 2. Rotate and glow logo
     wait(0.2)
     local logoTween = TweenService:Create(
         self.LogoContainer,
@@ -3172,8 +2426,6 @@ function Loading:PlayEntranceAnimations()
         {Rotation = 0}
     )
     logoTween:Play()
-    
-    -- 3. Fade in title
     wait(0.3)
     local titleTween = TweenService:Create(
         self.TitleLabel,
@@ -3181,8 +2433,6 @@ function Loading:PlayEntranceAnimations()
         {TextTransparency = 0}
     )
     titleTween:Play()
-    
-    -- 4. Fade in subtitle
     wait(0.2)
     local subtitleTween = TweenService:Create(
         self.SubtitleLabel,
@@ -3190,8 +2440,6 @@ function Loading:PlayEntranceAnimations()
         {TextTransparency = 0}
     )
     subtitleTween:Play()
-    
-    -- 5. Expand progress bar
     if self.ProgressContainer then
         wait(0.3)
         local progressTween = TweenService:Create(
@@ -3202,20 +2450,15 @@ function Loading:PlayEntranceAnimations()
         progressTween:Play()
     end
 end
-
 function Loading:StartLoading()
-    -- 🚀 MAIN LOADING ANIMATION LOOP 🚀
     local connection
     connection = RunService.Heartbeat:Connect(function()
         if self.IsComplete then
             connection:Disconnect()
             return
         end
-        
         local elapsed = tick() - self.StartTime
         self.Progress = math.min(elapsed / self.Duration, 1)
-        
-        -- Update progress bar
         if self.ProgressFill then
             local targetSize = UDim2.new(self.Progress, 0, 1, 0)
             local progressTween = TweenService:Create(
@@ -3225,13 +2468,9 @@ function Loading:StartLoading()
             )
             progressTween:Play()
         end
-        
-        -- Update percentage
         if self.PercentageLabel then
             local percentage = math.floor(self.Progress * 100)
             self.PercentageLabel.Text = percentage .. "%"
-            
-            -- Color transition based on progress
             local color = Color3.fromRGB(
                 math.floor(100 + (155 * self.Progress)),
                 math.floor(180 + (75 * self.Progress)),
@@ -3239,37 +2478,27 @@ function Loading:StartLoading()
             )
             self.PercentageLabel.TextColor3 = color
         end
-        
-        -- Pulse logo based on progress
         local pulseScale = 1 + (math.sin(elapsed * 8) * 0.05)
         self.LogoContainer.Size = UDim2.new(0, 120 * pulseScale, 0, 120 * pulseScale)
-        
-        -- Complete loading
         if self.Progress >= 1 and not self.IsComplete then
             self.IsComplete = true
             self:CompleteLoading()
         end
     end)
 end
-
 function Loading:CompleteLoading()
-    -- 🎉 EPIC COMPLETION SEQUENCE 🎉
-    
-    -- Flash effect
     local flash = Instance.new("Frame")
     flash.Size = UDim2.new(1, 0, 1, 0)
     flash.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
     flash.BackgroundTransparency = 1
     flash.BorderSizePixel = 0
     flash.Parent = self.Background
-    
     local flashTween = TweenService:Create(
         flash,
         TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut),
         {BackgroundTransparency = 0.7}
     )
     flashTween:Play()
-    
     flashTween.Completed:Connect(function()
         local flashOut = TweenService:Create(
             flash,
@@ -3277,19 +2506,14 @@ function Loading:CompleteLoading()
             {BackgroundTransparency = 1}
         )
         flashOut:Play()
-        
         flashOut.Completed:Connect(function()
             flash:Destroy()
         end)
     end)
-    
-    -- Success message
     if self.SubtitleLabel then
         self.SubtitleLabel.Text = "Loading Complete! ✨"
         self.SubtitleLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
     end
-    
-    -- Scale out animation
     wait(0.8)
     local exitTween = TweenService:Create(
         self.LoadingContainer,
@@ -3300,75 +2524,50 @@ function Loading:CompleteLoading()
         }
     )
     exitTween:Play()
-    
-    -- Fade out background (from semi-transparent to fully transparent)
     local bgTween = TweenService:Create(
         self.Background,
         TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 1}
     )
     bgTween:Play()
-    
     bgTween.Completed:Connect(function()
-        -- Call completion callback
         self.OnComplete()
-        
-        -- Clean up
         wait(0.2)
         self.ScreenGui:Destroy()
     end)
 end
-
 return Loading
 end)() end,
-    function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)--[[
-    Mobile Floating Icon Component
-    A small draggable app icon for mobile users to access floating controls
-]]
-
-local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
 local MobileFloatingIcon = {}
 MobileFloatingIcon.__index = MobileFloatingIcon
-
 function MobileFloatingIcon.new(options, floatingControls)
     local self = setmetatable({}, MobileFloatingIcon)
-    
     self.FloatingControls = floatingControls
     self.IconText = options.IconText or "C"
     self.IconColor = options.IconColor or Color3.fromRGB(0, 120, 215)
     self.Size = options.Size or 60
-    
-    -- Only create on mobile devices
     if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
         self:CreateGui()
     end
-    
     return self
 end
-
 function MobileFloatingIcon:CreateGui()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
-    -- Create ScreenGui for mobile icon
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "MobileFloatingIcon"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.Parent = playerGui
-    
-    -- Container for dragging
     self.Container = Instance.new("Frame")
     self.Container.Name = "IconContainer"
     self.Container.Size = UDim2.new(0, self.Size + 10, 0, self.Size + 10)
-    self.Container.Position = UDim2.new(0, 20, 0, 150) -- Top left, below other UI
+    self.Container.Position = UDim2.new(0, 20, 0, 150) 
     self.Container.BackgroundTransparency = 1
     self.Container.Parent = self.ScreenGui
-    
-    -- Main icon button
     self.IconButton = Instance.new("TextButton")
     self.IconButton.Name = "IconButton"
     self.IconButton.Size = UDim2.new(0, self.Size, 0, self.Size)
@@ -3380,20 +2579,14 @@ function MobileFloatingIcon:CreateGui()
     self.IconButton.Font = Enum.Font.GothamBold
     self.IconButton.BorderSizePixel = 0
     self.IconButton.Parent = self.Container
-    
-    -- Circular shape
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(1, 0)
     corner.Parent = self.IconButton
-    
-    -- Premium border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(255, 255, 255)
     border.Thickness = 3
     border.Transparency = 0.7
     border.Parent = self.IconButton
-    
-    -- Shadow effect
     local shadow = Instance.new("Frame")
     shadow.Name = "Shadow"
     shadow.Size = UDim2.new(1, 8, 1, 8)
@@ -3403,12 +2596,9 @@ function MobileFloatingIcon:CreateGui()
     shadow.BorderSizePixel = 0
     shadow.ZIndex = self.IconButton.ZIndex - 1
     shadow.Parent = self.IconButton
-    
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(1, 0)
     shadowCorner.Parent = shadow
-    
-    -- Notification badge (for showing active features count)
     self.Badge = Instance.new("Frame")
     self.Badge.Name = "Badge"
     self.Badge.Size = UDim2.new(0, 20, 0, 20)
@@ -3417,11 +2607,9 @@ function MobileFloatingIcon:CreateGui()
     self.Badge.BorderSizePixel = 0
     self.Badge.Visible = false
     self.Badge.Parent = self.IconButton
-    
     local badgeCorner = Instance.new("UICorner")
     badgeCorner.CornerRadius = UDim.new(1, 0)
     badgeCorner.Parent = self.Badge
-    
     self.BadgeText = Instance.new("TextLabel")
     self.BadgeText.Size = UDim2.new(1, 0, 1, 0)
     self.BadgeText.BackgroundTransparency = 1
@@ -3432,12 +2620,10 @@ function MobileFloatingIcon:CreateGui()
     self.BadgeText.TextXAlignment = Enum.TextXAlignment.Center
     self.BadgeText.TextYAlignment = Enum.TextYAlignment.Center
     self.BadgeText.Parent = self.Badge
-    
-    -- Close button for mobile icon
     self.CloseButton = Instance.new("TextButton")
     self.CloseButton.Name = "CloseButton"
     self.CloseButton.Size = UDim2.new(0, 25, 0, 25)
-    self.CloseButton.Position = UDim2.new(0, -8, 0, -8) -- Top left corner
+    self.CloseButton.Position = UDim2.new(0, -8, 0, -8) 
     self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
     self.CloseButton.Text = "×"
     self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -3446,31 +2632,21 @@ function MobileFloatingIcon:CreateGui()
     self.CloseButton.BorderSizePixel = 0
     self.CloseButton.ZIndex = 100
     self.CloseButton.Parent = self.IconButton
-    
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(1, 0)
     closeCorner.Parent = self.CloseButton
-    
     local closeBorder = Instance.new("UIStroke")
     closeBorder.Color = Color3.fromRGB(255, 255, 255)
     closeBorder.Thickness = 2
     closeBorder.Parent = self.CloseButton
-    
-    -- Make draggable
     self:MakeDraggable()
-    
-    -- Button functionality
     self.IconButton.MouseButton1Click:Connect(function()
         self:OnIconTapped()
     end)
-    
-    -- Close button functionality
     self.CloseButton.MouseButton1Click:Connect(function()
-        print("Mobile icon close button clicked") -- Debug
+        print("Mobile icon close button clicked") 
         self:Hide()
     end)
-    
-    -- Close button hover effects
     self.CloseButton.MouseEnter:Connect(function()
         local scaleTween = TweenService:Create(
             self.CloseButton,
@@ -3479,7 +2655,6 @@ function MobileFloatingIcon:CreateGui()
         )
         scaleTween:Play()
     end)
-    
     self.CloseButton.MouseLeave:Connect(function()
         local scaleTween = TweenService:Create(
             self.CloseButton,
@@ -3488,33 +2663,24 @@ function MobileFloatingIcon:CreateGui()
         )
         scaleTween:Play()
     end)
-    
-    -- Hover/touch effects
     self:SetupTouchEffects()
-    
-    -- Update badge when controls change
     self:UpdateBadge()
-    
     return self
 end
-
 function MobileFloatingIcon:MakeDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
-    
     local function updateInput(input)
         local delta = input.Position - dragStart
         self.Container.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-    
     self.Container.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.Container.Position
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -3522,22 +2688,18 @@ function MobileFloatingIcon:MakeDraggable()
             end)
         end
     end)
-    
     self.Container.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
         end
     end)
 end
-
 function MobileFloatingIcon:SetupTouchEffects()
-    -- Touch down effect
     self.IconButton.MouseButton1Down:Connect(function()
         local scaleTween = TweenService:Create(
             self.IconButton,
@@ -3545,7 +2707,6 @@ function MobileFloatingIcon:SetupTouchEffects()
             {Size = UDim2.new(0, self.Size * 0.9, 0, self.Size * 0.9)}
         )
         scaleTween:Play()
-        
         local colorTween = TweenService:Create(
             self.IconButton,
             TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -3557,8 +2718,6 @@ function MobileFloatingIcon:SetupTouchEffects()
         )
         colorTween:Play()
     end)
-    
-    -- Touch up effect
     self.IconButton.MouseButton1Up:Connect(function()
         local scaleTween = TweenService:Create(
             self.IconButton,
@@ -3566,7 +2725,6 @@ function MobileFloatingIcon:SetupTouchEffects()
             {Size = UDim2.new(0, self.Size, 0, self.Size)}
         )
         scaleTween:Play()
-        
         local colorTween = TweenService:Create(
             self.IconButton,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -3575,20 +2733,15 @@ function MobileFloatingIcon:SetupTouchEffects()
         colorTween:Play()
     end)
 end
-
 function MobileFloatingIcon:OnIconTapped()
-    -- Toggle the floating controls
     if self.FloatingControls then
         self.FloatingControls:Toggle()
-        
-        -- Pulse effect
         local pulseTween = TweenService:Create(
             self.IconButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = UDim2.new(0, self.Size * 1.2, 0, self.Size * 1.2)}
         )
         pulseTween:Play()
-        
         pulseTween.Completed:Connect(function()
             local returnTween = TweenService:Create(
                 self.IconButton,
@@ -3599,24 +2752,17 @@ function MobileFloatingIcon:OnIconTapped()
         end)
     end
 end
-
 function MobileFloatingIcon:UpdateBadge()
     if not self.FloatingControls then return end
-    
-    -- Count active toggles
     local activeCount = 0
     for _, control in ipairs(self.FloatingControls.Controls) do
         if control.Type == "Toggle" and control.GetValue() then
             activeCount = activeCount + 1
         end
     end
-    
-    -- Update badge
     if activeCount > 0 then
         self.Badge.Visible = true
         self.BadgeText.Text = tostring(activeCount)
-        
-        -- Animate badge appearance
         local badgeTween = TweenService:Create(
             self.Badge,
             TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
@@ -3627,166 +2773,121 @@ function MobileFloatingIcon:UpdateBadge()
         self.Badge.Visible = false
     end
 end
-
 function MobileFloatingIcon:Show()
     if self.ScreenGui then
         self.ScreenGui.Enabled = true
     end
 end
-
 function MobileFloatingIcon:Hide()
     if self.ScreenGui then
         self.ScreenGui.Enabled = false
     end
 end
-
 return MobileFloatingIcon
 end)() end,
-    function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)--[[
-    Notifications System - Ultra-Modern Design
-    Beautiful toast notifications with premium animations and styling
-]]
-
-local TweenService = game:GetService("TweenService")
+    function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-
 local Notifications = {}
 Notifications.__index = Notifications
-
--- Notification types with their styling
 local NotificationTypes = {
     Success = {
-        Color = Color3.fromRGB(34, 197, 94), -- Green
+        Color = Color3.fromRGB(34, 197, 94), 
         Icon = "check-circle",
-        Sound = "rbxassetid://131961136" -- Success sound
+        Sound = "rbxassetid://131961136" 
     },
     Error = {
-        Color = Color3.fromRGB(239, 68, 68), -- Red
+        Color = Color3.fromRGB(239, 68, 68), 
         Icon = "x-circle",
-        Sound = "rbxassetid://131961136" -- Error sound
+        Sound = "rbxassetid://131961136" 
     },
     Warning = {
-        Color = Color3.fromRGB(245, 158, 11), -- Orange
+        Color = Color3.fromRGB(245, 158, 11), 
         Icon = "alert-triangle",
-        Sound = "rbxassetid://131961136" -- Warning sound
+        Sound = "rbxassetid://131961136" 
     },
     Info = {
-        Color = Color3.fromRGB(59, 130, 246), -- Blue
+        Color = Color3.fromRGB(59, 130, 246), 
         Icon = "info",
-        Sound = "rbxassetid://131961136" -- Info sound
+        Sound = "rbxassetid://131961136" 
     }
 }
-
 function Notifications.new()
     local self = setmetatable({}, Notifications)
-    
     self.ActiveNotifications = {}
     self.NotificationQueue = {}
-    self.MaxNotifications = 5 -- Maximum notifications on screen
-    
-    -- Create the notification container
+    self.MaxNotifications = 5 
     self:CreateContainer()
-    
     return self
 end
-
 function Notifications:CreateContainer()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
-    -- 🚀 ULTRA-MODERN NOTIFICATION CONTAINER 🚀
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "ProjectMadaraNotifications"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.DisplayOrder = 999 -- Always on top
+    self.ScreenGui.DisplayOrder = 999 
     self.ScreenGui.Parent = playerGui
-    
-    -- Notification container (top-right corner)
     self.Container = Instance.new("Frame")
     self.Container.Name = "NotificationContainer"
-    self.Container.Size = UDim2.new(0, 350, 1, 0) -- Fixed width, full height
-    self.Container.Position = UDim2.new(1, -370, 0, 20) -- Top-right with margin
+    self.Container.Size = UDim2.new(0, 350, 1, 0) 
+    self.Container.Position = UDim2.new(1, -370, 0, 20) 
     self.Container.BackgroundTransparency = 1
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.ScreenGui
-    
-    -- Layout for notifications (top to bottom)
     self.Layout = Instance.new("UIListLayout")
     self.Layout.FillDirection = Enum.FillDirection.Vertical
     self.Layout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.Layout.Padding = UDim.new(0, 12) -- Space between notifications
+    self.Layout.Padding = UDim.new(0, 12) 
     self.Layout.Parent = self.Container
 end
-
 function Notifications:Show(options)
     options = options or {}
     local title = options.Title or "Notification"
     local content = options.Content or "This is a notification message."
-    local type = options.Type or "Info" -- Success, Error, Warning, Info
-    local duration = options.Duration or 3 -- Seconds
-    
-    -- Get notification style
+    local type = options.Type or "Info" 
+    local duration = options.Duration or 3 
     local style = NotificationTypes[type] or NotificationTypes.Info
-    
-    -- If we have too many notifications, queue this one
     if #self.ActiveNotifications >= self.MaxNotifications then
         table.insert(self.NotificationQueue, options)
         return
     end
-    
-    -- Create the notification
     local notification = self:CreateNotification(title, content, style, duration)
     table.insert(self.ActiveNotifications, notification)
-    
-    -- Animate in
     self:AnimateIn(notification)
-    
-    -- Auto-dismiss after duration
     if duration > 0 then
         task.wait(duration)
         self:Dismiss(notification)
     end
 end
-
 function Notifications:CreateNotification(title, content, style, duration)
-    -- 🎨 ULTRA-PREMIUM NOTIFICATION DESIGN 🎨
     local notification = Instance.new("Frame")
     notification.Name = "Notification"
-    notification.Size = UDim2.new(1, 0, 0, 80) -- Minimum height of 80 pixels
-    notification.BackgroundColor3 = Color3.fromRGB(20, 25, 32) -- Ultra-dark premium background
+    notification.Size = UDim2.new(1, 0, 0, 80) 
+    notification.BackgroundColor3 = Color3.fromRGB(20, 25, 32) 
     notification.BorderSizePixel = 0
     notification.AutomaticSize = Enum.AutomaticSize.Y
     notification.LayoutOrder = #self.ActiveNotifications + 1
     notification.Parent = self.Container
-    
-    -- Premium corner radius
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12) -- Very rounded for modern look
+    corner.CornerRadius = UDim.new(0, 12) 
     corner.Parent = notification
-    
-    -- Stunning gradient border
     local border = Instance.new("UIStroke")
     border.Color = style.Color
     border.Thickness = 2
-    border.Transparency = 0.3 -- Subtle glow effect
+    border.Transparency = 0.3 
     border.Parent = notification
-    
-    -- Subtle inner glow
     local glow = Instance.new("Frame")
     glow.Name = "Glow"
     glow.Size = UDim2.new(1, -4, 1, -4)
     glow.Position = UDim2.new(0, 2, 0, 2)
     glow.BackgroundColor3 = style.Color
-    glow.BackgroundTransparency = 0.95 -- Very subtle
+    glow.BackgroundTransparency = 0.95 
     glow.BorderSizePixel = 0
     glow.Parent = notification
-    
     local glowCorner = Instance.new("UICorner")
     glowCorner.CornerRadius = UDim.new(0, 10)
     glowCorner.Parent = glow
-    
-    -- Colored accent bar (left side)
     local accentBar = Instance.new("Frame")
     accentBar.Name = "AccentBar"
     accentBar.Size = UDim2.new(0, 4, 1, -16)
@@ -3794,12 +2895,9 @@ function Notifications:CreateNotification(title, content, style, duration)
     accentBar.BackgroundColor3 = style.Color
     accentBar.BorderSizePixel = 0
     accentBar.Parent = notification
-    
     local accentCorner = Instance.new("UICorner")
     accentCorner.CornerRadius = UDim.new(0, 2)
     accentCorner.Parent = accentBar
-    
-    -- Premium icon container
     local iconContainer = Instance.new("Frame")
     iconContainer.Name = "IconContainer"
     iconContainer.Size = UDim2.new(0, 36, 0, 36)
@@ -3808,16 +2906,12 @@ function Notifications:CreateNotification(title, content, style, duration)
     iconContainer.BackgroundTransparency = 0.9
     iconContainer.BorderSizePixel = 0
     iconContainer.Parent = notification
-    
     local iconCorner = Instance.new("UICorner")
     iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = iconContainer
-    
-    -- Icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     local icon = Instance.new("ImageLabel")
     icon.Name = "Icon"
     icon.Size = UDim2.new(0, 20, 0, 20)
@@ -3827,8 +2921,6 @@ function Notifications:CreateNotification(title, content, style, duration)
     icon.Image = (success and Lucide and Lucide[style.Icon]) or "rbxassetid://10723416057"
     icon.ImageColor3 = style.Color
     icon.Parent = iconContainer
-    
-    -- Close button
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Size = UDim2.new(0, 24, 0, 24)
@@ -3841,12 +2933,9 @@ function Notifications:CreateNotification(title, content, style, duration)
     closeButton.Font = Enum.Font.GothamBold
     closeButton.BorderSizePixel = 0
     closeButton.Parent = notification
-    
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(1, 0)
     closeCorner.Parent = closeButton
-    
-    -- Title
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Size = UDim2.new(1, -120, 0, 20)
@@ -3859,8 +2948,6 @@ function Notifications:CreateNotification(title, content, style, duration)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.TextYAlignment = Enum.TextYAlignment.Center
     titleLabel.Parent = notification
-    
-    -- Content
     local contentLabel = Instance.new("TextLabel")
     contentLabel.Name = "Content"
     contentLabel.Size = UDim2.new(1, -80, 0, 0)
@@ -3875,30 +2962,23 @@ function Notifications:CreateNotification(title, content, style, duration)
     contentLabel.TextWrapped = true
     contentLabel.AutomaticSize = Enum.AutomaticSize.Y
     contentLabel.Parent = notification
-    
-    -- Padding - ensure enough bottom padding for content and progress bar
     local padding = Instance.new("UIPadding")
     padding.PaddingLeft = UDim.new(0, 0)
     padding.PaddingRight = UDim.new(0, 16)
     padding.PaddingTop = UDim.new(0, 0)
-    padding.PaddingBottom = UDim.new(0, 24) -- More bottom padding for progress bar
+    padding.PaddingBottom = UDim.new(0, 24) 
     padding.Parent = notification
-    
-    -- Progress bar (if duration > 0)
     if duration > 0 then
         local progressBar = Instance.new("Frame")
         progressBar.Name = "ProgressBar"
         progressBar.Size = UDim2.new(1, -16, 0, 2)
-        progressBar.Position = UDim2.new(0, 8, 1, -10) -- Position higher to avoid clipping
+        progressBar.Position = UDim2.new(0, 8, 1, -10) 
         progressBar.BackgroundColor3 = style.Color
         progressBar.BorderSizePixel = 0
         progressBar.Parent = notification
-        
         local progressCorner = Instance.new("UICorner")
         progressCorner.CornerRadius = UDim.new(0, 1)
         progressCorner.Parent = progressBar
-        
-        -- Animate progress bar
         local progressTween = TweenService:Create(
             progressBar,
             TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out),
@@ -3906,13 +2986,9 @@ function Notifications:CreateNotification(title, content, style, duration)
         )
         progressTween:Play()
     end
-    
-    -- Close button functionality
     closeButton.MouseButton1Click:Connect(function()
         self:Dismiss(notification)
     end)
-    
-    -- Close button hover effects
     closeButton.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             closeButton,
@@ -3921,7 +2997,6 @@ function Notifications:CreateNotification(title, content, style, duration)
         )
         hoverTween:Play()
     end)
-    
     closeButton.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             closeButton,
@@ -3930,35 +3005,23 @@ function Notifications:CreateNotification(title, content, style, duration)
         )
         leaveTween:Play()
     end)
-    
-    -- Store references using attributes or just return the notification
-    -- We don't need to store these as properties since we can find them by name
-    
     return notification
 end
-
 function Notifications:AnimateIn(notification)
-    -- Start from the right, slide in
     notification.Position = UDim2.new(1, 50, 0, 0)
     notification.BackgroundTransparency = 1
-    
-    -- Slide in animation
     local slideTween = TweenService:Create(
         notification,
         TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
         {Position = UDim2.new(0, 0, 0, 0)}
     )
     slideTween:Play()
-    
-    -- Fade in animation
     local fadeTween = TweenService:Create(
         notification,
         TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0}
     )
     fadeTween:Play()
-    
-    -- Icon bounce animation
     local iconContainer = notification:FindFirstChild("IconContainer")
     if iconContainer then
         iconContainer.Size = UDim2.new(0, 0, 0, 0)
@@ -3970,36 +3033,27 @@ function Notifications:AnimateIn(notification)
         iconTween:Play()
     end
 end
-
 function Notifications:Dismiss(notification)
-    -- Find and remove from active notifications
     for i, activeNotif in ipairs(self.ActiveNotifications) do
         if activeNotif == notification then
             table.remove(self.ActiveNotifications, i)
             break
         end
     end
-    
-    -- Slide out animation
     local slideOutTween = TweenService:Create(
         notification,
         TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
         {Position = UDim2.new(1, 50, 0, 0), BackgroundTransparency = 1}
     )
     slideOutTween:Play()
-    
     slideOutTween.Completed:Connect(function()
         notification:Destroy()
-        
-        -- Process queue
         if #self.NotificationQueue > 0 then
             local nextNotification = table.remove(self.NotificationQueue, 1)
             self:Show(nextNotification)
         end
     end)
 end
-
--- Convenience methods
 function Notifications:Success(title, content, duration)
     self:Show({
         Title = title,
@@ -4008,7 +3062,6 @@ function Notifications:Success(title, content, duration)
         Duration = duration or 4
     })
 end
-
 function Notifications:Error(title, content, duration)
     self:Show({
         Title = title,
@@ -4017,7 +3070,6 @@ function Notifications:Error(title, content, duration)
         Duration = duration or 6
     })
 end
-
 function Notifications:Warning(title, content, duration)
     self:Show({
         Title = title,
@@ -4026,7 +3078,6 @@ function Notifications:Warning(title, content, duration)
         Duration = duration or 5
     })
 end
-
 function Notifications:Info(title, content, duration)
     self:Show({
         Title = title,
@@ -4035,46 +3086,23 @@ function Notifications:Info(title, content, duration)
         Duration = duration or 4
     })
 end
-
 return Notifications
 end)() end,
-    function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)--[[
-    Options Manager
-    A centralized system for managing UI component values with easy referencing
-    
-    Usage:
-    local Toggles, Options = OptionsManager.new()
-    
-    -- Access values:
-    Toggles.toggleName.Value
-    Toggles["toggleName"].Value
-    Options.dropdownName.Value
-    Options["dropdownName"].Value
-    Options.sliderName.Value
-    Options["sliderName"].Value
-    Options.inputName.Value
-    Options["inputName"].Value
-]]
-
-local OptionsManager = {}
+    function()local wax,script,require=ImportGlobals(11)local ImportGlobals return (function(...)local OptionsManager = {}
 OptionsManager.__index = OptionsManager
 
--- Create a new options manager instance
 function OptionsManager.new()
     local self = setmetatable({}, OptionsManager)
     
-    -- Storage for all components
     self.Toggles = {}
     self.Options = {}
     
-    -- Metatable for easy access
     setmetatable(self.Toggles, {
         __index = function(t, key)
             local component = rawget(t, key)
             if component then
                 return component
             end
-            -- Return a dummy object if component doesn't exist yet
             return {Value = false}
         end
     })
@@ -4085,7 +3113,6 @@ function OptionsManager.new()
             if component then
                 return component
             end
-            -- Return a dummy object if component doesn't exist yet
             return {Value = ""}
         end
     })
@@ -4093,19 +3120,16 @@ function OptionsManager.new()
     return self.Toggles, self.Options, self
 end
 
--- Register a toggle component
 function OptionsManager:RegisterToggle(name, component)
     self.Toggles[name] = component
     return component
 end
 
--- Register an option component (dropdown, slider, textbox)
 function OptionsManager:RegisterOption(name, component)
     self.Options[name] = component
     return component
 end
 
--- Get all toggle values
 function OptionsManager:GetToggles()
     local values = {}
     for name, component in pairs(self.Toggles) do
@@ -4114,7 +3138,6 @@ function OptionsManager:GetToggles()
     return values
 end
 
--- Get all option values
 function OptionsManager:GetOptions()
     local values = {}
     for name, component in pairs(self.Options) do
@@ -4123,7 +3146,6 @@ function OptionsManager:GetOptions()
     return values
 end
 
--- Get all values combined
 function OptionsManager:GetAllValues()
     return {
         Toggles = self:GetToggles(),
@@ -4131,21 +3153,18 @@ function OptionsManager:GetAllValues()
     }
 end
 
--- Set toggle value
 function OptionsManager:SetToggle(name, value)
     if self.Toggles[name] and self.Toggles[name].SetValue then
         self.Toggles[name]:SetValue(value)
     end
 end
 
--- Set option value
 function OptionsManager:SetOption(name, value)
     if self.Options[name] and self.Options[name].SetValue then
         self.Options[name]:SetValue(value)
     end
 end
 
--- Load values from a table
 function OptionsManager:LoadValues(data)
     if data.Toggles then
         for name, value in pairs(data.Toggles) do
@@ -4160,86 +3179,60 @@ function OptionsManager:LoadValues(data)
     end
 end
 
--- Save values to a table (for config saving)
 function OptionsManager:SaveValues()
     return self:GetAllValues()
 end
 
 return OptionsManager
 end)() end,
-    function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)--[[
-    Paragraph Component - Ultra-Modern Design
-    A beautiful paragraph display component for longer text content
-]]
-
-local TweenService = game:GetService("TweenService")
-
+    function()local wax,script,require=ImportGlobals(12)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Paragraph = {}
 Paragraph.__index = Paragraph
-
 function Paragraph.new(options, tab)
     local self = setmetatable({}, Paragraph)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "Paragraph"
     self.Subtitle = options.Subtitle or "Add your paragraph content here..."
-    
-    -- Create the paragraph UI
     self:Create()
-    
     return self
 end
-
 function Paragraph:Create()
-    -- 🎨 ULTRA-MODERN PARAGRAPH CONTAINER 🎨
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Paragraph"
-    self.Container.Size = UDim2.new(1, 0, 0, 0) -- Auto-size based on content
-    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40) -- Slightly different from other components
+    self.Container.Size = UDim2.new(1, 0, 0, 0) 
+    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40) 
     self.Container.BorderSizePixel = 0
-    self.Container.AutomaticSize = Enum.AutomaticSize.Y -- Auto-resize based on text
+    self.Container.AutomaticSize = Enum.AutomaticSize.Y 
     self.Container.Parent = self.Tab.Container
-    
-    -- Premium border with subtle accent
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(45, 55, 65) -- Subtle border, not as bright as interactive components
+    border.Color = Color3.fromRGB(45, 55, 65) 
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = self.Container
-    
-    -- Subtle accent line on the left (like a quote indicator)
     self.AccentLine = Instance.new("Frame")
     self.AccentLine.Name = "AccentLine"
-    self.AccentLine.Size = UDim2.new(0, 3, 1, -24) -- Full height minus padding
+    self.AccentLine.Size = UDim2.new(0, 3, 1, -24) 
     self.AccentLine.Position = UDim2.new(0, 12, 0, 12)
-    self.AccentLine.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.AccentLine.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
     self.AccentLine.BorderSizePixel = 0
     self.AccentLine.Parent = self.Container
-    
     local accentCorner = Instance.new("UICorner")
     accentCorner.CornerRadius = UDim.new(0, 2)
     accentCorner.Parent = self.AccentLine
-    
-    -- Premium paragraph icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.ParagraphIcon = Instance.new("ImageLabel")
     self.ParagraphIcon.Name = "Icon"
     self.ParagraphIcon.Size = UDim2.new(0, 20, 0, 20)
     self.ParagraphIcon.Position = UDim2.new(0, 24, 0, 16)
     self.ParagraphIcon.BackgroundTransparency = 1
     self.ParagraphIcon.Image = (success and Lucide and Lucide["file-text"]) or "rbxassetid://10723416057"
-    self.ParagraphIcon.ImageColor3 = Color3.fromRGB(100, 140, 180) -- Subtle blue-gray
+    self.ParagraphIcon.ImageColor3 = Color3.fromRGB(100, 140, 180) 
     self.ParagraphIcon.Parent = self.Container
-    
-    -- Paragraph title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
     self.TitleLabel.Size = UDim2.new(1, -60, 0, 24)
@@ -4252,39 +3245,30 @@ function Paragraph:Create()
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TitleLabel.Parent = self.Container
-    
-    -- Paragraph content text
     self.ContentLabel = Instance.new("TextLabel")
     self.ContentLabel.Name = "Content"
-    self.ContentLabel.Size = UDim2.new(1, -60, 0, 0) -- Auto-size height
+    self.ContentLabel.Size = UDim2.new(1, -60, 0, 0) 
     self.ContentLabel.Position = UDim2.new(0, 52, 0, 44)
     self.ContentLabel.BackgroundTransparency = 1
     self.ContentLabel.Text = self.Subtitle
-    self.ContentLabel.TextColor3 = Color3.fromRGB(180, 195, 210) -- Readable but not too bright
+    self.ContentLabel.TextColor3 = Color3.fromRGB(180, 195, 210) 
     self.ContentLabel.TextSize = 13
     self.ContentLabel.Font = Enum.Font.Gotham
     self.ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
-    self.ContentLabel.TextWrapped = true -- Allow text wrapping
-    self.ContentLabel.AutomaticSize = Enum.AutomaticSize.Y -- Auto-resize based on text
+    self.ContentLabel.TextWrapped = true 
+    self.ContentLabel.AutomaticSize = Enum.AutomaticSize.Y 
     self.ContentLabel.Parent = self.Container
-    
-    -- Add padding to the container
     local padding = Instance.new("UIPadding")
     padding.PaddingLeft = UDim.new(0, 0)
     padding.PaddingRight = UDim.new(0, 16)
     padding.PaddingTop = UDim.new(0, 0)
     padding.PaddingBottom = UDim.new(0, 16)
     padding.Parent = self.Container
-    
-    -- Update container size when content changes
     self.ContentLabel:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-        self.Container.Size = UDim2.new(1, 0, 0, self.ContentLabel.AbsoluteSize.Y + 60) -- Title + content + padding
-        -- Update accent line height
+        self.Container.Size = UDim2.new(1, 0, 0, self.ContentLabel.AbsoluteSize.Y + 60) 
         self.AccentLine.Size = UDim2.new(0, 3, 1, -24)
     end)
-    
-    -- Subtle hover effect for premium feel
     self.Container.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
@@ -4292,15 +3276,12 @@ function Paragraph:Create()
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(60, 70, 80)}
         )
         borderTween:Play()
-        
-        -- Subtle accent line glow
         local accentTween = TweenService:Create(
             self.AccentLine,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4308,7 +3289,6 @@ function Paragraph:Create()
         )
         accentTween:Play()
     end)
-    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
@@ -4316,14 +3296,12 @@ function Paragraph:Create()
             {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(45, 55, 65)}
         )
         borderTween:Play()
-        
         local accentTween = TweenService:Create(
             self.AccentLine,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4331,97 +3309,66 @@ function Paragraph:Create()
         )
         accentTween:Play()
     end)
-    
     return self
 end
-
 function Paragraph:SetTitle(title)
     self.Name = title
     self.TitleLabel.Text = title
     return self
 end
-
 function Paragraph:SetContent(content)
     self.Subtitle = content
     self.ContentLabel.Text = content
     return self
 end
-
 return Paragraph
 end)() end,
-    function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)--[[
-    Slider Component
-    A slider UI element for selecting values in a range
-]]
-
-local UserInputService = game:GetService("UserInputService")
+    function()local wax,script,require=ImportGlobals(13)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
 local Slider = {}
 Slider.__index = Slider
-
 function Slider:FormatValue(value)
-    -- Clean up decimal display - max 2 decimal places, remove trailing zeros
     if value == math.floor(value) then
-        -- Integer value
         return tostring(math.floor(value))
     else
-        -- Decimal value - round to 2 decimal places and remove trailing zeros
         local formatted = string.format("%.2f", value)
-        formatted = formatted:gsub("%.?0+$", "") -- Remove trailing zeros and decimal point if needed
+        formatted = formatted:gsub("%.?0+$", "") 
         return formatted
     end
 end
-
 function Slider.new(options, tab)
     local self = setmetatable({}, Slider)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "Slider"
-    self.Description = options.Description or "" -- Add subtitle support
+    self.Description = options.Description or "" 
     self.Min = options.Min or 0
     self.Max = options.Max or 100
     self.Step = options.Step or 1
-    
     self.Value = options.InitialValue or self.Min
     self.Callback = options.Callback or function() end
-    
-    -- Ensure value is within bounds and properly stepped
     self.Value = math.clamp(self.Value, self.Min, self.Max)
     self.Value = self.Min + (math.floor((self.Value - self.Min) / self.Step + 0.5) * self.Step)
-    
-    -- Create the slider UI
     self:Create()
-    
     return self
 end
-
 function Slider:Create()
-    -- Main container with modern styling
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
     self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Modern border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(55, 60, 67)
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = self.Container
-    
-    -- Slider icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.SliderIcon = Instance.new("ImageLabel")
     self.SliderIcon.Name = "Icon"
     self.SliderIcon.Size = UDim2.new(0, 18, 0, 18)
@@ -4430,8 +3377,6 @@ function Slider:Create()
     self.SliderIcon.Image = (success and Lucide and Lucide["sliders"]) or "rbxassetid://10734942565"
     self.SliderIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.SliderIcon.Parent = self.Container
-    
-    -- Slider name
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
@@ -4443,8 +3388,6 @@ function Slider:Create()
     self.NameLabel.Font = Enum.Font.GothamSemibold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    
-    -- Slider description
     if self.Description ~= "" then
         self.SliderDescription = Instance.new("TextLabel")
         self.SliderDescription.Name = "Description"
@@ -4458,13 +3401,11 @@ function Slider:Create()
         self.SliderDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.SliderDescription.Parent = self.Container
     end
-    
-    -- Value display
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
-    self.ValueLabel.Size = UDim2.new(0, 40, 1, 0) -- Bigger size for value
-    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0) -- Right aligned with more space
-    self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5) -- Right anchor
+    self.ValueLabel.Size = UDim2.new(0, 40, 1, 0) 
+    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0) 
+    self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5) 
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
     self.ValueLabel.TextColor3 = self.Library.Colors.LightText
@@ -4472,82 +3413,59 @@ function Slider:Create()
     self.ValueLabel.Font = Enum.Font.GothamMedium
     self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
     self.ValueLabel.Parent = self.Container
-    
-    -- Slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -220, 0, 4) -- Smaller track, more space for value
-    self.SliderTrack.Position = UDim2.new(0, 170, 0.5, 0) -- Better positioning
-    self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
+    self.SliderTrack.Size = UDim2.new(1, -220, 0, 4) 
+    self.SliderTrack.Position = UDim2.new(0, 170, 0.5, 0) 
+    self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5) 
     self.SliderTrack.BackgroundColor3 = self.Library.Colors.Background
     self.SliderTrack.BorderSizePixel = 0
     self.SliderTrack.Parent = self.Container
-    
-    -- Track corner radius
     local trackCorner = Instance.new("UICorner")
     trackCorner.CornerRadius = UDim.new(1, 0)
     trackCorner.Parent = self.SliderTrack
-    
-    -- Slider fill
     self.SliderFill = Instance.new("Frame")
     self.SliderFill.Name = "Fill"
-    self.SliderFill.Size = UDim2.new(0, 0, 1, 0) -- Will be set in UpdateValue
+    self.SliderFill.Size = UDim2.new(0, 0, 1, 0) 
     self.SliderFill.BackgroundColor3 = self.Library.Colors.Accent
     self.SliderFill.BorderSizePixel = 0
     self.SliderFill.Parent = self.SliderTrack
-    
-    -- Fill corner radius
     local fillCorner = Instance.new("UICorner")
     fillCorner.CornerRadius = UDim.new(1, 0)
     fillCorner.Parent = self.SliderFill
-    
-    -- Slider indicator
     self.SliderIndicator = Instance.new("Frame")
     self.SliderIndicator.Name = "Indicator"
-    self.SliderIndicator.Size = UDim2.new(0, 12, 0, 12) -- Smaller, more refined like Darius
-    self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0) -- Will be set in UpdateValue
+    self.SliderIndicator.Size = UDim2.new(0, 12, 0, 12) 
+    self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0) 
     self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderIndicator.BorderSizePixel = 0
     self.SliderIndicator.Parent = self.SliderTrack
-    
-    -- Indicator corner radius
     local indicatorCorner = Instance.new("UICorner")
     indicatorCorner.CornerRadius = UDim.new(1, 0)
     indicatorCorner.Parent = self.SliderIndicator
-    
-    -- Slider interaction button
     self.SliderButton = Instance.new("TextButton")
     self.SliderButton.Name = "Button"
     self.SliderButton.Size = UDim2.new(1, 0, 1, 0)
     self.SliderButton.BackgroundTransparency = 1
     self.SliderButton.Text = ""
     self.SliderButton.Parent = self.SliderTrack
-    
-    -- Update the slider to the initial value
     self:UpdateValue(self.Value)
-    
-    -- Slider interaction
     local isDragging = false
-    
     self.SliderButton.MouseButton1Down:Connect(function()
         isDragging = true
         self:UpdateFromMouse()
     end)
-    
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
             self:UpdateFromMouse()
         end
     end)
-    
-    -- Modern hover effects
     self.Container.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
@@ -4555,7 +3473,6 @@ function Slider:Create()
             {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4563,7 +3480,6 @@ function Slider:Create()
         )
         borderTween:Play()
     end)
-    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
@@ -4571,7 +3487,6 @@ function Slider:Create()
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4579,136 +3494,92 @@ function Slider:Create()
         )
         borderTween:Play()
     end)
-    
     return self
 end
-
 function Slider:UpdateFromMouse()
     local mouse = game:GetService("Players").LocalPlayer:GetMouse()
     local trackPosition = self.SliderTrack.AbsolutePosition
     local trackSize = self.SliderTrack.AbsoluteSize
-    
     local relativeX = math.clamp(mouse.X - trackPosition.X, 0, trackSize.X)
     local percent = relativeX / trackSize.X
-    
     local value = self.Min + ((self.Max - self.Min) * percent)
     value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
-    
     self:UpdateValue(value)
 end
-
 function Slider:UpdateValue(value)
     value = math.clamp(value, self.Min, self.Max)
     value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
-    
     self.Value = value
     self.ValueLabel.Text = self:FormatValue(value)
-    
-    -- Calculate the percentage for visual updates
     local percent = (value - self.Min) / (self.Max - self.Min)
-    
-    -- Update the fill and indicator position
     self.SliderFill.Size = UDim2.new(percent, 0, 1, 0)
     self.SliderIndicator.Position = UDim2.new(percent, 0, 0.5, 0)
-    
-    -- Call the callback with the new value
     self.Callback(value)
-    
     return self
 end
-
 return Slider
 end)() end,
-    function()local wax,script,require=ImportGlobals(14)local ImportGlobals return (function(...)--[[
-    Tab Component
-    Represents a section in the UI
-]]
-
-local TweenService = game:GetService("TweenService")
-
+    function()local wax,script,require=ImportGlobals(14)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Tab = {}
 Tab.__index = Tab
-
 function Tab.new(options, window)
     local self = setmetatable({}, Tab)
-    
     self.Window = window
     self.Library = window.Library
     self.Name = options.Name or "Tab"
     self.Color = options.tabColor or self.Library.Colors.Accent
     self.Icon = options.Icon or ""
     self.Elements = {}
-    
-    -- Options manager integration
     self.OptionsManager = options.OptionsManager
-    
-    -- Create the tab button and content container
     self:Create()
-    
     return self
 end
-
 function Tab:Create()
-    -- Load Lucide icons with error handling
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
-    -- 🚀 ULTRA-MODERN TAB BUTTON DESIGN 🚀
     self.TabButton = Instance.new("TextButton")
     self.TabButton.Name = self.Name .. "Tab"
-    self.TabButton.Size = UDim2.new(1, 0, 0, 50) -- Taller for premium feel
-    self.TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32) -- Dark premium background
-    self.TabButton.BackgroundTransparency = 1 -- Start transparent
+    self.TabButton.Size = UDim2.new(1, 0, 0, 50) 
+    self.TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32) 
+    self.TabButton.BackgroundTransparency = 1 
     self.TabButton.BorderSizePixel = 0
     self.TabButton.Text = ""
     self.TabButton.AutoButtonColor = false
     self.TabButton.Parent = self.Window.TabListContainer
-    
-    -- Ultra-modern corner radius
     local tabCorner = Instance.new("UICorner")
-    tabCorner.CornerRadius = UDim.new(0, 14) -- Very rounded for premium look
+    tabCorner.CornerRadius = UDim.new(0, 14) 
     tabCorner.Parent = self.TabButton
-    
-    -- Premium gradient border effect
     self.TabBorder = Instance.new("UIStroke")
-    self.TabBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.TabBorder.Color = Color3.fromRGB(0, 120, 215) 
     self.TabBorder.Thickness = 1
-    self.TabBorder.Transparency = 1 -- Hidden initially
+    self.TabBorder.Transparency = 1 
     self.TabBorder.Parent = self.TabButton
-    
-    -- Subtle glow effect background
     self.TabGlow = Instance.new("Frame")
     self.TabGlow.Name = "GlowEffect"
     self.TabGlow.Size = UDim2.new(1, 4, 1, 4)
     self.TabGlow.Position = UDim2.new(0, -2, 0, -2)
     self.TabGlow.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.TabGlow.BackgroundTransparency = 1 -- Hidden initially
+    self.TabGlow.BackgroundTransparency = 1 
     self.TabGlow.BorderSizePixel = 0
     self.TabGlow.ZIndex = self.TabButton.ZIndex - 1
     self.TabGlow.Parent = self.TabButton
-    
     local glowCorner = Instance.new("UICorner")
     glowCorner.CornerRadius = UDim.new(0, 16)
     glowCorner.Parent = self.TabGlow
-    
-    -- Premium Icon Design
     if self.Icon and self.Icon ~= "" and success and Lucide and Lucide[self.Icon] then
-        -- Icon container with subtle background
         self.IconContainer = Instance.new("Frame")
         self.IconContainer.Name = "IconContainer"
         self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
         self.IconContainer.Position = UDim2.new(0, 12, 0.5, 0)
         self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
         self.IconContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-        self.IconContainer.BackgroundTransparency = 0.9 -- Very subtle
+        self.IconContainer.BackgroundTransparency = 0.9 
         self.IconContainer.BorderSizePixel = 0
         self.IconContainer.Parent = self.TabButton
-        
         local iconCorner = Instance.new("UICorner")
         iconCorner.CornerRadius = UDim.new(0, 8)
         iconCorner.Parent = self.IconContainer
-        
         self.TabIcon = Instance.new("ImageLabel")
         self.TabIcon.Name = "Icon"
         self.TabIcon.Size = UDim2.new(0, 18, 0, 18)
@@ -4718,8 +3589,6 @@ function Tab:Create()
         self.TabIcon.Image = Lucide[self.Icon]
         self.TabIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
         self.TabIcon.Parent = self.IconContainer
-        
-        -- Premium Tab Text (with icon)
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
         self.TabText.Size = UDim2.new(1, -60, 1, 0)
@@ -4733,7 +3602,6 @@ function Tab:Create()
         self.TabText.TextXAlignment = Enum.TextXAlignment.Left
         self.TabText.Parent = self.TabButton
     else
-        -- Premium Tab Text (without icon)
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
         self.TabText.Size = UDim2.new(1, -32, 1, 0)
@@ -4747,93 +3615,70 @@ function Tab:Create()
         self.TabText.TextXAlignment = Enum.TextXAlignment.Left
         self.TabText.Parent = self.TabButton
     end
-    
-    -- Ultra-Modern Active Indicator (left side accent)
     self.TabIndicator = Instance.new("Frame")
     self.TabIndicator.Name = "Indicator"
     self.TabIndicator.Size = UDim2.new(0, 4, 0, 30)
     self.TabIndicator.Position = UDim2.new(0, 0, 0.5, 0)
     self.TabIndicator.AnchorPoint = Vector2.new(0, 0.5)
-    self.TabIndicator.BackgroundColor3 = Color3.fromRGB(0, 150, 255) -- Bright blue accent
+    self.TabIndicator.BackgroundColor3 = Color3.fromRGB(0, 150, 255) 
     self.TabIndicator.BorderSizePixel = 0
     self.TabIndicator.Visible = false
     self.TabIndicator.Parent = self.TabButton
-    
-    -- Indicator corner radius
     local indicatorCorner = Instance.new("UICorner")
     indicatorCorner.CornerRadius = UDim.new(0, 2)
     indicatorCorner.Parent = self.TabIndicator
-    
-    -- Content Container
     self.Container = Instance.new("ScrollingFrame")
     self.Container.Name = self.Name .. "Container"
-    self.Container.Size = UDim2.new(1, -8, 1, -8) -- Less margin
-    self.Container.Position = UDim2.new(0, 4, 0, 4) -- Minimal offset
+    self.Container.Size = UDim2.new(1, -8, 1, -8) 
+    self.Container.Position = UDim2.new(0, 4, 0, 4) 
     self.Container.BackgroundTransparency = 1
     self.Container.BorderSizePixel = 0
-    self.Container.ScrollBarThickness = 3 -- Thinner scrollbar
+    self.Container.ScrollBarThickness = 3 
     self.Container.ScrollBarImageColor3 = self.Library.Colors.Accent
     self.Container.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    self.Container.Visible = false -- Hidden by default
+    self.Container.Visible = false 
     self.Container.Parent = self.Window.ContentContainer
-    
-    -- Container Layout with better spacing
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, 12) -- Better spacing between components
+    self.ContainerLayout.Padding = UDim.new(0, 12) 
     self.ContainerLayout.Parent = self.Container
-    
-    -- Container Padding
     local containerPadding = Instance.new("UIPadding")
-    containerPadding.PaddingLeft = UDim.new(0, 12) -- Reduced padding
+    containerPadding.PaddingLeft = UDim.new(0, 12) 
     containerPadding.PaddingRight = UDim.new(0, 12)
     containerPadding.PaddingTop = UDim.new(0, 12)
     containerPadding.PaddingBottom = UDim.new(0, 12)
     containerPadding.Parent = self.Container
-    
-    -- Tab button click handler
     self.TabButton.MouseButton1Click:Connect(function()
         self.Window:SelectTab(self)
     end)
-    
-    -- 🌟 ULTRA-MODERN HOVER EFFECTS WITH PREMIUM ANIMATIONS 🌟
     self.TabButton.MouseEnter:Connect(function()
         if self.Window.ActiveTab ~= self then
-            -- Premium background animation
             local bgTween = TweenService:Create(
                 self.TabButton,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {BackgroundColor3 = Color3.fromRGB(28, 35, 42), BackgroundTransparency = 0}
             )
             bgTween:Play()
-            
-            -- Subtle glow effect
             local glowTween = TweenService:Create(
                 self.TabGlow,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {BackgroundTransparency = 0.95}
             )
             glowTween:Play()
-            
-            -- Border highlight
             local borderTween = TweenService:Create(
                 self.TabBorder,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {Transparency = 0.7}
             )
             borderTween:Play()
-            
-            -- Premium text animation
             local textTween = TweenService:Create(
                 self.TabText,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {TextColor3 = Color3.fromRGB(220, 240, 255)}
             )
             textTween:Play()
-            
-            -- Icon container and icon animations
             if self.IconContainer then
                 local iconBgTween = TweenService:Create(
                     self.IconContainer,
@@ -4841,7 +3686,6 @@ function Tab:Create()
                     {BackgroundTransparency = 0.8}
                 )
                 iconBgTween:Play()
-                
                 local iconTween = TweenService:Create(
                     self.TabIcon,
                     TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4851,38 +3695,32 @@ function Tab:Create()
             end
         end
     end)
-    
     self.TabButton.MouseLeave:Connect(function()
         if self.Window.ActiveTab ~= self then
-            -- Smooth return animations
             local bgTween = TweenService:Create(
                 self.TabButton,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {BackgroundTransparency = 1}
             )
             bgTween:Play()
-            
             local glowTween = TweenService:Create(
                 self.TabGlow,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {BackgroundTransparency = 1}
             )
             glowTween:Play()
-            
             local borderTween = TweenService:Create(
                 self.TabBorder,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {Transparency = 1}
             )
             borderTween:Play()
-            
             local textTween = TweenService:Create(
                 self.TabText,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {TextColor3 = Color3.fromRGB(160, 180, 200)}
             )
             textTween:Play()
-            
             if self.IconContainer then
                 local iconBgTween = TweenService:Create(
                     self.IconContainer,
@@ -4890,7 +3728,6 @@ function Tab:Create()
                     {BackgroundTransparency = 0.9}
                 )
                 iconBgTween:Play()
-                
                 local iconTween = TweenService:Create(
                     self.TabIcon,
                     TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4900,51 +3737,36 @@ function Tab:Create()
             end
         end
     end)
-    
     return self
 end
-
 function Tab:Show()
     self.Container.Visible = true
     self.TabIndicator.Visible = true
-    
-    -- 🔥 ULTRA-PREMIUM ACTIVE STATE ANIMATIONS 🔥
-    
-    -- Stunning gradient background
     local bgTween = TweenService:Create(
         self.TabButton,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundColor3 = Color3.fromRGB(0, 120, 215), BackgroundTransparency = 0}
     )
     bgTween:Play()
-    
-    -- Premium glow effect
     local glowTween = TweenService:Create(
         self.TabGlow,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0.8}
     )
     glowTween:Play()
-    
-    -- Bright border highlight
     local borderTween = TweenService:Create(
         self.TabBorder,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Color = Color3.fromRGB(100, 180, 255), Transparency = 0}
     )
     borderTween:Play()
-    
-    -- Premium text styling
     local textTween = TweenService:Create(
         self.TabText,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {TextColor3 = Color3.fromRGB(255, 255, 255)}
     )
     textTween:Play()
-    
-    self.TabText.Font = Enum.Font.GothamBold -- Bold when active for premium feel
-    
-    -- Icon container and icon premium animations
+    self.TabText.Font = Enum.Font.GothamBold 
     if self.IconContainer then
         local iconBgTween = TweenService:Create(
             self.IconContainer,
@@ -4952,7 +3774,6 @@ function Tab:Show()
             {BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.1}
         )
         iconBgTween:Play()
-        
         local iconTween = TweenService:Create(
             self.TabIcon,
             TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -4961,42 +3782,34 @@ function Tab:Show()
         iconTween:Play()
     end
 end
-
 function Tab:Hide()
     self.Container.Visible = false
     self.TabIndicator.Visible = false
-    
-    -- Smooth return to inactive state
     local bgTween = TweenService:Create(
         self.TabButton,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 1}
     )
     bgTween:Play()
-    
     local glowTween = TweenService:Create(
         self.TabGlow,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundTransparency = 1}
     )
     glowTween:Play()
-    
     local borderTween = TweenService:Create(
         self.TabBorder,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Color = Color3.fromRGB(0, 120, 215), Transparency = 1}
     )
     borderTween:Play()
-    
     local textTween = TweenService:Create(
         self.TabText,
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {TextColor3 = Color3.fromRGB(160, 180, 200)}
     )
     textTween:Play()
-    
-    self.TabText.Font = Enum.Font.GothamMedium -- Medium weight when inactive
-    
+    self.TabText.Font = Enum.Font.GothamMedium 
     if self.IconContainer then
         local iconBgTween = TweenService:Create(
             self.IconContainer,
@@ -5004,7 +3817,6 @@ function Tab:Hide()
             {BackgroundColor3 = Color3.fromRGB(0, 120, 215), BackgroundTransparency = 0.9}
         )
         iconBgTween:Play()
-        
         local iconTween = TweenService:Create(
             self.TabIcon,
             TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5013,100 +3825,75 @@ function Tab:Hide()
         iconTween:Play()
     end
 end
-
--- Create a section to group elements
 function Tab:Section(name)
     local section = Instance.new("Frame")
     section.Name = name .. "Section"
-    section.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
+    section.Size = UDim2.new(1, 0, 0, 0) 
     section.BackgroundTransparency = 1
     section.BorderSizePixel = 0
     section.AutomaticSize = Enum.AutomaticSize.Y
     section.Parent = self.Container
-    
-    -- Section title
     local title = Instance.new("TextLabel")
     title.Name = "Title"
-    title.Size = UDim2.new(1, 0, 0, 18) -- Slightly smaller height
+    title.Size = UDim2.new(1, 0, 0, 18) 
     title.BackgroundTransparency = 1
     title.Text = name
     title.TextColor3 = self.Library.Colors.LightText
-    title.TextSize = 14 -- Smaller text size
+    title.TextSize = 14 
     title.Font = Enum.Font.GothamBold
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = section
-    
-    -- Section content
     local content = Instance.new("Frame")
     content.Name = "Content"
-    content.Size = UDim2.new(1, 0, 0, 0) -- Auto-size
-    content.Position = UDim2.new(0, 0, 0, 22) -- Reduced spacing
+    content.Size = UDim2.new(1, 0, 0, 0) 
+    content.Position = UDim2.new(0, 0, 0, 22) 
     content.BackgroundTransparency = 1
     content.BorderSizePixel = 0
     content.AutomaticSize = Enum.AutomaticSize.Y
     content.Parent = section
-    
-    -- Content layout
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Vertical
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 4) -- Reduced padding between elements
+    layout.Padding = UDim.new(0, 4) 
     layout.Parent = content
-    
-    -- Auto-size the section based on its contents
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         content.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
         section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + 30)
     end)
-    
     return content
 end
-
--- UI Element Creation Methods
 function Tab:Toggle(options)
     options = options or {}
     options.Name = options.Name or "Toggle"
     options.Default = options.Default or false
     options.Callback = options.Callback or function() end
-    
     local toggle = require(script.Parent.Toggle).new(options, self)
     table.insert(self.Elements, toggle)
-    
-    -- Register with options manager if available
     if self.OptionsManager then
         self.OptionsManager:RegisterToggle(options.Name, toggle)
     end
-    
     return toggle
 end
-
 function Tab:Button(options)
     options = options or {}
     options.Name = options.Name or "Button"
     options.Callback = options.Callback or function() end
-    
     local button = require(script.Parent.Button).new(options, self)
     table.insert(self.Elements, button)
     return button
 end
-
 function Tab:TextBox(options)
     options = options or {}
     options.Name = options.Name or "TextBox"
     options.Placeholder = options.Placeholder or "Type here..."
     options.Callback = options.Callback or function() end
-    
     local textbox = require(script.Parent.TextBox).new(options, self)
     table.insert(self.Elements, textbox)
-    
-    -- Register with options manager if available
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, textbox)
     end
-    
     return textbox
 end
-
 function Tab:Slider(options)
     options = options or {}
     options.Name = options.Name or "Slider"
@@ -5115,18 +3902,13 @@ function Tab:Slider(options)
     options.Step = options.Step or 1
     options.InitialValue = options.InitialValue or options.Min
     options.Callback = options.Callback or function() end
-    
     local slider = require(script.Parent.Slider).new(options, self)
     table.insert(self.Elements, slider)
-    
-    -- Register with options manager if available
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, slider)
     end
-    
     return slider
 end
-
 function Tab:Dropdown(options)
     options = options or {}
     options.Name = options.Name or "Dropdown"
@@ -5134,89 +3916,60 @@ function Tab:Dropdown(options)
     options.Items = options.Items or {}
     options.Multiselect = options.Multiselect or false
     options.Callback = options.Callback or function() end
-    
     local dropdown = require(script.Parent.Dropdown).new(options, self)
     table.insert(self.Elements, dropdown)
-    
-    -- Register with options manager if available
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, dropdown)
     end
-    
     return dropdown
 end
-
 function Tab:Label(text)
     local label = require(script.Parent.Label).new({Text = text}, self)
     table.insert(self.Elements, label)
     return label
 end
-
 function Tab:Paragraph(options)
     options = options or {}
     options.Name = options.Name or "Paragraph"
     options.Subtitle = options.Subtitle or "Add your paragraph content here..."
-    
     local paragraph = require(script.Parent.Paragraph).new(options, self)
     table.insert(self.Elements, paragraph)
     return paragraph
 end
-
 return Tab
 end)() end,
-    function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)--[[
-    TextBox Component
-    A text input UI element
-]]
-
-local UserInputService = game:GetService("UserInputService")
+    function()local wax,script,require=ImportGlobals(15)local ImportGlobals return (function(...)local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
 local TextBox = {}
 TextBox.__index = TextBox
-
 function TextBox.new(options, tab)
     local self = setmetatable({}, TextBox)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "TextBox"
     self.Placeholder = options.Placeholder or "Type here..."
-    
     self.Value = ""
     self.Callback = options.Callback or function() end
-    
-    -- Create the textbox UI
     self:Create()
-    
     return self
 end
-
 function TextBox:Create()
-    -- Main container with modern styling
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "TextBox"
     self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Modern border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(55, 60, 67)
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = self.Container
-    
-    -- TextBox icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.TextBoxIcon = Instance.new("ImageLabel")
     self.TextBoxIcon.Name = "Icon"
     self.TextBoxIcon.Size = UDim2.new(0, 18, 0, 18)
@@ -5226,8 +3979,6 @@ function TextBox:Create()
     self.TextBoxIcon.Image = (success and Lucide and Lucide["type"]) or "rbxassetid://10723367606"
     self.TextBoxIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.TextBoxIcon.Parent = self.Container
-    
-    -- TextBox name
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
@@ -5239,8 +3990,6 @@ function TextBox:Create()
     self.NameLabel.Font = Enum.Font.GothamSemibold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    
-    -- Modern TextBox input background
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
     self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
@@ -5249,19 +3998,13 @@ function TextBox:Create()
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.InputBackground.BorderSizePixel = 0
     self.InputBackground.Parent = self.Container
-    
-    -- Input background border
     self.InputBorder = Instance.new("UIStroke")
     self.InputBorder.Color = Color3.fromRGB(50, 55, 62)
     self.InputBorder.Thickness = 1
     self.InputBorder.Parent = self.InputBackground
-    
-    -- Input background corner radius
     local inputCorner = Instance.new("UICorner")
     inputCorner.CornerRadius = UDim.new(0, 6)
     inputCorner.Parent = self.InputBackground
-    
-    -- TextBox input
     self.Input = Instance.new("TextBox")
     self.Input.Name = "Input"
     self.Input.Size = UDim2.new(1, -16, 1, 0)
@@ -5276,8 +4019,6 @@ function TextBox:Create()
     self.Input.TextXAlignment = Enum.TextXAlignment.Left
     self.Input.ClearTextOnFocus = false
     self.Input.Parent = self.InputBackground
-    
-    -- Modern input focus/unfocus effects
     self.Input.Focused:Connect(function()
         local bgTween = TweenService:Create(
             self.InputBackground,
@@ -5285,7 +4026,6 @@ function TextBox:Create()
             {BackgroundColor3 = Color3.fromRGB(35, 40, 47)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             self.InputBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5293,7 +4033,6 @@ function TextBox:Create()
         )
         borderTween:Play()
     end)
-    
     self.Input.FocusLost:Connect(function(enterPressed)
         local bgTween = TweenService:Create(
             self.InputBackground,
@@ -5301,19 +4040,15 @@ function TextBox:Create()
             {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             self.InputBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(50, 55, 62)}
         )
         borderTween:Play()
-        
         self.Value = self.Input.Text
         self.Callback(self.Value)
     end)
-    
-    -- Modern hover effects
     self.Container.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
@@ -5321,7 +4056,6 @@ function TextBox:Create()
             {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5329,7 +4063,6 @@ function TextBox:Create()
         )
         borderTween:Play()
     end)
-    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
@@ -5337,7 +4070,6 @@ function TextBox:Create()
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5345,79 +4077,53 @@ function TextBox:Create()
         )
         borderTween:Play()
     end)
-    
     return self
 end
-
 function TextBox:SetValue(value)
     self.Value = value
     self.Input.Text = value
     self.Callback(value)
     return self
 end
-
 return TextBox
 end)() end,
-    function()local wax,script,require=ImportGlobals(16)local ImportGlobals return (function(...)--[[
-    Toggle Component
-    A toggle switch UI element
-]]
-
-local TweenService = game:GetService("TweenService")
-
+    function()local wax,script,require=ImportGlobals(16)local ImportGlobals return (function(...)local TweenService = game:GetService("TweenService")
 local Toggle = {}
 Toggle.__index = Toggle
-
 function Toggle.new(options, tab)
     local self = setmetatable({}, Toggle)
-    
     self.Tab = tab
     self.Library = tab.Library
     self.Name = options.Name or "Toggle"
-    self.Description = options.Description or "" -- Add subtitle support
-    self.HasKeybind = options.Keybind or false -- Keybind support
-    self.Keybind = nil -- Will be set by user
+    self.Description = options.Description or "" 
+    self.HasKeybind = options.Keybind or false 
+    self.Keybind = nil 
     self.IsListeningForKeybind = false
-    
     self.Value = options.Default or false
     self.Callback = options.Callback or function() end
-    
-    -- Create the toggle UI
     self:Create()
-    
-    -- Setup keybind system if enabled
     if self.HasKeybind then
         self:SetupKeybindSystem()
     end
-    
     return self
 end
-
 function Toggle:Create()
-    -- Main container with modern styling
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Toggle"
     self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
-    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Match content container
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Modern border
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(40, 45, 52)
     border.Thickness = 1
     border.Parent = self.Container
-    
-    -- Corner radius
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12) -- Match window corner radius
+    corner.CornerRadius = UDim.new(0, 12) 
     corner.Parent = self.Container
-    
-    -- Toggle icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.ToggleIcon = Instance.new("ImageLabel")
     self.ToggleIcon.Name = "Icon"
     self.ToggleIcon.Size = UDim2.new(0, 22, 0, 22)
@@ -5426,8 +4132,6 @@ function Toggle:Create()
     self.ToggleIcon.Image = (success and Lucide and Lucide["power"]) or "rbxassetid://10734930466"
     self.ToggleIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
     self.ToggleIcon.Parent = self.Container
-    
-    -- Toggle name
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
@@ -5439,8 +4143,6 @@ function Toggle:Create()
     self.NameLabel.Font = Enum.Font.GothamSemibold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    
-    -- Toggle description
     if self.Description ~= "" then
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
@@ -5454,45 +4156,33 @@ function Toggle:Create()
         self.ToggleDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.ToggleDescription.Parent = self.Container
     end
-    
-
-    
-    -- Toggle switch background
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, 44, 0, 24) -- Bigger Fluent-style toggle
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -94 or -54, 0.5, 0) -- Move left if keybind exists
-    self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
-    self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 65) -- Darker background
+    self.ToggleBackground.Size = UDim2.new(0, 44, 0, 24) 
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -94 or -54, 0.5, 0) 
+    self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5) 
+    self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 65) 
     self.ToggleBackground.BorderSizePixel = 0
     self.ToggleBackground.Parent = self.Container
-    
-    -- Toggle background corner radius
     local bgCorner = Instance.new("UICorner")
-    bgCorner.CornerRadius = UDim.new(1, 0) -- Fully rounded
+    bgCorner.CornerRadius = UDim.new(1, 0) 
     bgCorner.Parent = self.ToggleBackground
-    
-    -- Toggle switch indicator
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, 18, 0, 18) -- Bigger indicator
-    self.ToggleIndicator.Position = UDim2.new(0, 3, 0.5, 0) -- Left position
-    self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5) -- Center vertically
-    self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White indicator
+    self.ToggleIndicator.Size = UDim2.new(0, 18, 0, 18) 
+    self.ToggleIndicator.Position = UDim2.new(0, 3, 0.5, 0) 
+    self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5) 
+    self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
     self.ToggleIndicator.BorderSizePixel = 0
     self.ToggleIndicator.Parent = self.ToggleBackground
-    
-    -- Toggle indicator corner radius
     local indicatorCorner = Instance.new("UICorner")
-    indicatorCorner.CornerRadius = UDim.new(1, 0) -- Fully rounded
+    indicatorCorner.CornerRadius = UDim.new(1, 0) 
     indicatorCorner.Parent = self.ToggleIndicator
-    
-    -- Keybind button (if enabled) - positioned AFTER the toggle switch
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
         self.KeybindButton.Size = UDim2.new(0, 36, 0, 28)
-        self.KeybindButton.Position = UDim2.new(1, -44, 0.5, 0) -- Right side, after toggle
+        self.KeybindButton.Position = UDim2.new(1, -44, 0.5, 0) 
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
@@ -5500,64 +4190,44 @@ function Toggle:Create()
         self.KeybindButton.TextSize = 14
         self.KeybindButton.Font = Enum.Font.GothamBold
         self.KeybindButton.BorderSizePixel = 0
-        self.KeybindButton.ZIndex = 10 -- Higher z-index to ensure it's on top
+        self.KeybindButton.ZIndex = 10 
         self.KeybindButton.Parent = self.Container
-        
-        -- Keybind button corner radius
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = self.KeybindButton
-        
-        -- Keybind button functionality handled by drag detection below
-        
-        -- Drag out functionality for all platforms
         local UserInputService = game:GetService("UserInputService")
         local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        
-        -- Variables for drag detection
         local isDragging = false
         local dragStart = nil
         local pressTime = 0
         local hasMovedEnough = false
         local dragConnection = nil
-        
-        -- Variables for connections
         local releaseConnection = nil
-        
-        -- Mouse/Touch down
         self.KeybindButton.MouseButton1Down:Connect(function()
             isDragging = true
             dragStart = UserInputService:GetMouseLocation()
             pressTime = tick()
             hasMovedEnough = false
-            print("Toggle keybind drag started") -- Debug
-            
-            -- Clean up any existing connections
+            print("Toggle keybind drag started") 
             if dragConnection then
                 dragConnection:Disconnect()
             end
             if releaseConnection then
                 releaseConnection:Disconnect()
             end
-            
-            -- Connect to mouse movement
             dragConnection = UserInputService.InputChanged:Connect(function(input)
                 if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
                     local currentPos = Vector2.new(input.Position.X, input.Position.Y)
                     local distance = (currentPos - dragStart).Magnitude
-                    if distance > 15 then -- Reduced threshold
+                    if distance > 15 then 
                         hasMovedEnough = true
-                        print("Toggle keybind moved enough:", distance) -- Debug
+                        print("Toggle keybind moved enough:", distance) 
                     end
                 end
             end)
-            
-            -- Connect to global mouse release
             releaseConnection = UserInputService.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
-                    print("Toggle keybind mouse released") -- Debug
-                    
-                    -- Clean up connections
+                    print("Toggle keybind mouse released") 
                     if releaseConnection then
                         releaseConnection:Disconnect()
                         releaseConnection = nil
@@ -5566,34 +4236,25 @@ function Toggle:Create()
                         dragConnection:Disconnect()
                         dragConnection = nil
                     end
-                    
                     local holdTime = tick() - pressTime
-                    print("Toggle keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) -- Debug
-                    
-                    -- Create draggable if: moved enough OR held long enough
+                    print("Toggle keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) 
                     if hasMovedEnough or holdTime > 0.5 then
-                        print("Creating draggable toggle keybind") -- Debug
+                        print("Creating draggable toggle keybind") 
                         self:CreateDraggableKeybind()
                     elseif holdTime < 0.3 then
-                        -- Quick click - start keybind listening
-                        print("Starting keybind listening") -- Debug
+                        print("Starting keybind listening") 
                         self:StartKeybindListening()
                     end
-                    
                     isDragging = false
                     dragStart = nil
                     hasMovedEnough = false
                 end
             end)
         end)
-        
-        -- Right click for PC users (alternative method)
         self.KeybindButton.MouseButton2Click:Connect(function()
-            print("Right click - creating draggable toggle keybind") -- Debug
+            print("Right click - creating draggable toggle keybind") 
             self:CreateDraggableKeybind()
         end)
-        
-        -- Keybind button hover effects
         self.KeybindButton.MouseEnter:Connect(function()
             if not self.IsListeningForKeybind then
                 local hoverTween = TweenService:Create(
@@ -5604,7 +4265,6 @@ function Toggle:Create()
                 hoverTween:Play()
             end
         end)
-        
         self.KeybindButton.MouseLeave:Connect(function()
             if not self.IsListeningForKeybind then
                 local leaveTween = TweenService:Create(
@@ -5616,26 +4276,18 @@ function Toggle:Create()
             end
         end)
     end
-    
-    -- Toggle button for interaction (exclude keybind area)
     self.ToggleButton = Instance.new("TextButton")
     self.ToggleButton.Name = "Button"
-    self.ToggleButton.Size = UDim2.new(1, self.HasKeybind and -44 or 0, 1, 0) -- Exclude keybind button area
+    self.ToggleButton.Size = UDim2.new(1, self.HasKeybind and -44 or 0, 1, 0) 
     self.ToggleButton.BackgroundTransparency = 1
     self.ToggleButton.Text = ""
     self.ToggleButton.Parent = self.Container
-    
-    -- Set initial state
     if self.Value then
-        self:SetValue(true, false) -- Set value without callback
+        self:SetValue(true, false) 
     end
-    
-    -- Toggle click handler
     self.ToggleButton.MouseButton1Click:Connect(function()
         self:SetValue(not self.Value)
     end)
-    
-    -- Modern hover effects
     self.ToggleButton.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
@@ -5643,7 +4295,6 @@ function Toggle:Create()
             {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5651,7 +4302,6 @@ function Toggle:Create()
         )
         borderTween:Play()
     end)
-    
     self.ToggleButton.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
@@ -5659,7 +4309,6 @@ function Toggle:Create()
             {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -5667,26 +4316,18 @@ function Toggle:Create()
         )
         borderTween:Play()
     end)
-    
     return self
 end
-
 function Toggle:SetValue(value, callCallback)
     if callCallback == nil then callCallback = true end
-    
     self.Value = value
-    
-    -- Update visual state
     if value then
-        -- Tween the indicator to the right
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             self.Library.TweenInfo,
-            {Position = UDim2.new(0, 23, 0.5, 0)} -- Adjusted for bigger toggle
+            {Position = UDim2.new(0, 23, 0.5, 0)} 
         )
         indicatorTween:Play()
-        
-        -- Tween the background color
         local bgTween = TweenService:Create(
             self.ToggleBackground,
             self.Library.TweenInfo,
@@ -5694,15 +4335,12 @@ function Toggle:SetValue(value, callCallback)
         )
         bgTween:Play()
     else
-        -- Tween the indicator to the left
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             self.Library.TweenInfo,
-            {Position = UDim2.new(0, 3, 0.5, 0)} -- Adjusted for bigger toggle
+            {Position = UDim2.new(0, 3, 0.5, 0)} 
         )
         indicatorTween:Play()
-        
-        -- Tween the background color
         local bgTween = TweenService:Create(
             self.ToggleBackground,
             self.Library.TweenInfo,
@@ -5710,59 +4348,44 @@ function Toggle:SetValue(value, callCallback)
         )
         bgTween:Play()
     end
-    
-    -- Call the callback function if requested
     if callCallback then
         self.Callback(self.Value)
     end
-    
     return self
 end
-
 function Toggle:SetupKeybindSystem()
     local UserInputService = game:GetService("UserInputService")
-    
-    -- Listen for keybind input
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
-        
         if self.IsListeningForKeybind then
-            -- Set new keybind
             self.Keybind = input.KeyCode
             self.IsListeningForKeybind = false
             self:UpdateKeybindDisplay()
             self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
             return
         end
-        
-        -- Check if pressed key matches toggle keybind
         if self.Keybind and input.KeyCode == self.Keybind then
             self:SetValue(not self.Value)
         end
     end)
 end
-
 function Toggle:StartKeybindListening()
     self.IsListeningForKeybind = true
     self.KeybindButton.Text = "..."
-    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent -- Accent color when listening
+    self.KeybindButton.BackgroundColor3 = self.Library.Colors.Accent 
 end
-
 function Toggle:UpdateKeybindDisplay()
     if self.Keybind then
-        -- Convert KeyCode to readable text
         local keyName = tostring(self.Keybind):gsub("Enum.KeyCode.", "")
         self.KeybindButton.Text = keyName:upper()
-        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 -- Bigger text for all keys
+        self.KeybindButton.TextSize = #keyName > 2 and 12 or 14 
     else
         self.KeybindButton.Text = "⌨"
     end
 end
-
 function Toggle:CreateDraggableKeybind()
-    print("Toggle:CreateDraggableKeybind called for:", self.Name) -- Debug
+    print("Toggle:CreateDraggableKeybind called for:", self.Name) 
     local DraggableKeybind = require(script.Parent.DraggableKeybind)
-    
     local draggable = DraggableKeybind.CreateFromButton(
         self.KeybindButton,
         "Toggle",
@@ -5771,65 +4394,39 @@ function Toggle:CreateDraggableKeybind()
         function() return self.Value end,
         function(value) self:SetValue(value) end
     )
-    print("Draggable toggle created:", draggable) -- Debug
+    print("Draggable toggle created:", draggable) 
 end
-
 return Toggle
 end)() end,
-    function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)--[[
-    Window Component
-    The main container for the UI
-]]
-
-local Players = game:GetService("Players")
+    function()local wax,script,require=ImportGlobals(17)local ImportGlobals return (function(...)local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-
 local Window = {}
 Window.__index = Window
-
 function Window.new(options, library)
     local self = setmetatable({}, Window)
-    
     self.Library = library
     self.Title = options.Title or "ProjectMadara UI"
     self.Subtitle = options.Subtitle or "Please Set this up when you get a chance"
     self.Tabs = {}
     self.ActiveTab = nil
-    
-    -- Options manager integration
     self.OptionsManager = options.OptionsManager
-    
-    -- Config system disabled for now
-    -- self.Config = library.Components.Config.new(options.ConfigName or self.Title)
-    
-    -- Create the main GUI
     self:CreateGui()
-    
     return self
 end
-
 function Window:CreateGui()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    
-    -- Detect device type for responsive scaling
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    
-    -- Create ScreenGui
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "ProjectMadaraUI"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.Parent = playerGui
-    
-    -- Responsive sizing based on device
-    local baseWidth = isMobile and 320 or 675  -- Smaller for mobile
+    local baseWidth = isMobile and 320 or 675  
     local baseHeight = isMobile and 400 or 550
     local scaleFactor = isMobile and 0.9 or 1.0
-    
-    -- Main Frame with responsive sizing
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
     self.MainFrame.Size = UDim2.new(0, baseWidth, 0, baseHeight)
@@ -5838,31 +4435,21 @@ function Window:CreateGui()
     self.MainFrame.BackgroundColor3 = self.Library.Colors.Background
     self.MainFrame.BorderSizePixel = 0
     self.MainFrame.Parent = self.ScreenGui
-    
-    -- Store device info for later use
     self.IsMobile = isMobile
     self.ScaleFactor = scaleFactor
-    
-    -- Apply corner radius
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 15)
     corner.Parent = self.MainFrame
-    
-    -- 🚀 ULTRA-MODERN PREMIUM TITLE BAR 🚀
     self.TitleBar = Instance.new("Frame")
     self.TitleBar.Name = "TitleBar"
-    self.TitleBar.Size = UDim2.new(1, 0, 0, 70) -- Taller for premium feel
-    self.TitleBar.Position = UDim2.new(0, 0, 0, 0) -- Ensure it's at the top
-    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24) -- Ultra-dark premium background
+    self.TitleBar.Size = UDim2.new(1, 0, 0, 70) 
+    self.TitleBar.Position = UDim2.new(0, 0, 0, 0) 
+    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24) 
     self.TitleBar.BorderSizePixel = 0
     self.TitleBar.Parent = self.MainFrame
-    
-    -- Premium corner radius - only round top corners
     local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 12) -- Match main frame
+    titleCorner.CornerRadius = UDim.new(0, 12) 
     titleCorner.Parent = self.TitleBar
-    
-    -- Create a bottom mask to hide the bottom corners of title bar
     local titleMask = Instance.new("Frame")
     titleMask.Name = "TitleMask"
     titleMask.Size = UDim2.new(1, 0, 0, 12)
@@ -5870,106 +4457,84 @@ function Window:CreateGui()
     titleMask.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
     titleMask.BorderSizePixel = 0
     titleMask.Parent = self.TitleBar
-    
-    -- Premium gradient border
     local titleBorder = Instance.new("UIStroke")
-    titleBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent border
+    titleBorder.Color = Color3.fromRGB(0, 120, 215) 
     titleBorder.Thickness = 1
-    titleBorder.Transparency = 0.6 -- Subtle glow effect
+    titleBorder.Transparency = 0.6 
     titleBorder.Parent = self.TitleBar
-    
-    -- Subtle inner glow effect
     self.TitleGlow = Instance.new("Frame")
     self.TitleGlow.Name = "TitleGlow"
     self.TitleGlow.Size = UDim2.new(1, -4, 1, -4)
     self.TitleGlow.Position = UDim2.new(0, 2, 0, 2)
     self.TitleGlow.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.TitleGlow.BackgroundTransparency = 0.95 -- Very subtle
+    self.TitleGlow.BackgroundTransparency = 0.95 
     self.TitleGlow.BorderSizePixel = 0
     self.TitleGlow.Parent = self.TitleBar
-    
     local glowCorner = Instance.new("UICorner")
     glowCorner.CornerRadius = UDim.new(0, 10)
     glowCorner.Parent = self.TitleGlow
-    
-    -- Premium App Icon/Logo Area
     self.AppIcon = Instance.new("Frame")
     self.AppIcon.Name = "AppIcon"
     self.AppIcon.Size = UDim2.new(0, 40, 0, 40)
     self.AppIcon.Position = UDim2.new(0, 20, 0.5, 0)
     self.AppIcon.AnchorPoint = Vector2.new(0, 0.5)
-    self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent
+    self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
     self.AppIcon.BorderSizePixel = 0
     self.AppIcon.Parent = self.TitleBar
-    
     local iconCorner = Instance.new("UICorner")
     iconCorner.CornerRadius = UDim.new(0, 10)
     iconCorner.Parent = self.AppIcon
-    
-    -- App icon symbol
     self.AppIconText = Instance.new("TextLabel")
     self.AppIconText.Name = "IconText"
     self.AppIconText.Size = UDim2.new(1, 0, 1, 0)
     self.AppIconText.BackgroundTransparency = 1
-    self.AppIconText.Text = "M" -- First letter of "Madara"
+    self.AppIconText.Text = "M" 
     self.AppIconText.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.AppIconText.TextSize = 20
     self.AppIconText.Font = Enum.Font.GothamBold
     self.AppIconText.TextXAlignment = Enum.TextXAlignment.Center
     self.AppIconText.TextYAlignment = Enum.TextYAlignment.Center
     self.AppIconText.Parent = self.AppIcon
-    
-    -- Premium Title Text
     self.TitleText = Instance.new("TextLabel")
     self.TitleText.Name = "TitleText"
     self.TitleText.Size = UDim2.new(0, 250, 0, 24)
     self.TitleText.Position = UDim2.new(0, 75, 0, 12)
     self.TitleText.BackgroundTransparency = 1
     self.TitleText.Text = self.Title
-    self.TitleText.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white for premium feel
+    self.TitleText.TextColor3 = Color3.fromRGB(255, 255, 255) 
     self.TitleText.TextSize = 18
     self.TitleText.Font = Enum.Font.GothamBold
     self.TitleText.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleText.Parent = self.TitleBar
-    
-    -- Premium Subtitle Text
     self.SubtitleText = Instance.new("TextLabel")
     self.SubtitleText.Name = "SubtitleText"
     self.SubtitleText.Size = UDim2.new(0, 350, 0, 16)
     self.SubtitleText.Position = UDim2.new(0, 75, 0, 38)
     self.SubtitleText.BackgroundTransparency = 1
     self.SubtitleText.Text = self.Subtitle
-    self.SubtitleText.TextColor3 = Color3.fromRGB(160, 180, 200) -- Subtle blue-gray
+    self.SubtitleText.TextColor3 = Color3.fromRGB(160, 180, 200) 
     self.SubtitleText.TextSize = 12
     self.SubtitleText.Font = Enum.Font.Gotham
     self.SubtitleText.TextXAlignment = Enum.TextXAlignment.Left
     self.SubtitleText.Parent = self.TitleBar
-    
-    -- 🔍 COMPACT MODERN SEARCH BAR 🔍
     self.SearchBackground = Instance.new("Frame")
     self.SearchBackground.Name = "SearchBackground"
-    self.SearchBackground.Size = UDim2.new(0, 220, 0, 32) -- Smaller to show subtitle
-    self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0) -- More space from keybind button
+    self.SearchBackground.Size = UDim2.new(0, 220, 0, 32) 
+    self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0) 
     self.SearchBackground.AnchorPoint = Vector2.new(0, 0.5)
-    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32) -- Dark premium background
+    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32) 
     self.SearchBackground.BorderSizePixel = 0
     self.SearchBackground.Parent = self.TitleBar
-    
-    -- Premium search border
     local searchBorder = Instance.new("UIStroke")
-    searchBorder.Color = Color3.fromRGB(40, 50, 60) -- Subtle border
+    searchBorder.Color = Color3.fromRGB(40, 50, 60) 
     searchBorder.Thickness = 1
     searchBorder.Parent = self.SearchBackground
-    
     local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(0, 12) -- More rounded for premium look
+    searchCorner.CornerRadius = UDim.new(0, 12) 
     searchCorner.Parent = self.SearchBackground
-    
-    -- Premium Search Icon
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    
     self.SearchIcon = Instance.new("ImageLabel")
     self.SearchIcon.Name = "SearchIcon"
     self.SearchIcon.Size = UDim2.new(0, 18, 0, 18)
@@ -5977,10 +4542,8 @@ function Window:CreateGui()
     self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.SearchIcon.BackgroundTransparency = 1
     self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10723416057"
-    self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 140, 160) -- Subtle icon color
+    self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 140, 160) 
     self.SearchIcon.Parent = self.SearchBackground
-    
-    -- Premium Search TextBox
     self.SearchBox = Instance.new("TextBox")
     self.SearchBox.Name = "SearchBox"
     self.SearchBox.Size = UDim2.new(1, -45, 1, 0)
@@ -5988,39 +4551,30 @@ function Window:CreateGui()
     self.SearchBox.BackgroundTransparency = 1
     self.SearchBox.Text = ""
     self.SearchBox.PlaceholderText = "Search components..."
-    self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) -- Bright text
-    self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) -- Subtle placeholder
+    self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) 
+    self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) 
     self.SearchBox.TextSize = 14
     self.SearchBox.Font = Enum.Font.Gotham
     self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
     self.SearchBox.Parent = self.SearchBackground
-    
-    -- Search functionality
     self.SearchBox.Changed:Connect(function(property)
         if property == "Text" then
             self:FilterComponents(self.SearchBox.Text)
         end
     end)
-    
-    -- 🌟 PREMIUM SEARCH FOCUS EFFECTS 🌟
     self.SearchBox.Focused:Connect(function()
-        -- Premium background glow
         local bgTween = TweenService:Create(
             self.SearchBackground,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = Color3.fromRGB(28, 35, 42)}
         )
         bgTween:Play()
-        
-        -- Blue accent border
         local borderTween = TweenService:Create(
             searchBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(0, 120, 215)}
         )
         borderTween:Play()
-        
-        -- Icon highlight
         local iconTween = TweenService:Create(
             self.SearchIcon,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6028,23 +4582,19 @@ function Window:CreateGui()
         )
         iconTween:Play()
     end)
-    
     self.SearchBox.FocusLost:Connect(function()
-        -- Return to normal state
         local bgTween = TweenService:Create(
             self.SearchBackground,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             searchBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(40, 50, 60)}
         )
         borderTween:Play()
-        
         local iconTween = TweenService:Create(
             self.SearchIcon,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6052,112 +4602,86 @@ function Window:CreateGui()
         )
         iconTween:Play()
     end)
-    
-    -- 🎮 ULTRA-MODERN CONTROL BUTTONS 🎮
-    
-    -- Premium Keybind Button
     self.KeybindButton = Instance.new("TextButton")
     self.KeybindButton.Name = "KeybindButton"
     self.KeybindButton.Size = UDim2.new(0, 36, 0, 36)
-    self.KeybindButton.Position = UDim2.new(1, -140, 0.5, 0) -- Centered vertically
+    self.KeybindButton.Position = UDim2.new(1, -140, 0.5, 0) 
     self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
-    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) -- Premium dark blue
+    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) 
     self.KeybindButton.Text = "⌨"
     self.KeybindButton.TextColor3 = Color3.fromRGB(200, 220, 240)
     self.KeybindButton.TextSize = 16
     self.KeybindButton.Font = Enum.Font.GothamBold
     self.KeybindButton.BorderSizePixel = 0
     self.KeybindButton.Parent = self.TitleBar
-    
-    -- Premium keybind button styling
     local keybindBorder = Instance.new("UIStroke")
     keybindBorder.Color = Color3.fromRGB(70, 80, 90)
     keybindBorder.Thickness = 1
     keybindBorder.Parent = self.KeybindButton
-    
     local keybindCorner = Instance.new("UICorner")
     keybindCorner.CornerRadius = UDim.new(0, 10)
     keybindCorner.Parent = self.KeybindButton
-    
-    -- Premium Minimize Button
     self.MinimizeButton = Instance.new("TextButton")
     self.MinimizeButton.Name = "MinimizeButton"
     self.MinimizeButton.Size = UDim2.new(0, 36, 0, 36)
-    self.MinimizeButton.Position = UDim2.new(1, -92, 0.5, 0) -- Centered vertically
+    self.MinimizeButton.Position = UDim2.new(1, -92, 0.5, 0) 
     self.MinimizeButton.AnchorPoint = Vector2.new(0, 0.5)
-    self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 70, 80) -- Premium gray
+    self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 70, 80) 
     self.MinimizeButton.Text = "−"
     self.MinimizeButton.TextColor3 = Color3.fromRGB(220, 230, 240)
     self.MinimizeButton.TextSize = 18
     self.MinimizeButton.Font = Enum.Font.GothamBold
     self.MinimizeButton.BorderSizePixel = 0
     self.MinimizeButton.Parent = self.TitleBar
-    
     local minimizeBorder = Instance.new("UIStroke")
     minimizeBorder.Color = Color3.fromRGB(80, 90, 100)
     minimizeBorder.Thickness = 1
     minimizeBorder.Parent = self.MinimizeButton
-    
     local minimizeCorner = Instance.new("UICorner")
     minimizeCorner.CornerRadius = UDim.new(0, 10)
     minimizeCorner.Parent = self.MinimizeButton
-    
-    -- Premium Close Button
     self.CloseButton = Instance.new("TextButton")
     self.CloseButton.Name = "CloseButton"
     self.CloseButton.Size = UDim2.new(0, 36, 0, 36)
-    self.CloseButton.Position = UDim2.new(1, -44, 0.5, 0) -- Centered vertically
+    self.CloseButton.Position = UDim2.new(1, -44, 0.5, 0) 
     self.CloseButton.AnchorPoint = Vector2.new(0, 0.5)
-    self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70) -- Premium red
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70) 
     self.CloseButton.Text = "×"
     self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.CloseButton.TextSize = 18
     self.CloseButton.Font = Enum.Font.GothamBold
     self.CloseButton.BorderSizePixel = 0
     self.CloseButton.Parent = self.TitleBar
-    
     local closeBorder = Instance.new("UIStroke")
     closeBorder.Color = Color3.fromRGB(220, 90, 90)
     closeBorder.Thickness = 1
     closeBorder.Parent = self.CloseButton
-    
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(0, 10)
     closeCorner.Parent = self.CloseButton
-    
     self.Sidebar = Instance.new("Frame")
     self.Sidebar.Name = "Sidebar"
-    self.Sidebar.Size = UDim2.new(0, 200, 1, -70) -- Adjusted for taller title bar
+    self.Sidebar.Size = UDim2.new(0, 200, 1, -70) 
     self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
-    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28) -- Ultra-dark premium background
+    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28) 
     self.Sidebar.BorderSizePixel = 0
     self.Sidebar.Parent = self.MainFrame
-    
-    -- Keep sidebar completely flat - no corner radius needed
-    -- The main frame's corner radius will handle the overall window shape
-    
-    -- Premium gradient border effect
     local sidebarBorder = Instance.new("UIStroke")
-    sidebarBorder.Color = Color3.fromRGB(0, 120, 215) -- Blue accent border
+    sidebarBorder.Color = Color3.fromRGB(0, 120, 215) 
     sidebarBorder.Thickness = 1
-    sidebarBorder.Transparency = 0.7 -- Subtle glow effect
+    sidebarBorder.Transparency = 0.7 
     sidebarBorder.Parent = self.Sidebar
-    
-    -- Subtle inner shadow effect
     self.SidebarShadow = Instance.new("Frame")
     self.SidebarShadow.Name = "InnerShadow"
     self.SidebarShadow.Size = UDim2.new(1, -4, 1, -4)
     self.SidebarShadow.Position = UDim2.new(0, 2, 0, 2)
-    self.SidebarShadow.BackgroundColor3 = Color3.fromRGB(15, 18, 24) -- Even darker for depth
+    self.SidebarShadow.BackgroundColor3 = Color3.fromRGB(15, 18, 24) 
     self.SidebarShadow.BackgroundTransparency = 0.5
     self.SidebarShadow.BorderSizePixel = 0
     self.SidebarShadow.Parent = self.Sidebar
-    
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(0, 10)
     shadowCorner.Parent = self.SidebarShadow
-    
-    -- Ultra-Modern Tab List Container (full height, no wasted space)
     self.TabListContainer = Instance.new("ScrollingFrame")
     self.TabListContainer.Name = "TabListContainer"
     self.TabListContainer.Size = UDim2.new(1, -24, 1, -24)
@@ -6170,77 +4694,48 @@ function Window:CreateGui()
     self.TabListContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.TabListContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
     self.TabListContainer.Parent = self.Sidebar
-    
-    -- Tab List Layout with better spacing
     self.TabListLayout = Instance.new("UIListLayout")
     self.TabListLayout.FillDirection = Enum.FillDirection.Vertical
     self.TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.TabListLayout.Padding = UDim.new(0, 4) -- Tighter spacing for modern look
+    self.TabListLayout.Padding = UDim.new(0, 4) 
     self.TabListLayout.Parent = self.TabListContainer
-    
-    -- Tab list padding
     local tabPadding = Instance.new("UIPadding")
     tabPadding.PaddingLeft = UDim.new(0, 12)
     tabPadding.PaddingRight = UDim.new(0, 12)
     tabPadding.PaddingTop = UDim.new(0, 12)
     tabPadding.PaddingBottom = UDim.new(0, 12)
     tabPadding.Parent = self.TabListContainer
-    
-    -- 🎨 ULTRA-MODERN CONTENT AREA 🎨
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
-    self.ContentContainer.Size = UDim2.new(1, -200, 1, -70) -- Adjusted for taller title bar
-    self.ContentContainer.Position = UDim2.new(0, 200, 0, 70) -- Next to sidebar
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36) -- Premium dark background
+    self.ContentContainer.Size = UDim2.new(1, -200, 1, -70) 
+    self.ContentContainer.Position = UDim2.new(0, 200, 0, 70) 
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
     self.ContentContainer.BorderSizePixel = 0
     self.ContentContainer.Parent = self.MainFrame
-    
-    -- Keep content container completely flat - no corner radius needed
-    -- The main frame's corner radius will handle the overall window shape
-    
-    -- Premium content border
     local contentBorder = Instance.new("UIStroke")
     contentBorder.Color = Color3.fromRGB(0, 120, 215)
     contentBorder.Thickness = 1
-    contentBorder.Transparency = 0.8 -- Subtle glow
+    contentBorder.Transparency = 0.8 
     contentBorder.Parent = self.ContentContainer
-    
-    -- Content container padding for consistency
     local contentPadding = Instance.new("UIPadding")
     contentPadding.PaddingLeft = UDim.new(0, 12)
     contentPadding.PaddingRight = UDim.new(0, 12)
     contentPadding.PaddingTop = UDim.new(0, 12)
     contentPadding.PaddingBottom = UDim.new(0, 12)
     contentPadding.Parent = self.ContentContainer
-    
-    -- Make window draggable
     self:MakeDraggable()
-    
-    -- Mobile icon creation removed
-    
-    -- Setup keybind system
     self:SetupKeybindSystem()
-    self:UpdateKeybindDisplay() -- Show initial keybind
-    
-    -- Window state
+    self:UpdateKeybindDisplay() 
     self.IsMinimized = false
     self.OriginalSize = self.MainFrame.Size
-    self.ToggleKeybind = Enum.KeyCode.Insert -- Default keybind
+    self.ToggleKeybind = Enum.KeyCode.Insert 
     self.IsListeningForKeybind = false
-    
-    -- Keybind button functionality
     self.KeybindButton.MouseButton1Click:Connect(function()
         self:StartKeybindListening()
     end)
-    
-    -- Minimize button functionality
     self.MinimizeButton.MouseButton1Click:Connect(function()
         self:ToggleMinimize()
     end)
-    
-    -- 🌟 PREMIUM BUTTON HOVER EFFECTS 🌟
-    
-    -- Keybind button premium hover
     self.KeybindButton.MouseEnter:Connect(function()
         local bgTween = TweenService:Create(
             self.KeybindButton,
@@ -6248,14 +4743,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             keybindBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(100, 180, 255)}
         )
         borderTween:Play()
-        
         local textTween = TweenService:Create(
             self.KeybindButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6263,7 +4756,6 @@ function Window:CreateGui()
         )
         textTween:Play()
     end)
-    
     self.KeybindButton.MouseLeave:Connect(function()
         local bgTween = TweenService:Create(
             self.KeybindButton,
@@ -6271,14 +4763,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(45, 55, 65)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             keybindBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(70, 80, 90)}
         )
         borderTween:Play()
-        
         local textTween = TweenService:Create(
             self.KeybindButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6286,8 +4776,6 @@ function Window:CreateGui()
         )
         textTween:Play()
     end)
-    
-    -- Minimize button premium hover
     self.MinimizeButton.MouseEnter:Connect(function()
         local bgTween = TweenService:Create(
             self.MinimizeButton,
@@ -6295,14 +4783,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(80, 90, 100)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             minimizeBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(120, 130, 140)}
         )
         borderTween:Play()
-        
         local textTween = TweenService:Create(
             self.MinimizeButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6310,7 +4796,6 @@ function Window:CreateGui()
         )
         textTween:Play()
     end)
-    
     self.MinimizeButton.MouseLeave:Connect(function()
         local bgTween = TweenService:Create(
             self.MinimizeButton,
@@ -6318,14 +4803,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(60, 70, 80)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             minimizeBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(80, 90, 100)}
         )
         borderTween:Play()
-        
         local textTween = TweenService:Create(
             self.MinimizeButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6333,13 +4816,9 @@ function Window:CreateGui()
         )
         textTween:Play()
     end)
-    
-    -- Close button functionality
     self.CloseButton.MouseButton1Click:Connect(function()
         self.ScreenGui:Destroy()
     end)
-    
-    -- Close button premium hover with danger effect
     self.CloseButton.MouseEnter:Connect(function()
         local bgTween = TweenService:Create(
             self.CloseButton,
@@ -6347,15 +4826,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(255, 90, 90)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             closeBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(255, 120, 120)}
         )
         borderTween:Play()
-        
-        -- Subtle scale effect for danger
         local scaleTween = TweenService:Create(
             self.CloseButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6363,7 +4839,6 @@ function Window:CreateGui()
         )
         scaleTween:Play()
     end)
-    
     self.CloseButton.MouseLeave:Connect(function()
         local bgTween = TweenService:Create(
             self.CloseButton,
@@ -6371,15 +4846,12 @@ function Window:CreateGui()
             {BackgroundColor3 = Color3.fromRGB(200, 70, 70)}
         )
         bgTween:Play()
-        
         local borderTween = TweenService:Create(
             closeBorder,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {Color = Color3.fromRGB(220, 90, 90)}
         )
         borderTween:Play()
-        
-        -- Return to normal size
         local scaleTween = TweenService:Create(
             self.CloseButton,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6387,27 +4859,22 @@ function Window:CreateGui()
         )
         scaleTween:Play()
     end)
-    
     return self
 end
-
 function Window:MakeDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
-    
     local function updateInput(input)
         local delta = input.Position - dragStart
         self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-    
     self.TitleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.MainFrame.Position
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -6415,62 +4882,44 @@ function Window:MakeDraggable()
             end)
         end
     end)
-    
     self.TitleBar.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
         end
     end)
 end
-
 function Window:Tab(options)
     options = options or {}
     options.Name = options.Name or "Tab"
     options.tabColor = options.tabColor or self.Library.Colors.Accent
     options.Icon = options.Icon or ""
     options.OptionsManager = self.OptionsManager
-    
     local tab = require(script.Parent.Tab).new(options, self)
     table.insert(self.Tabs, tab)
-    
-    -- If this is the first tab, set it as active
     if #self.Tabs == 1 then
         self:SelectTab(tab)
     end
-    
     return tab
 end
-
 function Window:SelectTab(tab)
-    -- Hide all tabs
     for _, t in ipairs(self.Tabs) do
         t:Hide()
     end
-    
-    -- Show the selected tab
     tab:Show()
     self.ActiveTab = tab
 end
-
 function Window:ToggleMinimize()
     local TweenService = game:GetService("TweenService")
-    
     if not self.IsMinimized then
-        -- Minimize
         self.IsMinimized = true
         self.MinimizeButton.Text = "+"
-        
-        -- Hide content and sidebar
         self.ContentContainer.Visible = false
         self.Sidebar.Visible = false
-        
-        -- Animate to smaller size
         local minimizeTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -6478,68 +4927,51 @@ function Window:ToggleMinimize()
         )
         minimizeTween:Play()
     else
-        -- Restore
         self.IsMinimized = false
         self.MinimizeButton.Text = "−"
-        
-        -- Animate back to original size
         local restoreTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = self.OriginalSize}
         )
         restoreTween:Play()
-        
-        -- Show content and sidebar after animation
         restoreTween.Completed:Connect(function()
             self.ContentContainer.Visible = true
             self.Sidebar.Visible = true
         end)
     end
 end
-
 function Window:CreateMobileIcon()
-    -- Create mobile toggle icon for touch devices
     self.MobileIcon = Instance.new("ScreenGui")
     self.MobileIcon.Name = "ProjectMadaraMobile"
     self.MobileIcon.ResetOnSpawn = false
     self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    
-    -- Mobile button container for dragging
     self.MobileContainer = Instance.new("Frame")
     self.MobileContainer.Name = "MobileContainer"
     self.MobileContainer.Size = UDim2.new(0, 60, 0, 60)
-    self.MobileContainer.Position = UDim2.new(0, 20, 0, 100) -- Top left corner
+    self.MobileContainer.Position = UDim2.new(0, 20, 0, 100) 
     self.MobileContainer.BackgroundTransparency = 1
     self.MobileContainer.Parent = self.MobileIcon
-    
-    -- Mobile button
     self.MobileButton = Instance.new("TextButton")
     self.MobileButton.Name = "MobileButton"
     self.MobileButton.Size = UDim2.new(0, 50, 0, 50)
     self.MobileButton.Position = UDim2.new(0, 5, 0, 5)
-    self.MobileButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215) -- Blue accent like the UI
+    self.MobileButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
     self.MobileButton.Text = "M"
     self.MobileButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.MobileButton.TextSize = 22
     self.MobileButton.Font = Enum.Font.GothamBold
     self.MobileButton.BorderSizePixel = 0
     self.MobileButton.Parent = self.MobileContainer
-    
-    -- Mobile button corner radius
     local mobileCorner = Instance.new("UICorner")
-    mobileCorner.CornerRadius = UDim.new(0, 25) -- Circular
+    mobileCorner.CornerRadius = UDim.new(0, 25) 
     mobileCorner.Parent = self.MobileButton
-    
-    -- Premium border effect
     local mobileBorder = Instance.new("UIStroke")
     mobileBorder.Color = Color3.fromRGB(100, 180, 255)
     mobileBorder.Thickness = 2
     mobileBorder.Transparency = 0.3
     mobileBorder.Parent = self.MobileButton
-    
-    -- Mobile button shadow effect
     local shadow = Instance.new("Frame")
     shadow.Name = "Shadow"
     shadow.Size = UDim2.new(1, 6, 1, 6)
@@ -6549,38 +4981,27 @@ function Window:CreateMobileIcon()
     shadow.BorderSizePixel = 0
     shadow.ZIndex = self.MobileButton.ZIndex - 1
     shadow.Parent = self.MobileButton
-    
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(0, 25)
     shadowCorner.Parent = shadow
-    
-    -- Drag functionality for mobile button
     self:MakeMobileDraggable()
-    
-    -- Mobile button functionality - tap to toggle
     local tapStartTime = 0
     local isDragging = false
-    
     self.MobileButton.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             tapStartTime = tick()
             isDragging = false
         end
     end)
-    
     self.MobileButton.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             local tapDuration = tick() - tapStartTime
-            -- If it was a quick tap (not a drag), toggle the UI
             if tapDuration < 0.3 and not isDragging then
                 self:ToggleVisibility()
-                -- Visual feedback for tap
                 self:MobileButtonFeedback()
             end
         end
     end)
-    
-    -- Mobile button hover effects (for mouse users)
     self.MobileButton.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.MobileButton,
@@ -6588,7 +5009,6 @@ function Window:CreateMobileIcon()
             {BackgroundColor3 = Color3.fromRGB(30, 140, 235)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             mobileBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6596,7 +5016,6 @@ function Window:CreateMobileIcon()
         )
         borderTween:Play()
     end)
-    
     self.MobileButton.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.MobileButton,
@@ -6604,7 +5023,6 @@ function Window:CreateMobileIcon()
             {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             mobileBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6612,17 +5030,13 @@ function Window:CreateMobileIcon()
         )
         borderTween:Play()
     end)
-    
-    -- Auto-hide when main UI is visible (optional)
     self.MobileContainer.Visible = not self.ScreenGui.Enabled
 end
-
 function Window:MakeMobileDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
-    
     local function updateInput(input)
         local delta = input.Position - dragStart
         local newPos = UDim2.new(
@@ -6631,35 +5045,26 @@ function Window:MakeMobileDraggable()
             startPos.Y.Scale, 
             startPos.Y.Offset + delta.Y
         )
-        
-        -- Keep button within screen bounds
         local screenSize = workspace.CurrentCamera.ViewportSize
         local buttonSize = self.MobileContainer.AbsoluteSize
-        
         local clampedX = math.clamp(newPos.X.Offset, 0, screenSize.X - buttonSize.X)
         local clampedY = math.clamp(newPos.Y.Offset, 0, screenSize.Y - buttonSize.Y)
-        
         self.MobileContainer.Position = UDim2.new(0, clampedX, 0, clampedY)
     end
-    
     self.MobileContainer.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.MobileContainer.Position
-            
-            -- Visual feedback for drag start
             local scaleTween = TweenService:Create(
                 self.MobileButton,
                 TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {Size = UDim2.new(0, 45, 0, 45)}
             )
             scaleTween:Play()
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-                    -- Visual feedback for drag end
                     local scaleTween = TweenService:Create(
                         self.MobileButton,
                         TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
@@ -6670,32 +5075,27 @@ function Window:MakeMobileDraggable()
             end)
         end
     end)
-    
     self.MobileContainer.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
             if dragging then
-                isDragging = true -- Set flag to prevent tap action
+                isDragging = true 
             end
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
         end
     end)
 end
-
 function Window:MobileButtonFeedback()
-    -- Quick scale animation for tap feedback
     local scaleTween = TweenService:Create(
         self.MobileButton,
         TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Size = UDim2.new(0, 45, 0, 45)}
     )
     scaleTween:Play()
-    
     scaleTween.Completed:Connect(function()
         local returnTween = TweenService:Create(
             self.MobileButton,
@@ -6704,15 +5104,12 @@ function Window:MobileButtonFeedback()
         )
         returnTween:Play()
     end)
-    
-    -- Color flash
     local colorTween = TweenService:Create(
         self.MobileButton,
         TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundColor3 = Color3.fromRGB(100, 200, 255)}
     )
     colorTween:Play()
-    
     colorTween.Completed:Connect(function()
         local returnColorTween = TweenService:Create(
             self.MobileButton,
@@ -6722,61 +5119,43 @@ function Window:MobileButtonFeedback()
         returnColorTween:Play()
     end)
 end
-
 function Window:SetupKeybindSystem()
     local UserInputService = game:GetService("UserInputService")
-    
-    -- Listen for keybind input
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
-        
         if self.IsListeningForKeybind then
-            -- Set new keybind
             self.ToggleKeybind = input.KeyCode
             self.IsListeningForKeybind = false
             self:UpdateKeybindDisplay()
             self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65)
             return
         end
-        
-        -- Check if pressed key matches toggle keybind
         if input.KeyCode == self.ToggleKeybind then
             self:ToggleVisibility()
         end
     end)
 end
-
 function Window:StartKeybindListening()
     self.IsListeningForKeybind = true
     self.KeybindButton.Text = "..."
-    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(88, 166, 255) -- Accent color when listening
+    self.KeybindButton.BackgroundColor3 = Color3.fromRGB(88, 166, 255) 
 end
-
 function Window:UpdateKeybindDisplay()
-    -- Convert KeyCode to readable text
     local keyName = tostring(self.ToggleKeybind):gsub("Enum.KeyCode.", "")
     self.KeybindButton.Text = keyName:upper()
-    self.KeybindButton.TextSize = #keyName > 3 and 10 or 12 -- Smaller text for longer keys
+    self.KeybindButton.TextSize = #keyName > 3 and 10 or 12 
 end
-
 function Window:ToggleVisibility()
     self.ScreenGui.Enabled = not self.ScreenGui.Enabled
 end
-
 function Window:FilterComponents(searchText)
     if not self.ActiveTab then return end
-    
     searchText = searchText:lower()
-    
-    -- Get all components in the active tab
     for _, child in ipairs(self.ActiveTab.Container:GetChildren()) do
         if child:IsA("Frame") and child.Name:find("Button") or child.Name:find("Toggle") or child.Name:find("TextBox") or child.Name:find("Dropdown") or child.Name:find("Slider") then
-            -- Get the component name from the name label
             local nameLabel = child:FindFirstChild("Name") or child:FindFirstChild("Text")
             if nameLabel and nameLabel:IsA("TextLabel") then
                 local componentName = nameLabel.Text:lower()
-                
-                -- Show/hide based on search
                 if searchText == "" or componentName:find(searchText) then
                     child.Visible = true
                 else
@@ -6786,11 +5165,8 @@ function Window:FilterComponents(searchText)
         end
     end
 end
-
 function Window:Show()
     self.ScreenGui.Enabled = true
-    
-    -- Entrance animation
     self.MainFrame.Size = UDim2.new(0, 0, 0, 0)
     local showTween = TweenService:Create(
         self.MainFrame,
@@ -6799,14 +5175,11 @@ function Window:Show()
     )
     showTween:Play()
 end
-
 function Window:Hide()
     self.ScreenGui.Enabled = false
 end
-
 function Window:ToggleVisibility()
     if self.ScreenGui.Enabled then
-        -- Hide main UI
         self.ScreenGui.Enabled = false
         if self.MobileContainer then
             self.MobileContainer.Visible = true
@@ -6814,8 +5187,6 @@ function Window:ToggleVisibility()
         if self.ToggleContainer then
             self.ToggleContainer.Visible = true
         end
-        
-        -- Animate mobile button appearance
         if self.MobileButton then
             self.MobileButton.Size = UDim2.new(0, 30, 0, 30)
             local appearTween = TweenService:Create(
@@ -6825,8 +5196,6 @@ function Window:ToggleVisibility()
             )
             appearTween:Play()
         end
-        
-        -- Animate toggle button appearance
         if self.ToggleButton then
             self.ToggleButton.Size = UDim2.new(0, 40, 0, 40)
             local toggleAppearTween = TweenService:Create(
@@ -6837,7 +5206,6 @@ function Window:ToggleVisibility()
             toggleAppearTween:Play()
         end
     else
-        -- Show main UI
         self.ScreenGui.Enabled = true
         if self.MobileContainer then
             self.MobileContainer.Visible = false
@@ -6845,8 +5213,6 @@ function Window:ToggleVisibility()
         if self.ToggleContainer then
             self.ToggleContainer.Visible = false
         end
-        
-        -- Optional: animate main UI appearance
         self.MainFrame.Size = UDim2.new(0, 600, 0, 500)
         local showTween = TweenService:Create(
             self.MainFrame,
@@ -6856,49 +5222,37 @@ function Window:ToggleVisibility()
         showTween:Play()
     end
 end
-
 function Window:CreateMobileToggleButton()
-    -- Create separate mobile toggle controls GUI
     self.MobileToggleGui = Instance.new("ScreenGui")
     self.MobileToggleGui.Name = "ProjectMadaraToggleControls"
     self.MobileToggleGui.ResetOnSpawn = false
     self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    
-    -- Toggle button container for dragging
     self.ToggleContainer = Instance.new("Frame")
     self.ToggleContainer.Name = "ToggleContainer"
     self.ToggleContainer.Size = UDim2.new(0, 70, 0, 70)
-    self.ToggleContainer.Position = UDim2.new(1, -90, 0, 150) -- Top right corner
+    self.ToggleContainer.Position = UDim2.new(1, -90, 0, 150) 
     self.ToggleContainer.BackgroundTransparency = 1
     self.ToggleContainer.Parent = self.MobileToggleGui
-    
-    -- Toggle button
     self.ToggleButton = Instance.new("TextButton")
     self.ToggleButton.Name = "ToggleButton"
     self.ToggleButton.Size = UDim2.new(0, 60, 0, 60)
     self.ToggleButton.Position = UDim2.new(0, 5, 0, 5)
-    self.ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) -- Different color from main button
-    self.ToggleButton.Text = "⚡" -- Lightning bolt for toggles/power
+    self.ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) 
+    self.ToggleButton.Text = "⚡" 
     self.ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.ToggleButton.TextSize = 24
     self.ToggleButton.Font = Enum.Font.GothamBold
     self.ToggleButton.BorderSizePixel = 0
     self.ToggleButton.Parent = self.ToggleContainer
-    
-    -- Toggle button corner radius
     local toggleCorner = Instance.new("UICorner")
-    toggleCorner.CornerRadius = UDim.new(0, 30) -- Circular
+    toggleCorner.CornerRadius = UDim.new(0, 30) 
     toggleCorner.Parent = self.ToggleButton
-    
-    -- Premium border effect for toggle button
     local toggleBorder = Instance.new("UIStroke")
-    toggleBorder.Color = Color3.fromRGB(255, 165, 0) -- Orange accent for toggles
+    toggleBorder.Color = Color3.fromRGB(255, 165, 0) 
     toggleBorder.Thickness = 2
     toggleBorder.Transparency = 0.3
     toggleBorder.Parent = self.ToggleButton
-    
-    -- Toggle button shadow effect
     local toggleShadow = Instance.new("Frame")
     toggleShadow.Name = "Shadow"
     toggleShadow.Size = UDim2.new(1, 6, 1, 6)
@@ -6908,68 +5262,52 @@ function Window:CreateMobileToggleButton()
     toggleShadow.BorderSizePixel = 0
     toggleShadow.ZIndex = self.ToggleButton.ZIndex - 1
     toggleShadow.Parent = self.ToggleButton
-    
     local toggleShadowCorner = Instance.new("UICorner")
     toggleShadowCorner.CornerRadius = UDim.new(0, 30)
     toggleShadowCorner.Parent = toggleShadow
-    
-    -- State tracking for toggle button
-    self.ToggleButtonState = "off" -- "off", "on", "auto"
+    self.ToggleButtonState = "off" 
     self.ToggleStates = {"off", "on", "auto"}
-    self.ToggleIcons = {"⚡", "🔥", "🤖"} -- Lightning, Fire, Robot
+    self.ToggleIcons = {"⚡", "🔥", "🤖"} 
     self.ToggleColors = {
-        Color3.fromRGB(45, 55, 65),   -- Off - Gray
-        Color3.fromRGB(0, 200, 100),  -- On - Green  
-        Color3.fromRGB(255, 165, 0)   -- Auto - Orange
+        Color3.fromRGB(45, 55, 65),   
+        Color3.fromRGB(0, 200, 100),  
+        Color3.fromRGB(255, 165, 0)   
     }
     self.ToggleBorderColors = {
-        Color3.fromRGB(100, 110, 120), -- Off border
-        Color3.fromRGB(100, 255, 150), -- On border
-        Color3.fromRGB(255, 200, 100)  -- Auto border
+        Color3.fromRGB(100, 110, 120), 
+        Color3.fromRGB(100, 255, 150), 
+        Color3.fromRGB(255, 200, 100)  
     }
-    
-    -- Make toggle button draggable
     self:MakeToggleDraggable()
-    
-    -- Toggle button functionality - cycle through states
     local tapStartTime = 0
     local isToggleDragging = false
-    
     self.ToggleButton.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             tapStartTime = tick()
             isToggleDragging = false
         end
     end)
-    
     self.ToggleButton.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             local tapDuration = tick() - tapStartTime
-            -- If it was a quick tap (not a drag), cycle toggle state
             if tapDuration < 0.3 and not isToggleDragging then
                 self:CycleToggleState()
                 self:ToggleButtonFeedback()
             end
         end
     end)
-    
-    -- Toggle button hover effects (for mouse users)
     self.ToggleButton.MouseEnter:Connect(function()
         local currentStateIndex = self:GetToggleStateIndex()
         local hoverColor = self.ToggleColors[currentStateIndex]
-        
-        -- Brighten the current color
         local r = math.min(255, hoverColor.R * 255 + 30)
         local g = math.min(255, hoverColor.G * 255 + 30)
         local b = math.min(255, hoverColor.B * 255 + 30)
-        
         local hoverTween = TweenService:Create(
             self.ToggleButton,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
             {BackgroundColor3 = Color3.fromRGB(r, g, b)}
         )
         hoverTween:Play()
-        
         local borderTween = TweenService:Create(
             toggleBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6977,7 +5315,6 @@ function Window:CreateMobileToggleButton()
         )
         borderTween:Play()
     end)
-    
     self.ToggleButton.MouseLeave:Connect(function()
         local currentStateIndex = self:GetToggleStateIndex()
         local leaveTween = TweenService:Create(
@@ -6986,7 +5323,6 @@ function Window:CreateMobileToggleButton()
             {BackgroundColor3 = self.ToggleColors[currentStateIndex]}
         )
         leaveTween:Play()
-        
         local borderTween = TweenService:Create(
             toggleBorder,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -6994,17 +5330,13 @@ function Window:CreateMobileToggleButton()
         )
         borderTween:Play()
     end)
-    
-    -- Initially hide toggle controls when main UI is visible
     self.ToggleContainer.Visible = not self.ScreenGui.Enabled
 end
-
 function Window:MakeToggleDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
-    
     local function updateInput(input)
         local delta = input.Position - dragStart
         local newPos = UDim2.new(
@@ -7013,35 +5345,26 @@ function Window:MakeToggleDraggable()
             startPos.Y.Scale, 
             startPos.Y.Offset + delta.Y
         )
-        
-        -- Keep button within screen bounds
         local screenSize = workspace.CurrentCamera.ViewportSize
         local buttonSize = self.ToggleContainer.AbsoluteSize
-        
         local clampedX = math.clamp(newPos.X.Offset, 0, screenSize.X - buttonSize.X)
         local clampedY = math.clamp(newPos.Y.Offset, 0, screenSize.Y - buttonSize.Y)
-        
         self.ToggleContainer.Position = UDim2.new(0, clampedX, 0, clampedY)
     end
-    
     self.ToggleContainer.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.ToggleContainer.Position
-            
-            -- Visual feedback for drag start
             local scaleTween = TweenService:Create(
                 self.ToggleButton,
                 TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {Size = UDim2.new(0, 55, 0, 55)}
             )
             scaleTween:Play()
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-                    -- Visual feedback for drag end
                     local scaleTween = TweenService:Create(
                         self.ToggleButton,
                         TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
@@ -7052,87 +5375,63 @@ function Window:MakeToggleDraggable()
             end)
         end
     end)
-    
     self.ToggleContainer.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
             if dragging then
-                isToggleDragging = true -- Set flag to prevent tap action
+                isToggleDragging = true 
             end
         end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
         end
     end)
 end
-
 function Window:CycleToggleState()
-    -- Find current state index
     local currentIndex = self:GetToggleStateIndex()
-    
-    -- Cycle to next state
     local nextIndex = (currentIndex % #self.ToggleStates) + 1
     self.ToggleButtonState = self.ToggleStates[nextIndex]
-    
-    -- Update button appearance
     self.ToggleButton.Text = self.ToggleIcons[nextIndex]
-    
-    -- Animate color change
     local colorTween = TweenService:Create(
         self.ToggleButton,
         TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {BackgroundColor3 = self.ToggleColors[nextIndex]}
     )
     colorTween:Play()
-    
-    -- Animate border color change
     local borderTween = TweenService:Create(
         self.ToggleButton.UIStroke,
         TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Color = self.ToggleBorderColors[nextIndex]}
     )
     borderTween:Play()
-    
-    -- Here you can add logic to actually toggle features based on the state
     self:HandleToggleStateChange(self.ToggleButtonState)
 end
-
 function Window:GetToggleStateIndex()
     for i, state in ipairs(self.ToggleStates) do
         if state == self.ToggleButtonState then
             return i
         end
     end
-    return 1 -- Default to first state
+    return 1 
 end
-
 function Window:HandleToggleStateChange(newState)
-    -- This is where you'd implement the actual toggle functionality
-    -- For example:
     if newState == "off" then
-        -- Turn off all toggles/features
         print("All toggles OFF")
     elseif newState == "on" then
-        -- Turn on all toggles/features
         print("All toggles ON")
     elseif newState == "auto" then
-        -- Set toggles to auto mode
         print("Toggles set to AUTO")
     end
 end
-
 function Window:ToggleButtonFeedback()
-    -- Quick scale animation for tap feedback
     local scaleTween = TweenService:Create(
         self.ToggleButton,
         TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
         {Size = UDim2.new(0, 55, 0, 55)}
     )
     scaleTween:Play()
-    
     scaleTween.Completed:Connect(function()
         local returnTween = TweenService:Create(
             self.ToggleButton,
@@ -7142,17 +5441,11 @@ function Window:ToggleButtonFeedback()
         returnTween:Play()
     end)
 end
-
-
-
 function Window:FilterComponents(searchText)
-    -- This function will be implemented when tabs/components are added
-    -- For now, it's a placeholder for the search functionality
     if self.ActiveTab and self.ActiveTab.FilterComponents then
         self.ActiveTab:FilterComponents(searchText)
     end
 end
-
 return Window
 end)() end,
     function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)local assets = {
@@ -7990,31 +6283,17 @@ local ObjectTree = {
         },
         {
             {
+                5,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
                 18,
                 2,
                 {
                     "lucide"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "Toggle"
                 }
             },
             {
@@ -8025,38 +6304,10 @@ local ObjectTree = {
                 }
             },
             {
-                10,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
                 12,
                 2,
                 {
                     "Paragraph"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Tab"
                 }
             },
             {
@@ -8067,31 +6318,31 @@ local ObjectTree = {
                 }
             },
             {
+                15,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
                 17,
                 2,
                 {
                     "Window"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
                 }
             },
             {
@@ -8102,10 +6353,52 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                2,
                 2,
                 {
-                    "MobileFloatingIcon"
+                    "Button"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "Label"
                 }
             }
         }
@@ -8115,23 +6408,23 @@ local ObjectTree = {
 -- Line offsets for debugging (only included when minifyTables is false)
 local LineOffsets = {
     8,
-    107,
-    474,
-    674,
-    1127,
-    2054,
-    2795,
-    2871,
-    3324,
-    3645,
-    4041,
-    4170,
-    4352,
-    4622,
-    5167,
-    5361,
-    5779,
-    7158
+    88,
+    362,
+    500,
+    838,
+    1561,
+    2143,
+    2197,
+    2541,
+    2788,
+    3091,
+    3188,
+    3326,
+    3522,
+    3941,
+    4090,
+    4401,
+    5451
 }
 
 -- Misc AOT variable imports
