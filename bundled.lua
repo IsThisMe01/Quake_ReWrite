@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- bb
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -371,6 +371,7 @@ function Config.new(window)
     self.ConfigFile = self.ConfigFolder .. "/config.json"
     self.Data = {}
     
+    -- Create config folder if it doesn't exist
     self:CreateConfigFolder()
     
     return self
@@ -401,22 +402,18 @@ function Config:SaveConfig()
     end)
     
     if success then
-        print("Config saved successfully to:", self.ConfigFile)
         return true
     else
-        warn("Config System: Failed to save config:", result)
         return false
     end
 end
 
 function Config:LoadConfig()
     if not readfile or not isfile then
-        warn("Config System: readfile or isfile function not available")
         return false
     end
     
     if not isfile(self.ConfigFile) then
-        print("Config System: No existing config found, creating new one")
         return false
     end
     
@@ -434,7 +431,6 @@ function Config:LoadConfig()
     end)
     
     if success and result then
-        print("Config loaded successfully from:", self.ConfigFile)
         self:ApplyConfig()
         return true
     else
@@ -466,26 +462,22 @@ end
 
 function Config:ApplyComponentConfig(component, value)
     if component.Type == "Toggle" then
-        component:SetValue(value)
+        component:SetValue(value, false) -- Don't trigger callback when loading
     elseif component.Type == "Slider" then
-        component:SetValue(value)
+        component:SetValue(value, false) -- Don't save to config when loading
     elseif component.Type == "Dropdown" then
-        if component.Multiselect then
-            -- For multiselect dropdowns, value should be a table
-            if type(value) == "table" then
-                component.Selected = {}
-                for _, item in ipairs(value) do
-                    component.Selected[item] = true
-                end
-                component:UpdateSelectedText()
-                component:UpdateSelectAllButtonText()
-            end
-        else
-            -- For single select dropdowns
-            component:SetValue(value)
-        end
+        component:SetValue(value, false) -- Don't save to config when loading
     elseif component.Type == "TextBox" then
-        component:SetValue(value)
+        component:SetValue(value, false) -- Don't save to config when loading
+    end
+end
+
+function Config:ApplyConfigToComponent(tabName, component)
+    local tabData = self.Data[tabName] or {}
+    local savedValue = tabData[component.Name]
+    
+    if savedValue ~= nil then
+        self:ApplyComponentConfig(component, savedValue)
     end
 end
 
@@ -510,17 +502,14 @@ end
 function Config:ClearConfig()
     self.Data = {}
     self:SaveConfig()
-    print("Config System: Configuration cleared")
 end
 
 function Config:DeleteConfig()
     if delfile and isfile and isfile(self.ConfigFile) then
         delfile(self.ConfigFile)
-        print("Config System: Configuration file deleted")
     end
     if delfolder and isfolder and isfolder(self.ConfigFolder) then
         delfolder(self.ConfigFolder)
-        print("Config System: Configuration folder deleted")
     end
 end
 
@@ -2150,7 +2139,8 @@ function Dropdown:ToggleSelectAll()
     -- Update the button text based on new state
     self:UpdateSelectAllButtonText()
 end
-function Dropdown:SetValue(value)
+function Dropdown:SetValue(value, saveToConfig)
+    if saveToConfig == nil then saveToConfig = true end
     if self.Multiselect then
         self.Selected = {}
         if type(value) == "table" then
@@ -2164,6 +2154,22 @@ function Dropdown:SetValue(value)
     self:UpdateSelectedText()
     if self.Multiselect then
         self:UpdateSelectAllButtonText()
+        -- Update visual state for all items
+        self:CreateItems()
+    end
+    -- Save to config if enabled and not loading from config
+    if saveToConfig and self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        if self.Multiselect then
+            local selectedItems = {}
+            for item, selected in pairs(self.Selected) do
+                if selected == true then 
+                    table.insert(selectedItems, item)
+                end
+            end
+            self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, selectedItems)
+        else
+            self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, value)
+        end
     end
     return self
 end
@@ -4152,7 +4158,8 @@ function Slider:UpdateValue(value)
     self.Callback(value)
     return self
 end
-function Slider:SetValue(value)
+function Slider:SetValue(value, saveToConfig)
+    if saveToConfig == nil then saveToConfig = true end
     value = math.clamp(value, self.Min, self.Max)
     value = self.Min + (math.floor((value - self.Min) / self.Step + 0.5) * self.Step)
     self.Value = value
@@ -4160,6 +4167,10 @@ function Slider:SetValue(value)
     local percent = (value - self.Min) / (self.Max - self.Min)
     self.SliderFill.Size = UDim2.new(percent, 0, 1, 0)
     self.SliderIndicator.Position = UDim2.new(percent, 0, 0.5, 0)
+    -- Save to config if enabled and not loading from config
+    if saveToConfig and self.Tab.Window and self.Tab.Window.ConfigEnabled then
+        self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, value)
+    end
     return self
 end
 return Slider
@@ -4519,6 +4530,10 @@ function Tab:Toggle(options)
     if self.OptionsManager then
         self.OptionsManager:RegisterToggle(options.Name, toggle)
     end
+    -- Apply saved config to this component
+    if self.Window then
+        self.Window:ApplyConfigToComponent(self.Name, toggle)
+    end
     return toggle
 end
 function Tab:Button(options)
@@ -4540,6 +4555,10 @@ function Tab:TextBox(options)
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, textbox)
     end
+    -- Apply saved config to this component
+    if self.Window then
+        self.Window:ApplyConfigToComponent(self.Name, textbox)
+    end
     return textbox
 end
 function Tab:Slider(options)
@@ -4556,6 +4575,10 @@ function Tab:Slider(options)
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, slider)
     end
+    -- Apply saved config to this component
+    if self.Window then
+        self.Window:ApplyConfigToComponent(self.Name, slider)
+    end
     return slider
 end
 function Tab:Dropdown(options)
@@ -4570,6 +4593,10 @@ function Tab:Dropdown(options)
     table.insert(self.Components, dropdown) -- Track for config system
     if self.OptionsManager then
         self.OptionsManager:RegisterOption(options.Name, dropdown)
+    end
+    -- Apply saved config to this component
+    if self.Window then
+        self.Window:ApplyConfigToComponent(self.Name, dropdown)
     end
     return dropdown
 end
@@ -4745,11 +4772,12 @@ function TextBox:Create()
     end)
     return self
 end
-function TextBox:SetValue(value)
+function TextBox:SetValue(value, saveToConfig)
+    if saveToConfig == nil then saveToConfig = true end
     self.Value = value
     self.Input.Text = value
-    -- Save to config if enabled
-    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+    -- Save to config if enabled and not loading from config
+    if saveToConfig and self.Tab.Window and self.Tab.Window.ConfigEnabled then
         self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, value)
     end
     self.Callback(value)
@@ -5020,8 +5048,7 @@ function Toggle:SetValue(value, callCallback)
         bgTween:Play()
     end
     
-    -- Save to config if enabled
-    if self.Tab.Window and self.Tab.Window.ConfigEnabled then
+    if callCallback and self.Tab.Window and self.Tab.Window.ConfigEnabled then
         self.Tab.Window:SaveComponentConfig(self.Tab.Name, self.Name, self.Value)
     end
     
@@ -6151,6 +6178,12 @@ function Window:GetComponentConfig(tabName, componentName, defaultValue)
     return defaultValue
 end
 
+function Window:ApplyConfigToComponent(tabName, component)
+    if self.ConfigEnabled and self.Config then
+        self.Config:ApplyConfigToComponent(tabName, component)
+    end
+end
+
 return Window
 end)() end,
     function()local wax,script,require=ImportGlobals(19)local ImportGlobals return (function(...)local assets = {
@@ -6988,104 +7021,6 @@ local ObjectTree = {
         },
         {
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
                 4,
                 2,
                 {
@@ -7100,6 +7035,34 @@ local ObjectTree = {
                 }
             },
             {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
                 11,
                 2,
                 {
@@ -7107,10 +7070,80 @@ local ObjectTree = {
                 }
             },
             {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
                 7,
                 2,
                 {
                     "FloatingControls"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
                 }
             }
         }
@@ -7122,22 +7155,22 @@ local LineOffsets = {
     8,
     88,
     362,
-    530,
-    1048,
-    1386,
-    2192,
-    2774,
-    2828,
-    3172,
-    3419,
-    3722,
-    3819,
-    3957,
-    4168,
-    4603,
-    4761,
-    5079,
-    6157
+    518,
+    1036,
+    1374,
+    2197,
+    2779,
+    2833,
+    3177,
+    3424,
+    3727,
+    3824,
+    3962,
+    4178,
+    4629,
+    4788,
+    5105,
+    6189
 }
 
 -- Misc AOT variable imports
@@ -7634,4 +7667,3 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
-
