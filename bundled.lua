@@ -131,7 +131,7 @@ function Button:Create()
     self.ButtonLeftIcon.Parent = self.Container
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
-    self.ButtonText.Size = UDim2.new(0, 200, 0, 20)
+    self.ButtonText.Size = UDim2.new(1, -80, 0, 20)
     self.ButtonText.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
@@ -169,67 +169,9 @@ function Button:Create()
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = self.KeybindButton
-        self.KeybindButton.MouseButton1Down:Connect(function()
-        end)
-        local UserInputService = game:GetService("UserInputService")
-        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        local isDragging = false
-        local dragStart = nil
-        local pressTime = 0
-        local hasMovedEnough = false
-        local dragConnection = nil
-        local releaseConnection = nil
-        self.KeybindButton.MouseButton1Down:Connect(function()
-            isDragging = true
-            dragStart = UserInputService:GetMouseLocation()
-            pressTime = tick()
-            hasMovedEnough = false
-            print("Button keybind drag started") 
-            if dragConnection then
-                dragConnection:Disconnect()
-            end
-            if releaseConnection then
-                releaseConnection:Disconnect()
-            end
-            dragConnection = UserInputService.InputChanged:Connect(function(input)
-                if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local currentPos = Vector2.new(input.Position.X, input.Position.Y)
-                    local distance = (currentPos - dragStart).Magnitude
-                    if distance > 15 then 
-                        hasMovedEnough = true
-                        print("Button keybind moved enough:", distance) 
-                    end
-                end
-            end)
-            releaseConnection = UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
-                    print("Button keybind mouse released") 
-                    if releaseConnection then
-                        releaseConnection:Disconnect()
-                        releaseConnection = nil
-                    end
-                    if dragConnection then
-                        dragConnection:Disconnect()
-                        dragConnection = nil
-                    end
-                    local holdTime = tick() - pressTime
-                    print("Button keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) 
-                    if hasMovedEnough or holdTime > 0.5 then
-                        print("Creating draggable button keybind") 
-                        self:CreateDraggableKeybind()
-                    elseif holdTime < 0.3 then
-                        print("Starting keybind listening") 
-                        self:StartKeybindListening()
-                    end
-                    isDragging = false
-                    dragStart = nil
-                    hasMovedEnough = false
-                end
-            end)
-        end)
-        self.KeybindButton.MouseButton2Click:Connect(function()
-            print("Right click - creating draggable button keybind") 
-            self:CreateDraggableKeybind()
+        -- Simple behavior: clicking starts keybind listening; no draggable keybinds
+        self.KeybindButton.MouseButton1Click:Connect(function()
+            self:StartKeybindListening()
         end)
         self.KeybindButton.MouseEnter:Connect(function()
             if not self.IsListeningForKeybind then
@@ -626,19 +568,23 @@ function Credits:CreateHeader()
     titleLabel.TextSize = 24
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    titleLabel.TextWrapped = false
+    titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
     titleLabel.Parent = headerFrame
 
     -- Subtitle
     local subtitleLabel = Instance.new("TextLabel")
     subtitleLabel.Name = "Subtitle"
     subtitleLabel.Size = UDim2.new(1, -24, 0, 20)
-    subtitleLabel.Position = UDim2.new(0, 12, 0, 48)
+    subtitleLabel.Position = UDim2.new(0, 12, 0, 50)
     subtitleLabel.BackgroundTransparency = 1
     subtitleLabel.Text = self.Subtitle
     subtitleLabel.TextColor3 = Color3.fromRGB(180, 200, 220)
     subtitleLabel.TextSize = 14
     subtitleLabel.Font = Enum.Font.Gotham
     subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    subtitleLabel.TextWrapped = false
+    subtitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
     subtitleLabel.Parent = headerFrame
 end
 
@@ -692,6 +638,8 @@ function Credits:CreateProjectInfo()
         valueLabel.TextSize = 13
         valueLabel.Font = Enum.Font.Gotham
         valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+        valueLabel.TextWrapped = false
+        valueLabel.TextTruncate = Enum.TextTruncate.AtEnd
         valueLabel.Parent = infoItem
     end
 end
@@ -788,7 +736,7 @@ function Credits:CreateDeveloperCard(dev, parent, order)
     -- Developer Info
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
-    nameLabel.Size = UDim2.new(0, 200, 0, 20)
+    nameLabel.Size = UDim2.new(1, -140, 0, 20)
     nameLabel.Position = UDim2.new(0, 72, 0, 16)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = dev.Name or "Unknown Developer"
@@ -796,11 +744,13 @@ function Credits:CreateDeveloperCard(dev, parent, order)
     nameLabel.TextSize = 15
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.TextWrapped = false
+    nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     nameLabel.Parent = devCard
 
     local roleLabel = Instance.new("TextLabel")
     roleLabel.Name = "Role"
-    roleLabel.Size = UDim2.new(0, 200, 0, 16)
+    roleLabel.Size = UDim2.new(1, -140, 0, 16)
     roleLabel.Position = UDim2.new(0, 72, 0, 38)
     roleLabel.BackgroundTransparency = 1
     roleLabel.Text = dev.Role or "Developer"
@@ -808,6 +758,8 @@ function Credits:CreateDeveloperCard(dev, parent, order)
     roleLabel.TextSize = 12
     roleLabel.Font = Enum.Font.Gotham
     roleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    roleLabel.TextWrapped = false
+    roleLabel.TextTruncate = Enum.TextTruncate.AtEnd
     roleLabel.Parent = devCard
 
     -- Status Badge
@@ -3992,7 +3944,8 @@ end
 function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    -- Taller to prevent the track/knob from touching the labels
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 80 or 60)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4016,8 +3969,8 @@ function Slider:Create()
     self.SliderIcon.Parent = self.Container
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.Size = UDim2.new(1, -100, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 12)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
@@ -4040,8 +3993,8 @@ function Slider:Create()
     end
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
-    self.ValueLabel.Size = UDim2.new(0, 40, 1, 0) 
-    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0) 
+    self.ValueLabel.Size = UDim2.new(0, 48, 1, 0)
+    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0)
     self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5) 
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
@@ -4052,8 +4005,9 @@ function Slider:Create()
     self.ValueLabel.Parent = self.Container
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -220, 0, 4) 
-    self.SliderTrack.Position = UDim2.new(0, 170, 0.5, 0) 
+    -- Reserve more space on the right for the value and add vertical spacing below the text
+    self.SliderTrack.Size = UDim2.new(1, -80, 0, 4)
+    self.SliderTrack.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 50 or 40)
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5) 
     self.SliderTrack.BackgroundColor3 = self.Library.Colors.Background
     self.SliderTrack.BorderSizePixel = 0
@@ -4299,13 +4253,13 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, 8) 
+    self.ContainerLayout.Padding = UDim.new(0, 10) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
-    containerPadding.PaddingLeft = UDim.new(0, 8) 
-    containerPadding.PaddingRight = UDim.new(0, 8)
-    containerPadding.PaddingTop = UDim.new(0, 8)
-    containerPadding.PaddingBottom = UDim.new(0, 8)
+    containerPadding.PaddingLeft = UDim.new(0, 12) 
+    containerPadding.PaddingRight = UDim.new(0, 12)
+    containerPadding.PaddingTop = UDim.new(0, 10)
+    containerPadding.PaddingBottom = UDim.new(0, 10)
     containerPadding.Parent = self.Container
     self.TabButton.MouseButton1Click:Connect(function()
         self.Window:SelectTab(self)
@@ -4645,7 +4599,9 @@ end
 function TextBox:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "TextBox"
-    self.Container.Size = UDim2.new(1, 0, 0, 52)
+    -- Taller on mobile to accommodate stacked layout
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    self.Container.Size = isMobile and UDim2.new(1, 0, 0, 70) or UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4670,8 +4626,14 @@ function TextBox:Create()
     self.TextBoxIcon.Parent = self.Container
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 44, 0, 15)
+    -- On mobile, make the name label wider and positioned at the top
+    if isMobile then
+        self.NameLabel.Size = UDim2.new(1, -60, 0, 20)
+        self.NameLabel.Position = UDim2.new(0, 44, 0, 8)
+    else
+        self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
+        self.NameLabel.Position = UDim2.new(0, 44, 0, 15)
+    end
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
@@ -4681,9 +4643,16 @@ function TextBox:Create()
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
-    self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
-    self.InputBackground.Position = UDim2.new(1, -16, 0.5, 0)
-    self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
+    if isMobile then
+        -- Full width input under the label
+        self.InputBackground.Size = UDim2.new(1, -60, 0, 30)
+        self.InputBackground.Position = UDim2.new(0, 44, 0, 36)
+        self.InputBackground.AnchorPoint = Vector2.new(0, 0)
+    else
+        self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
+        self.InputBackground.Position = UDim2.new(1, -16, 0.5, 0)
+        self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
+    end
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.InputBackground.BorderSizePixel = 0
     self.InputBackground.Parent = self.Container
@@ -4833,7 +4802,7 @@ function Toggle:Create()
     self.ToggleIcon.Parent = self.Container
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 200, 0, 20)
+    self.NameLabel.Size = UDim2.new(1, -130, 0, 20)
     self.NameLabel.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -5142,36 +5111,50 @@ function Window:CreateGui()
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.Parent = playerGui
-    local baseWidth = isMobile and 320 or 675  
-    local baseHeight = isMobile and 400 or 550
-    local scaleFactor = isMobile and 0.9 or 1.0
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
-    self.MainFrame.Size = UDim2.new(0, baseWidth, 0, baseHeight)
+    if isMobile then
+        self.MainFrame.Size = UDim2.new(0, 800, 0, 550)
+    else
+        self.MainFrame.Size = UDim2.new(0, 675, 0, 550)
+    end
     self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     self.MainFrame.BackgroundColor3 = self.Library.Colors.Background
     self.MainFrame.BorderSizePixel = 0
+    self.MainFrame.ClipsDescendants = true
     self.MainFrame.Parent = self.ScreenGui
+
+    local sizeConstraint = Instance.new("UISizeConstraint")
+    if isMobile then
+        sizeConstraint.MaxSize = Vector2.new(600, 450)
+    else
+        sizeConstraint.MaxSize = Vector2.new(675, 550)
+    end
+    sizeConstraint.Parent = self.MainFrame
+
     self.IsMobile = isMobile
-    self.ScaleFactor = scaleFactor
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 15)
     corner.Parent = self.MainFrame
+
     self.TitleBar = Instance.new("Frame")
     self.TitleBar.Name = "TitleBar"
-    self.TitleBar.Size = UDim2.new(1, 0, 0, 70) 
-    self.TitleBar.Position = UDim2.new(0, 0, 0, 0) 
-    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24) 
+    self.TitleBar.Size = UDim2.new(1, 0, 0, 70)
+    self.TitleBar.Position = UDim2.new(0, 0, 0, 0)
+    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
     self.TitleBar.BorderSizePixel = 0
+    self.TitleBar.ClipsDescendants = true
+    self.TitleBar.ZIndex = 2
     self.TitleBar.Parent = self.MainFrame
     local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 12) 
+    titleCorner.CornerRadius = UDim.new(0, 15) 
     titleCorner.Parent = self.TitleBar
     local titleMask = Instance.new("Frame")
     titleMask.Name = "TitleMask"
-    titleMask.Size = UDim2.new(1, 0, 0, 12)
-    titleMask.Position = UDim2.new(0, 0, 1, -12)
+    titleMask.Size = UDim2.new(1, 0, 0, 15)
+    titleMask.Position = UDim2.new(0, 0, 1, -15)
     titleMask.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
     titleMask.BorderSizePixel = 0
     titleMask.Parent = self.TitleBar
@@ -5179,6 +5162,7 @@ function Window:CreateGui()
     titleBorder.Color = Color3.fromRGB(0, 120, 215) 
     titleBorder.Thickness = 1
     titleBorder.Transparency = 0.6 
+    titleBorder.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     titleBorder.Parent = self.TitleBar
     self.TitleGlow = Instance.new("Frame")
     self.TitleGlow.Name = "TitleGlow"
@@ -5237,10 +5221,16 @@ function Window:CreateGui()
     self.SubtitleText.Parent = self.TitleBar
     self.SearchBackground = Instance.new("Frame")
     self.SearchBackground.Name = "SearchBackground"
-    self.SearchBackground.Size = UDim2.new(0, 220, 0, 32) 
-    self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0) 
-    self.SearchBackground.AnchorPoint = Vector2.new(0, 0.5)
-    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32) 
+    if isMobile then
+        self.SearchBackground.Size = UDim2.new(0.28, 0, 0, 28)
+        self.SearchBackground.Position = UDim2.new(0.5, 65, 0.5, 0)
+        self.SearchBackground.AnchorPoint = Vector2.new(0.5, 0.5)
+    else
+        self.SearchBackground.Size = UDim2.new(0, 220, 0, 32)
+        self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0)
+        self.SearchBackground.AnchorPoint = Vector2.new(0, 0.5)
+    end
+    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.SearchBackground.BorderSizePixel = 0
     self.SearchBackground.Parent = self.TitleBar
     local searchBorder = Instance.new("UIStroke")
@@ -5255,7 +5245,11 @@ function Window:CreateGui()
     end)
     self.SearchIcon = Instance.new("ImageLabel")
     self.SearchIcon.Name = "SearchIcon"
-    self.SearchIcon.Size = UDim2.new(0, 18, 0, 18)
+    if isMobile then
+        self.SearchIcon.Size = UDim2.new(0, 16, 0, 16)
+    else
+        self.SearchIcon.Size = UDim2.new(0, 18, 0, 18)
+    end
     self.SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
     self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.SearchIcon.BackgroundTransparency = 1
@@ -5272,6 +5266,9 @@ function Window:CreateGui()
     self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) 
     self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) 
     self.SearchBox.TextSize = 14
+    if isMobile then
+        self.SearchBox.TextSize = 12
+    end
     self.SearchBox.Font = Enum.Font.Gotham
     self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
     self.SearchBox.Parent = self.SearchBackground
@@ -5379,16 +5376,25 @@ function Window:CreateGui()
     closeCorner.Parent = self.CloseButton
     self.Sidebar = Instance.new("Frame")
     self.Sidebar.Name = "Sidebar"
-    self.Sidebar.Size = UDim2.new(0, 200, 1, -70) 
+    if isMobile then
+        self.Sidebar.Size = UDim2.new(0, 150, 1, -70) 
+    else
+        self.Sidebar.Size = UDim2.new(0, 200, 1, -70)
+    end
     self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
-    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28) 
+    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28)
     self.Sidebar.BorderSizePixel = 0
+    self.Sidebar.ClipsDescendants = true
     self.Sidebar.Parent = self.MainFrame
     local sidebarBorder = Instance.new("UIStroke")
     sidebarBorder.Color = Color3.fromRGB(0, 120, 215) 
     sidebarBorder.Thickness = 1
     sidebarBorder.Transparency = 0.7 
+    sidebarBorder.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     sidebarBorder.Parent = self.Sidebar
+    local sidebarCorner = Instance.new("UICorner")
+    sidebarCorner.CornerRadius = UDim.new(0, 10)
+    sidebarCorner.Parent = self.Sidebar
     self.SidebarShadow = Instance.new("Frame")
     self.SidebarShadow.Name = "InnerShadow"
     self.SidebarShadow.Size = UDim2.new(1, -4, 1, -4)
@@ -5425,21 +5431,32 @@ function Window:CreateGui()
     tabPadding.Parent = self.TabListContainer
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
-    self.ContentContainer.Size = UDim2.new(1, -200, 1, -70) 
-    self.ContentContainer.Position = UDim2.new(0, 200, 0, 70) 
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
+    if isMobile then
+        self.ContentContainer.Size = UDim2.new(1, -120, 1, -70)
+        self.ContentContainer.Position = UDim2.new(0, 140, 0, 70)
+    else
+        self.ContentContainer.Size = UDim2.new(1, -200, 1, -70)
+        self.ContentContainer.Position = UDim2.new(0, 200, 0, 70)
+    end
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.ContentContainer.BorderSizePixel = 0
+    self.ContentContainer.ZIndex = 1
+    self.ContentContainer.ClipsDescendants = true
     self.ContentContainer.Parent = self.MainFrame
     local contentBorder = Instance.new("UIStroke")
     contentBorder.Color = Color3.fromRGB(0, 120, 215)
     contentBorder.Thickness = 1
     contentBorder.Transparency = 0.8 
+    contentBorder.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     contentBorder.Parent = self.ContentContainer
+    local contentCorner = Instance.new("UICorner")
+    contentCorner.CornerRadius = UDim.new(0, 10)
+    contentCorner.Parent = self.ContentContainer
     local contentPadding = Instance.new("UIPadding")
-    contentPadding.PaddingLeft = UDim.new(0, 8)
-    contentPadding.PaddingRight = UDim.new(0, 8)
-    contentPadding.PaddingTop = UDim.new(0, 8)
-    contentPadding.PaddingBottom = UDim.new(0, 8)
+    contentPadding.PaddingLeft = UDim.new(0, 14)
+    contentPadding.PaddingRight = UDim.new(0, 14)
+    contentPadding.PaddingTop = UDim.new(0, 12)
+    contentPadding.PaddingBottom = UDim.new(0, 12)
     contentPadding.Parent = self.ContentContainer
     self:MakeDraggable()
     self:SetupKeybindSystem()
@@ -5931,7 +5948,7 @@ function Window:ToggleVisibility()
         if self.ToggleContainer then
             self.ToggleContainer.Visible = false
         end
-        self.MainFrame.Size = UDim2.new(0, 600, 0, 500)
+        self.MainFrame.Size = UDim2.new(0, 700, 0, 800)
         local showTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
@@ -7021,10 +7038,24 @@ local ObjectTree = {
         },
         {
             {
-                4,
+                3,
                 2,
                 {
-                    "Credits"
+                    "Config"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
                 }
             },
             {
@@ -7035,31 +7066,10 @@ local ObjectTree = {
                 }
             },
             {
-                16,
+                15,
                 2,
                 {
-                    "TextBox"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
+                    "Tab"
                 }
             },
             {
@@ -7070,24 +7080,17 @@ local ObjectTree = {
                 }
             },
             {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
                 12,
                 2,
                 {
                     "OptionsManager"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
                 }
             },
             {
@@ -7105,10 +7108,24 @@ local ObjectTree = {
                 }
             },
             {
-                14,
+                19,
                 2,
                 {
-                    "Slider"
+                    "lucide"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
                 }
             },
             {
@@ -7119,24 +7136,17 @@ local ObjectTree = {
                 }
             },
             {
-                17,
+                8,
                 2,
                 {
-                    "Toggle"
+                    "Label"
                 }
             },
             {
-                15,
+                4,
                 2,
                 {
-                    "Tab"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
+                    "Credits"
                 }
             },
             {
@@ -7144,6 +7154,13 @@ local ObjectTree = {
                 2,
                 {
                     "Loading"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
                 }
             }
         }
@@ -7154,23 +7171,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    362,
-    518,
-    1036,
-    1374,
-    2197,
-    2779,
-    2833,
-    3177,
-    3424,
-    3727,
-    3824,
-    3962,
-    4178,
-    4629,
-    4788,
-    5105,
-    6189
+    304,
+    460,
+    988,
+    1326,
+    2149,
+    2731,
+    2785,
+    3129,
+    3376,
+    3679,
+    3776,
+    3914,
+    4132,
+    4583,
+    4757,
+    5074,
+    6206
 }
 
 -- Misc AOT variable imports
