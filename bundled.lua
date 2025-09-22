@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hello dude
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -888,7 +888,7 @@ function Credits:CreateDiscordSection()
         if setclipboard then
             setclipboard(self.DiscordInvite)
             -- Show feedback
-            discordText.Text = "✅ Invite Copied!"
+            discordText.Text = "Invite Copied!"
             wait(2)
             discordText.Text = "Join Discord Server"
         end
@@ -932,7 +932,7 @@ function Credits:CreateFooter()
     footerText.Size = UDim2.new(1, -24, 1, 0)
     footerText.Position = UDim2.new(0, 12, 0, 0)
     footerText.BackgroundTransparency = 1
-    footerText.Text = "Made with ❤️ using ProjectMadara UI Library"
+    footerText.Text = "Made with ❤️ using Project Madara"
     footerText.TextColor3 = Color3.fromRGB(140, 160, 180)
     footerText.TextSize = 12
     footerText.Font = Enum.Font.GothamMedium
@@ -2769,141 +2769,106 @@ function Loading:Create()
     self.Background.Name = "Background"
     self.Background.Size = UDim2.new(1, 0, 1, 0)
     self.Background.Position = UDim2.new(0, 0, 0, 0)
-    self.Background.BackgroundColor3 = Color3.fromRGB(5, 8, 15) 
-    self.Background.BackgroundTransparency = 0.2
+    self.Background.BackgroundColor3 = Color3.fromRGB(8, 12, 18) 
+    self.Background.BackgroundTransparency = 0.3 
     self.Background.BorderSizePixel = 0
     self.Background.Parent = self.ScreenGui
-    
-    -- Animated gradient background
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 8, 15)),
-        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(15, 25, 40)),
-        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(25, 35, 55)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 8, 15))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(8, 12, 18)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(15, 20, 28)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 12, 18))
+    }
+    gradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.3), 
+        NumberSequenceKeypoint.new(0.5, 0.2), 
+        NumberSequenceKeypoint.new(1, 0.3) 
     }
     gradient.Rotation = 45
     gradient.Parent = self.Background
-    
     local gradientTween = TweenService:Create(
         gradient,
-        TweenInfo.new(6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1),
+        TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
         {Rotation = 405}
     )
     gradientTween:Play()
-    
-    -- Add animated grid pattern
-    self:CreateGridPattern()
     self:CreateParticles()
-    self:CreateOrbitingElements()
-    
     self.LoadingContainer = Instance.new("Frame")
     self.LoadingContainer.Name = "LoadingContainer"
-    self.LoadingContainer.Size = UDim2.new(0, 600, 0, 400)
+    self.LoadingContainer.Size = UDim2.new(0, 500, 0, 300)
     self.LoadingContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.LoadingContainer.AnchorPoint = Vector2.new(0.5, 0.5)
     self.LoadingContainer.BackgroundTransparency = 1
     self.LoadingContainer.Parent = self.Background
-    
-    -- Enhanced logo with glow effects
     self.LogoContainer = Instance.new("Frame")
     self.LogoContainer.Name = "LogoContainer"
-    self.LogoContainer.Size = UDim2.new(0, 140, 0, 140)
-    self.LogoContainer.Position = UDim2.new(0.5, 0, 0, 20)
+    self.LogoContainer.Size = UDim2.new(0, 120, 0, 120)
+    self.LogoContainer.Position = UDim2.new(0.5, 0, 0, 0)
     self.LogoContainer.AnchorPoint = Vector2.new(0.5, 0)
     self.LogoContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     self.LogoContainer.BorderSizePixel = 0
     self.LogoContainer.Parent = self.LoadingContainer
-    
     local logoCorner = Instance.new("UICorner")
-    logoCorner.CornerRadius = UDim.new(0, 30)
+    logoCorner.CornerRadius = UDim.new(0, 25)
     logoCorner.Parent = self.LogoContainer
-    
-    -- Animated border
     local logoBorder = Instance.new("UIStroke")
     logoBorder.Color = Color3.fromRGB(100, 180, 255)
-    logoBorder.Thickness = 4
-    logoBorder.Transparency = 0.2
+    logoBorder.Thickness = 3
+    logoBorder.Transparency = 0.3
     logoBorder.Parent = self.LogoContainer
-    
-    -- Outer glow effect
-    self.LogoGlow = Instance.new("Frame")
-    self.LogoGlow.Name = "LogoGlow"
-    self.LogoGlow.Size = UDim2.new(1, 40, 1, 40)
-    self.LogoGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
-    self.LogoGlow.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.LogoGlow.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-    self.LogoGlow.BackgroundTransparency = 0.7
-    self.LogoGlow.BorderSizePixel = 0
-    self.LogoGlow.ZIndex = self.LogoContainer.ZIndex - 1
-    self.LogoGlow.Parent = self.LogoContainer
-    
-    local glowCorner = Instance.new("UICorner")
-    glowCorner.CornerRadius = UDim.new(0, 50)
-    glowCorner.Parent = self.LogoGlow
     self.LogoText = Instance.new("TextLabel")
     self.LogoText.Name = "LogoText"
     self.LogoText.Size = UDim2.new(1, 0, 1, 0)
     self.LogoText.BackgroundTransparency = 1
     self.LogoText.Text = "M" 
     self.LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.LogoText.TextSize = 56
+    self.LogoText.TextSize = 48
     self.LogoText.Font = Enum.Font.GothamBold
     self.LogoText.TextXAlignment = Enum.TextXAlignment.Center
     self.LogoText.TextYAlignment = Enum.TextYAlignment.Center
     self.LogoText.Parent = self.LogoContainer
-    
-    -- Text glow effect
-    local textStroke = Instance.new("UIStroke")
-    textStroke.Color = Color3.fromRGB(100, 200, 255)
-    textStroke.Thickness = 2
-    textStroke.Transparency = 0.5
-    textStroke.Parent = self.LogoText
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "TitleLabel"
-    self.TitleLabel.Size = UDim2.new(1, 0, 0, 50)
-    self.TitleLabel.Position = UDim2.new(0, 0, 0, 180)
+    self.TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+    self.TitleLabel.Position = UDim2.new(0, 0, 0, 140)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 36
+    self.TitleLabel.TextSize = 32
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.TitleLabel.Parent = self.LoadingContainer
-    
     local titleGlow = Instance.new("UIStroke")
     titleGlow.Color = Color3.fromRGB(100, 180, 255)
-    titleGlow.Thickness = 2
-    titleGlow.Transparency = 0.6
+    titleGlow.Thickness = 1
+    titleGlow.Transparency = 0.7
     titleGlow.Parent = self.TitleLabel
     self.SubtitleLabel = Instance.new("TextLabel")
     self.SubtitleLabel.Name = "SubtitleLabel"
-    self.SubtitleLabel.Size = UDim2.new(1, 0, 0, 30)
-    self.SubtitleLabel.Position = UDim2.new(0, 0, 0, 235)
+    self.SubtitleLabel.Size = UDim2.new(1, 0, 0, 24)
+    self.SubtitleLabel.Position = UDim2.new(0, 0, 0, 185)
     self.SubtitleLabel.BackgroundTransparency = 1
     self.SubtitleLabel.Text = self.Subtitle
-    self.SubtitleLabel.TextColor3 = Color3.fromRGB(180, 200, 220)
-    self.SubtitleLabel.TextSize = 18
+    self.SubtitleLabel.TextColor3 = Color3.fromRGB(160, 180, 200)
+    self.SubtitleLabel.TextSize = 16
     self.SubtitleLabel.Font = Enum.Font.Gotham
     self.SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.SubtitleLabel.Parent = self.LoadingContainer
     if self.ShowProgress then
         self.ProgressContainer = Instance.new("Frame")
         self.ProgressContainer.Name = "ProgressContainer"
-        self.ProgressContainer.Size = UDim2.new(0, 450, 0, 12)
-        self.ProgressContainer.Position = UDim2.new(0.5, 0, 0, 285)
+        self.ProgressContainer.Size = UDim2.new(0, 400, 0, 8)
+        self.ProgressContainer.Position = UDim2.new(0.5, 0, 0, 230)
         self.ProgressContainer.AnchorPoint = Vector2.new(0.5, 0)
-        self.ProgressContainer.BackgroundColor3 = Color3.fromRGB(20, 25, 35)
+        self.ProgressContainer.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
         self.ProgressContainer.BorderSizePixel = 0
         self.ProgressContainer.Parent = self.LoadingContainer
-        
         local progressCorner = Instance.new("UICorner")
         progressCorner.CornerRadius = UDim.new(1, 0)
         progressCorner.Parent = self.ProgressContainer
-        
         local progressBorder = Instance.new("UIStroke")
-        progressBorder.Color = Color3.fromRGB(60, 70, 85)
-        progressBorder.Thickness = 2
+        progressBorder.Color = Color3.fromRGB(45, 55, 65)
+        progressBorder.Thickness = 1
         progressBorder.Parent = self.ProgressContainer
         self.ProgressFill = Instance.new("Frame")
         self.ProgressFill.Name = "ProgressFill"
@@ -2912,162 +2877,70 @@ function Loading:Create()
         self.ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
         self.ProgressFill.BorderSizePixel = 0
         self.ProgressFill.Parent = self.ProgressContainer
-        
         local fillCorner = Instance.new("UICorner")
         fillCorner.CornerRadius = UDim.new(1, 0)
         fillCorner.Parent = self.ProgressFill
-        
-        -- Enhanced gradient with more colors
         local progressGradient = Instance.new("UIGradient")
         progressGradient.Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
-            ColorSequenceKeypoint.new(0.3, Color3.fromRGB(50, 150, 255)),
-            ColorSequenceKeypoint.new(0.7, Color3.fromRGB(100, 200, 255)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 180, 255))
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 180, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255))
         }
         progressGradient.Parent = self.ProgressFill
-        
         local progressGradientTween = TweenService:Create(
             progressGradient,
-            TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1),
+            TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
             {Offset = Vector2.new(1, 0)}
         )
         progressGradientTween:Play()
         self.ProgressGlow = Instance.new("Frame")
         self.ProgressGlow.Name = "ProgressGlow"
-        self.ProgressGlow.Size = UDim2.new(1, 30, 1, 30)
-        self.ProgressGlow.Position = UDim2.new(0, -15, 0, -15)
+        self.ProgressGlow.Size = UDim2.new(1, 20, 1, 20)
+        self.ProgressGlow.Position = UDim2.new(0, -10, 0, -10)
         self.ProgressGlow.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-        self.ProgressGlow.BackgroundTransparency = 0.7
+        self.ProgressGlow.BackgroundTransparency = 0.8
         self.ProgressGlow.BorderSizePixel = 0
         self.ProgressGlow.ZIndex = self.ProgressContainer.ZIndex - 1
         self.ProgressGlow.Parent = self.ProgressContainer
-        
         local glowCorner = Instance.new("UICorner")
         glowCorner.CornerRadius = UDim.new(1, 0)
         glowCorner.Parent = self.ProgressGlow
-        
-        -- Pulsing glow effect
-        local glowTween = TweenService:Create(
-            self.ProgressGlow,
-            TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1),
-            {BackgroundTransparency = 0.9}
-        )
-        glowTween:Play()
     end
     if self.ShowPercentage then
         self.PercentageLabel = Instance.new("TextLabel")
         self.PercentageLabel.Name = "PercentageLabel"
-        self.PercentageLabel.Size = UDim2.new(0, 120, 0, 35)
-        self.PercentageLabel.Position = UDim2.new(0.5, 0, 0, 315)
+        self.PercentageLabel.Size = UDim2.new(0, 100, 0, 30)
+        self.PercentageLabel.Position = UDim2.new(0.5, 0, 0, 250)
         self.PercentageLabel.AnchorPoint = Vector2.new(0.5, 0)
         self.PercentageLabel.BackgroundTransparency = 1
         self.PercentageLabel.Text = "0%"
-        self.PercentageLabel.TextColor3 = Color3.fromRGB(120, 200, 255)
-        self.PercentageLabel.TextSize = 22
+        self.PercentageLabel.TextColor3 = Color3.fromRGB(100, 180, 255)
+        self.PercentageLabel.TextSize = 18
         self.PercentageLabel.Font = Enum.Font.GothamBold
         self.PercentageLabel.TextXAlignment = Enum.TextXAlignment.Center
         self.PercentageLabel.Parent = self.LoadingContainer
-        
-        -- Add glow to percentage text
-        local percentStroke = Instance.new("UIStroke")
-        percentStroke.Color = Color3.fromRGB(100, 180, 255)
-        percentStroke.Thickness = 1
-        percentStroke.Transparency = 0.7
-        percentStroke.Parent = self.PercentageLabel
     end
     self:PlayEntranceAnimations()
 end
-function Loading:CreateGridPattern()
-    for i = 1, 8 do
-        for j = 1, 6 do
-            local dot = Instance.new("Frame")
-            dot.Name = "GridDot" .. i .. "_" .. j
-            dot.Size = UDim2.new(0, 2, 0, 2)
-            dot.Position = UDim2.new(i/9, 0, j/7, 0)
-            dot.BackgroundColor3 = Color3.fromRGB(50, 100, 150)
-            dot.BackgroundTransparency = 0.8
-            dot.BorderSizePixel = 0
-            dot.Parent = self.Background
-            
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(1, 0)
-            corner.Parent = dot
-            
-            local delay = (i + j) * 0.1
-            local pulseTween = TweenService:Create(
-                dot,
-                TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1),
-                {BackgroundTransparency = 0.95}
-            )
-            
-            wait(delay)
-            pulseTween:Play()
-        end
-    end
-end
-
-function Loading:CreateOrbitingElements()
-    for i = 1, 6 do
-        local orb = Instance.new("Frame")
-        orb.Name = "OrbitingOrb" .. i
-        orb.Size = UDim2.new(0, math.random(4, 8), 0, math.random(4, 8))
-        orb.Position = UDim2.new(0.5, 0, 0.5, 0)
-        orb.AnchorPoint = Vector2.new(0.5, 0.5)
-        orb.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
-        orb.BackgroundTransparency = 0.3
-        orb.BorderSizePixel = 0
-        orb.Parent = self.Background
-        
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(1, 0)
-        corner.Parent = orb
-        
-        local radius = math.random(200, 400)
-        local speed = math.random(8, 15)
-        local angle = (i - 1) * (360 / 6)
-        
-        local orbitTween = TweenService:Create(
-            orb,
-            TweenInfo.new(speed, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
-            {Rotation = 360}
-        )
-        orbitTween:Play()
-        
-        spawn(function()
-            while orb.Parent do
-                angle = angle + (360 / speed) * (1/60)
-                local x = math.cos(math.rad(angle)) * radius
-                local y = math.sin(math.rad(angle)) * radius
-                orb.Position = UDim2.new(0.5, x, 0.5, y)
-                wait(1/60)
-            end
-        end)
-    end
-end
-
 function Loading:CreateParticles()
-    for i = 1, 25 do
+    for i = 1, 15 do
         local particle = Instance.new("Frame")
         particle.Name = "Particle" .. i
-        particle.Size = UDim2.new(0, math.random(1, 4), 0, math.random(1, 4))
+        particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
         particle.Position = UDim2.new(math.random(), 0, math.random(), 0)
         particle.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
-        particle.BackgroundTransparency = math.random(60, 90) / 100
+        particle.BackgroundTransparency = math.random(30, 80) / 100
         particle.BorderSizePixel = 0
         particle.Parent = self.Background
-        
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(1, 0)
         corner.Parent = particle
-        
         local floatTween = TweenService:Create(
             particle,
-            TweenInfo.new(math.random(10, 20), Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+            TweenInfo.new(math.random(8, 15), Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true),
             {
                 Position = UDim2.new(math.random(), 0, math.random(), 0),
-                BackgroundTransparency = math.random(40, 95) / 100,
-                Rotation = math.random(-180, 180)
+                BackgroundTransparency = math.random(20, 90) / 100
             }
         )
         floatTween:Play()
@@ -3127,40 +3000,27 @@ function Loading:StartLoading()
         end
         local elapsed = tick() - self.StartTime
         self.Progress = math.min(elapsed / self.Duration, 1)
-        
         if self.ProgressFill then
             local targetSize = UDim2.new(self.Progress, 0, 1, 0)
             local progressTween = TweenService:Create(
                 self.ProgressFill,
-                TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                TweenInfo.new(0.1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
                 {Size = targetSize}
             )
             progressTween:Play()
         end
-        
         if self.PercentageLabel then
             local percentage = math.floor(self.Progress * 100)
             self.PercentageLabel.Text = percentage .. "%"
             local color = Color3.fromRGB(
-                math.floor(120 + (135 * self.Progress)),
-                math.floor(200 + (55 * self.Progress)),
+                math.floor(100 + (155 * self.Progress)),
+                math.floor(180 + (75 * self.Progress)),
                 255
             )
             self.PercentageLabel.TextColor3 = color
         end
-        
-        -- Enhanced logo pulse with rotation
-        local pulseScale = 1 + (math.sin(elapsed * 6) * 0.08)
-        local rotationSpeed = elapsed * 30
-        self.LogoContainer.Size = UDim2.new(0, 140 * pulseScale, 0, 140 * pulseScale)
-        self.LogoContainer.Rotation = math.sin(elapsed * 2) * 5
-        
-        -- Glow pulse effect
-        if self.LogoGlow then
-            local glowPulse = 0.7 + (math.sin(elapsed * 8) * 0.2)
-            self.LogoGlow.BackgroundTransparency = glowPulse
-        end
-        
+        local pulseScale = 1 + (math.sin(elapsed * 8) * 0.05)
+        self.LogoContainer.Size = UDim2.new(0, 120 * pulseScale, 0, 120 * pulseScale)
         if self.Progress >= 1 and not self.IsComplete then
             self.IsComplete = true
             self:CompleteLoading()
@@ -7239,45 +7099,10 @@ local ObjectTree = {
         },
         {
             {
-                3,
+                16,
                 2,
                 {
-                    "Config"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
+                    "TextBox"
                 }
             },
             {
@@ -7288,45 +7113,24 @@ local ObjectTree = {
                 }
             },
             {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
                 17,
                 2,
                 {
                     "Toggle"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             },
             {
@@ -7337,17 +7141,24 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                2,
                 2,
                 {
-                    "DraggableKeybind"
+                    "Button"
                 }
             },
             {
-                10,
+                11,
                 2,
                 {
-                    "MobileFloatingIcon"
+                    "Notifications"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
                 }
             },
             {
@@ -7358,10 +7169,59 @@ local ObjectTree = {
                 }
             },
             {
-                16,
+                8,
                 2,
                 {
-                    "TextBox"
+                    "Label"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
                 }
             }
         }
@@ -7379,16 +7239,16 @@ local LineOffsets = {
     2102,
     2684,
     2738,
-    3222,
-    3469,
-    3772,
-    3869,
-    4007,
-    4252,
-    4703,
-    4877,
-    5125,
-    6407
+    3082,
+    3329,
+    3632,
+    3729,
+    3867,
+    4112,
+    4563,
+    4737,
+    4985,
+    6267
 }
 
 -- Misc AOT variable imports
