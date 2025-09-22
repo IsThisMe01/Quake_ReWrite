@@ -1,4 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
+-- 0.0.2
 
 -- Will be used later for getting flattened globals
 local ImportGlobals
@@ -6204,8 +6205,49 @@ function Window:ToggleButtonFeedback()
     end)
 end
 function Window:FilterComponents(searchText)
-    if self.ActiveTab and self.ActiveTab.FilterComponents then
-        self.ActiveTab:FilterComponents(searchText)
+    searchText = searchText:lower()
+
+    -- If search is empty, show all components in the active tab
+    if searchText == "" then
+        if self.ActiveTab then
+            for _, component in ipairs(self.ActiveTab.Components) do
+                if component.Container then
+                    component.Container.Visible = true
+                end
+            end
+        end
+        return
+    end
+
+    -- Search through all components in the active tab
+    if self.ActiveTab then
+        for _, component in ipairs(self.ActiveTab.Components) do
+            if component.Container then
+                local name = component.Name:lower()
+                local description = component.Description and component.Description:lower() or ""
+                local matches = name:find(searchText) or description:find(searchText)
+
+                -- Special cases for different component types
+                if component.Type == "Toggle" and component.States then
+                    for _, state in ipairs(component.States) do
+                        if tostring(state):lower():find(searchText) then
+                            matches = true
+                            break
+                        end
+                    end
+                elseif component.Type == "Dropdown" and component.Items then
+                    for _, item in ipairs(component.Items) do
+                        if tostring(item):lower():find(searchText) then
+                            matches = true
+                            break
+                        end
+                    end
+                end
+
+                -- Show/hide based on match
+                component.Container.Visible = matches
+            end
+        end
     end
 end
 
@@ -7065,52 +7107,10 @@ local ObjectTree = {
         },
         {
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                17,
+                4,
                 2,
                 {
-                    "Toggle"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
+                    "Credits"
                 }
             },
             {
@@ -7121,10 +7121,10 @@ local ObjectTree = {
                 }
             },
             {
-                4,
+                14,
                 2,
                 {
-                    "Credits"
+                    "Slider"
                 }
             },
             {
@@ -7135,17 +7135,24 @@ local ObjectTree = {
                 }
             },
             {
-                18,
+                11,
                 2,
                 {
-                    "Window"
+                    "Notifications"
                 }
             },
             {
-                14,
+                5,
                 2,
                 {
-                    "Slider"
+                    "DraggableKeybind"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             },
             {
@@ -7153,6 +7160,27 @@ local ObjectTree = {
                 2,
                 {
                     "lucide"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
                 }
             },
             {
@@ -7170,17 +7198,17 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                18,
                 2,
                 {
-                    "DraggableKeybind"
+                    "Window"
                 }
             },
             {
-                15,
+                17,
                 2,
                 {
-                    "Tab"
+                    "Toggle"
                 }
             },
             {
@@ -7188,6 +7216,20 @@ local ObjectTree = {
                 2,
                 {
                     "Label"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
                 }
             }
         }
@@ -7214,7 +7256,7 @@ local LineOffsets = {
     4610,
     4784,
     5101,
-    6233
+    6274
 }
 
 -- Misc AOT variable imports
