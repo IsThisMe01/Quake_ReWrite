@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- Hello
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -7152,6 +7152,41 @@ local ObjectTree = {
         },
         {
             {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
                 6,
                 2,
                 {
@@ -7159,17 +7194,59 @@ local ObjectTree = {
                 }
             },
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
                 13,
                 2,
                 {
                     "Paragraph"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             },
             {
@@ -7187,62 +7264,6 @@ local ObjectTree = {
                 }
             },
             {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
                 15,
                 2,
                 {
@@ -7250,31 +7271,10 @@ local ObjectTree = {
                 }
             },
             {
-                11,
+                2,
                 2,
                 {
-                    "Notifications"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
+                    "Button"
                 }
             }
         }
