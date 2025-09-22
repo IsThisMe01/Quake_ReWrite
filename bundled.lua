@@ -4024,13 +4024,15 @@ function Slider:Create()
     local fillCorner = Instance.new("UICorner")
     fillCorner.CornerRadius = UDim.new(1, 0)
     fillCorner.Parent = self.SliderFill
-    self.SliderIndicator = Instance.new("Frame")
+    self.SliderIndicator = Instance.new("TextButton")
     self.SliderIndicator.Name = "Indicator"
     self.SliderIndicator.Size = UDim2.new(0, 12, 0, 12) 
     self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0) 
     self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderIndicator.BorderSizePixel = 0
+    self.SliderIndicator.Text = ""
+    self.SliderIndicator.AutoButtonColor = false
     self.SliderIndicator.Parent = self.SliderTrack
     local indicatorCorner = Instance.new("UICorner")
     indicatorCorner.CornerRadius = UDim.new(1, 0)
@@ -4043,15 +4045,40 @@ function Slider:Create()
     self.SliderButton.Parent = self.SliderTrack
     self:UpdateValue(self.Value)
     local isDragging = false
-    self.SliderButton.MouseButton1Down:Connect(function()
+
+    -- Function to start dragging
+    local function startDragging()
         isDragging = true
         self:UpdateFromMouse()
+    end
+
+    -- Connect both the track and indicator for dragging
+    self.SliderButton.MouseButton1Down:Connect(startDragging)
+    self.SliderIndicator.MouseButton1Down:Connect(startDragging)
+
+    -- Setup hover effect for the indicator
+    self.SliderIndicator.MouseEnter:Connect(function()
+        TweenService:Create(
+            self.SliderIndicator,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart),
+            {BackgroundColor3 = Color3.fromRGB(240, 240, 240)}
+        ):Play()
     end)
+
+    self.SliderIndicator.MouseLeave:Connect(function()
+        TweenService:Create(
+            self.SliderIndicator,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart),
+            {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
+        ):Play()
+    end)
+
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
         end
     end)
+
     UserInputService.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
             self:UpdateFromMouse()
@@ -7038,10 +7065,10 @@ local ObjectTree = {
         },
         {
             {
-                3,
+                2,
                 2,
                 {
-                    "Config"
+                    "Button"
                 }
             },
             {
@@ -7052,10 +7079,94 @@ local ObjectTree = {
                 }
             },
             {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
                 14,
                 2,
                 {
                     "Slider"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
                 }
             },
             {
@@ -7073,94 +7184,10 @@ local ObjectTree = {
                 }
             },
             {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
                 8,
                 2,
                 {
                     "Label"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
                 }
             }
         }
@@ -7183,11 +7210,11 @@ local LineOffsets = {
     3679,
     3776,
     3914,
-    4132,
-    4583,
-    4757,
-    5074,
-    6206
+    4159,
+    4610,
+    4784,
+    5101,
+    6233
 }
 
 -- Misc AOT variable imports
