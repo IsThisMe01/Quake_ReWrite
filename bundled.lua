@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hello UPDATE GITHUB
+-- Hello
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -4749,7 +4749,13 @@ function Toggle.new(options, tab)
     self.IsListeningForKeybind = false
     self.Value = options.Default or false
     self.Callback = options.Callback or function() end
+    self.Function = options.Function -- Function to execute when toggle is on
     self:Create()
+    
+    -- Register the function if provided
+    if self.Function and self.Tab.Window then
+        self.Tab.Window:RegisterToggleFunction(self.Name, self.Function)
+    end
     if self.HasKeybind then
         self:SetupKeybindSystem()
     end
@@ -4925,6 +4931,11 @@ function Toggle:SetValue(value, callCallback)
             {BackgroundColor3 = self.Library.Colors.Toggle}
         )
         bgTween:Play()
+        
+        -- Start the toggle function if it exists
+        if self.Function and self.Tab.Window then
+            self.Tab.Window:StartToggleFunction(self.Name)
+        end
     else
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
@@ -4938,6 +4949,11 @@ function Toggle:SetValue(value, callCallback)
             {BackgroundColor3 = Color3.fromRGB(60, 60, 65)}
         )
         bgTween:Play()
+        
+        -- Stop the toggle function if it exists
+        if self.Function and self.Tab.Window then
+            self.Tab.Window:StopToggleFunction(self.Name)
+        end
     end
     
     if callCallback and self.Tab.Window and self.Tab.Window.ConfigEnabled then
@@ -4997,6 +5013,11 @@ function Window.new(options, library)
     self.OptionsManager = options.OptionsManager
     self.ConfigEnabled = options.Config or false
     
+    -- Functionality system for executing toggle functions
+    self.ActiveToggles = {} -- Track active toggles
+    self.ToggleFunctions = {} -- Store toggle functionality
+    self.FunctionConnections = {} -- Store heartbeat connections
+    
     -- Initialize config system if enabled
     if self.ConfigEnabled then
         local Config = require(script.Parent.Config)
@@ -5021,6 +5042,7 @@ function Window:CreateGui()
     self.ScreenGui.Name = "ProjectMadaraUI"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.DisplayOrder = 999999999 -- Always on top
     self.ScreenGui.Parent = playerGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
@@ -5592,6 +5614,7 @@ function Window:CreateMobileIcon()
     self.MobileIcon.Name = "ProjectMadaraMobile"
     self.MobileIcon.ResetOnSpawn = false
     self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.MobileIcon.DisplayOrder = 999999998 -- Always on top, just below main UI
     self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.MobileContainer = Instance.new("Frame")
     self.MobileContainer.Name = "MobileContainer"
@@ -5873,6 +5896,7 @@ function Window:CreateMobileToggleButton()
     self.MobileToggleGui.Name = "ProjectMadaraToggleControls"
     self.MobileToggleGui.ResetOnSpawn = false
     self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.MobileToggleGui.DisplayOrder = 999999997 -- Always on top, below main UI and mobile icon
     self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.ToggleContainer = Instance.new("Frame")
     self.ToggleContainer.Name = "ToggleContainer"
@@ -6260,6 +6284,35 @@ function Window:ApplyConfigToComponent(tabName, component)
     if self.ConfigEnabled and self.Config then
         self.Config:ApplyConfigToComponent(tabName, component)
     end
+end
+
+-- Toggle functionality management
+function Window:RegisterToggleFunction(toggleName, func)
+    self.ToggleFunctions[toggleName] = func
+end
+
+function Window:StartToggleFunction(toggleName)
+    if self.ToggleFunctions[toggleName] and not self.FunctionConnections[toggleName] then
+        local RunService = game:GetService("RunService")
+        self.FunctionConnections[toggleName] = RunService.Heartbeat:Connect(function()
+            self.ToggleFunctions[toggleName]()
+        end)
+        self.ActiveToggles[toggleName] = true
+        print("Started function for:", toggleName)
+    end
+end
+
+function Window:StopToggleFunction(toggleName)
+    if self.FunctionConnections[toggleName] then
+        self.FunctionConnections[toggleName]:Disconnect()
+        self.FunctionConnections[toggleName] = nil
+        self.ActiveToggles[toggleName] = false
+        print("Stopped function for:", toggleName)
+    end
+end
+
+function Window:IsToggleActive(toggleName)
+    return self.ActiveToggles[toggleName] == true
 end
 
 return Window
@@ -7099,73 +7152,10 @@ local ObjectTree = {
         },
         {
             {
-                7,
+                6,
                 2,
                 {
-                    "FloatingControls"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
+                    "Dropdown"
                 }
             },
             {
@@ -7176,17 +7166,45 @@ local ObjectTree = {
                 }
             },
             {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
                 3,
                 2,
                 {
                     "Config"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
                 }
             },
             {
@@ -7197,10 +7215,24 @@ local ObjectTree = {
                 }
             },
             {
-                6,
+                10,
                 2,
                 {
-                    "Dropdown"
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
                 }
             },
             {
@@ -7211,6 +7243,13 @@ local ObjectTree = {
                 }
             },
             {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
                 11,
                 2,
                 {
@@ -7218,10 +7257,24 @@ local ObjectTree = {
                 }
             },
             {
-                18,
+                12,
                 2,
                 {
-                    "Window"
+                    "OptionsManager"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             }
         }
@@ -7247,8 +7300,8 @@ local LineOffsets = {
     4112,
     4563,
     4737,
-    4985,
-    6267
+    5001,
+    6320
 }
 
 -- Misc AOT variable imports
@@ -7745,4 +7798,3 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
-
