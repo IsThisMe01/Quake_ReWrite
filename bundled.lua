@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- hello
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -5343,8 +5343,8 @@ function Window:CreateGui()
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
     if isMobile then
-        self.ContentContainer.Size = UDim2.new(1, -120, 1, -70)
-        self.ContentContainer.Position = UDim2.new(0, 140, 0, 70)
+        self.ContentContainer.Size = UDim2.new(1, -150, 1, -70)
+        self.ContentContainer.Position = UDim2.new(0, 150, 0, 70)
     else
         self.ContentContainer.Size = UDim2.new(1, -200, 1, -70)
         self.ContentContainer.Position = UDim2.new(0, 200, 0, 70)
@@ -5364,10 +5364,10 @@ function Window:CreateGui()
     contentCorner.CornerRadius = UDim.new(0, 10)
     contentCorner.Parent = self.ContentContainer
     local contentPadding = Instance.new("UIPadding")
-    contentPadding.PaddingLeft = UDim.new(0, 14)
-    contentPadding.PaddingRight = UDim.new(0, 14)
-    contentPadding.PaddingTop = UDim.new(0, 12)
-    contentPadding.PaddingBottom = UDim.new(0, 12)
+    contentPadding.PaddingLeft = UDim.new(0, 8)
+    contentPadding.PaddingRight = UDim.new(0, 8)
+    contentPadding.PaddingTop = UDim.new(0, 8)
+    contentPadding.PaddingBottom = UDim.new(0, 8)
     contentPadding.Parent = self.ContentContainer
     self:MakeDraggable()
     self:SetupKeybindSystem()
@@ -7099,10 +7099,101 @@ local ObjectTree = {
         },
         {
             {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
                 16,
                 2,
                 {
                     "TextBox"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             },
             {
@@ -7120,34 +7211,6 @@ local ObjectTree = {
                 }
             },
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
                 11,
                 2,
                 {
@@ -7155,73 +7218,10 @@ local ObjectTree = {
                 }
             },
             {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
                 18,
                 2,
                 {
                     "Window"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
                 }
             }
         }
