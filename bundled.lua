@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- ahhhh 
+-- ahhhhhhhhhhhh
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -1402,45 +1402,10 @@ function Dropdown:Create()
         self.DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescriptionLabel.Parent = self.Header
     end
-    if self.Multiselect then
-        self.ClearButton = Instance.new("TextButton")
-        self.ClearButton.Name = "ClearButton"
-        self.ClearButton.Size = UDim2.new(0, 24, 0, 24)
-        self.ClearButton.Position = UDim2.new(1, -60, 0.5, 0)
-        self.ClearButton.AnchorPoint = Vector2.new(0, 0.5)
-        self.ClearButton.BackgroundColor3 = Color3.fromRGB(70, 75, 82)
-        self.ClearButton.Text = "✕"
-        self.ClearButton.TextColor3 = Color3.fromRGB(200, 205, 210)
-        self.ClearButton.TextSize = 12
-        self.ClearButton.Font = Enum.Font.GothamBold
-        self.ClearButton.BorderSizePixel = 0
-        self.ClearButton.Parent = self.Header
-        local clearCorner = Instance.new("UICorner")
-        clearCorner.CornerRadius = UDim.new(0, 6)
-        clearCorner.Parent = self.ClearButton
-        self.ClearButton.MouseButton1Click:Connect(function()
-            self:ClearAllSelections()
-        end)
-        self.ClearButton.MouseEnter:Connect(function()
-            local hoverTween = TweenService:Create(
-                self.ClearButton,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundColor3 = Color3.fromRGB(220, 85, 85)}
-            )
-            hoverTween:Play()
-        end)
-        self.ClearButton.MouseLeave:Connect(function()
-            local leaveTween = TweenService:Create(
-                self.ClearButton,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundColor3 = Color3.fromRGB(70, 75, 82)}
-            )
-            leaveTween:Play()
-        end)
-    end
+
     self.SelectedLabel = Instance.new("TextLabel")
     self.SelectedLabel.Name = "Selected"
-    self.SelectedLabel.Size = UDim2.new(1, self.Multiselect and -120 or -90, 1, 0)
+    self.SelectedLabel.Size = UDim2.new(1, -90, 1, 0)
     self.SelectedLabel.Position = UDim2.new(1, -32, 0.5, 0)
     self.SelectedLabel.AnchorPoint = Vector2.new(1, 0.5)
     self.SelectedLabel.BackgroundTransparency = 1
@@ -7134,10 +7099,31 @@ local ObjectTree = {
         },
         {
             {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
                 19,
                 2,
                 {
                     "lucide"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             },
             {
@@ -7155,31 +7141,10 @@ local ObjectTree = {
                 }
             },
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "Credits"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
                 }
             },
             {
@@ -7190,52 +7155,10 @@ local ObjectTree = {
                 }
             },
             {
-                18,
+                11,
                 2,
                 {
-                    "Window"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
+                    "Notifications"
                 }
             },
             {
@@ -7253,10 +7176,52 @@ local ObjectTree = {
                 }
             },
             {
-                6,
+                2,
                 2,
                 {
-                    "Dropdown"
+                    "Button"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
                 }
             }
         }
@@ -7271,19 +7236,19 @@ local LineOffsets = {
     448,
     976,
     1314,
-    2137,
-    2719,
-    2773,
-    3117,
-    3364,
-    3667,
-    3764,
-    3902,
-    4147,
-    4598,
-    4772,
-    5020,
-    6302
+    2102,
+    2684,
+    2738,
+    3082,
+    3329,
+    3632,
+    3729,
+    3867,
+    4112,
+    4563,
+    4737,
+    4985,
+    6267
 }
 
 -- Misc AOT variable imports
