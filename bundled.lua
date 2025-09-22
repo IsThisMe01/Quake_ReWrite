@@ -1,6 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- 0.0.2
-
+-- ahhhh 
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -287,19 +286,7 @@ function Button:UpdateKeybindDisplay()
         self.KeybindButton.Text = "⌨"
     end
 end
-function Button:CreateDraggableKeybind()
-    print("Button:CreateDraggableKeybind called for:", self.Name) 
-    local DraggableKeybind = require(script.Parent.DraggableKeybind)
-    local draggable = DraggableKeybind.CreateFromButton(
-        self.KeybindButton,
-        "Button",
-        self.Name,
-        self.Callback,
-        nil,
-        nil
-    )
-    print("Draggable button created:", draggable) 
-end
+
 return Button
 end)() end,
     function()local wax,script,require=ImportGlobals(3)local ImportGlobals return (function(...)local HttpService = game:GetService("HttpService")
@@ -4891,65 +4878,8 @@ function Toggle:Create()
         local keybindCorner = Instance.new("UICorner")
         keybindCorner.CornerRadius = UDim.new(0, 6)
         keybindCorner.Parent = self.KeybindButton
-        local UserInputService = game:GetService("UserInputService")
-        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        local isDragging = false
-        local dragStart = nil
-        local pressTime = 0
-        local hasMovedEnough = false
-        local dragConnection = nil
-        local releaseConnection = nil
-        self.KeybindButton.MouseButton1Down:Connect(function()
-            isDragging = true
-            dragStart = UserInputService:GetMouseLocation()
-            pressTime = tick()
-            hasMovedEnough = false
-            print("Toggle keybind drag started") 
-            if dragConnection then
-                dragConnection:Disconnect()
-            end
-            if releaseConnection then
-                releaseConnection:Disconnect()
-            end
-            dragConnection = UserInputService.InputChanged:Connect(function(input)
-                if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local currentPos = Vector2.new(input.Position.X, input.Position.Y)
-                    local distance = (currentPos - dragStart).Magnitude
-                    if distance > 15 then 
-                        hasMovedEnough = true
-                        print("Toggle keybind moved enough:", distance) 
-                    end
-                end
-            end)
-            releaseConnection = UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and isDragging then
-                    print("Toggle keybind mouse released") 
-                    if releaseConnection then
-                        releaseConnection:Disconnect()
-                        releaseConnection = nil
-                    end
-                    if dragConnection then
-                        dragConnection:Disconnect()
-                        dragConnection = nil
-                    end
-                    local holdTime = tick() - pressTime
-                    print("Toggle keybind released - holdTime:", holdTime, "moved:", hasMovedEnough) 
-                    if hasMovedEnough or holdTime > 0.5 then
-                        print("Creating draggable toggle keybind") 
-                        self:CreateDraggableKeybind()
-                    elseif holdTime < 0.3 then
-                        print("Starting keybind listening") 
-                        self:StartKeybindListening()
-                    end
-                    isDragging = false
-                    dragStart = nil
-                    hasMovedEnough = false
-                end
-            end)
-        end)
-        self.KeybindButton.MouseButton2Click:Connect(function()
-            print("Right click - creating draggable toggle keybind") 
-            self:CreateDraggableKeybind()
+        self.KeybindButton.MouseButton1Click:Connect(function()
+            self:StartKeybindListening()
         end)
         self.KeybindButton.MouseEnter:Connect(function()
             if not self.IsListeningForKeybind then
@@ -5084,19 +5014,7 @@ function Toggle:UpdateKeybindDisplay()
         self.KeybindButton.Text = "⌨"
     end
 end
-function Toggle:CreateDraggableKeybind()
-    print("Toggle:CreateDraggableKeybind called for:", self.Name) 
-    local DraggableKeybind = require(script.Parent.DraggableKeybind)
-    local draggable = DraggableKeybind.CreateFromButton(
-        self.KeybindButton,
-        "Toggle",
-        self.Name,
-        function() self:SetValue(not self.Value) end,
-        function() return self.Value end,
-        function(value) self:SetValue(value) end
-    )
-    print("Draggable toggle created:", draggable) 
-end
+
 return Toggle
 end)() end,
     function()local wax,script,require=ImportGlobals(18)local ImportGlobals return (function(...)local Players = game:GetService("Players")
@@ -6207,26 +6125,60 @@ end
 function Window:FilterComponents(searchText)
     searchText = searchText:lower()
 
-    -- If search is empty, show all components in the active tab
+    -- If search is empty, show all components and reset to original tab
     if searchText == "" then
-        if self.ActiveTab then
-            for _, component in ipairs(self.ActiveTab.Components) do
+        for _, tab in ipairs(self.Tabs) do
+            for _, component in ipairs(tab.Components or {}) do
                 if component.Container then
                     component.Container.Visible = true
+                end
+            end
+            -- Also check direct children of tab container for other elements
+            for _, child in ipairs(tab.Container:GetChildren()) do
+                if child:IsA("Frame") and child.Name:find("Section") then
+                    child.Visible = true
+                    -- Show all components in sections too
+                    for _, sectionChild in ipairs(child:GetChildren()) do
+                        if sectionChild.Name == "Content" then
+                            for _, contentChild in ipairs(sectionChild:GetChildren()) do
+                                if contentChild:IsA("Frame") then
+                                    contentChild.Visible = true
+                                end
+                            end
+                        end
+                    end
+                elseif child:IsA("Frame") then
+                    child.Visible = true
                 end
             end
         end
         return
     end
 
-    -- Search through all components in the active tab
-    if self.ActiveTab then
-        for _, component in ipairs(self.ActiveTab.Components) do
+    local foundMatches = {}
+    local bestMatchTab = nil
+    local bestMatchScore = 0
+
+    -- Search through ALL tabs and their components
+    for _, tab in ipairs(self.Tabs) do
+        local tabMatches = 0
+        local tabName = tab.Name:lower()
+        
+        -- Check if tab name matches
+        local tabNameMatch = tabName:find(searchText)
+        
+        -- Search through components in this tab
+        for _, component in ipairs(tab.Components or {}) do
             if component.Container then
+                local matches = false
                 local name = component.Name:lower()
                 local description = component.Description and component.Description:lower() or ""
-                local matches = name:find(searchText) or description:find(searchText)
-
+                
+                -- Check component name and description
+                if name:find(searchText) or description:find(searchText) then
+                    matches = true
+                end
+                
                 -- Special cases for different component types
                 if component.Type == "Toggle" and component.States then
                     for _, state in ipairs(component.States) do
@@ -6242,12 +6194,87 @@ function Window:FilterComponents(searchText)
                             break
                         end
                     end
+                elseif component.Type == "Slider" then
+                    -- Check slider min/max values
+                    if component.Min and tostring(component.Min):find(searchText) then
+                        matches = true
+                    elseif component.Max and tostring(component.Max):find(searchText) then
+                        matches = true
+                    end
                 end
-
-                -- Show/hide based on match
+                
+                -- Show/hide component based on match
                 component.Container.Visible = matches
+                
+                if matches then
+                    tabMatches = tabMatches + 1
+                    table.insert(foundMatches, {tab = tab, component = component})
+                end
             end
         end
+        
+        -- Also search through direct children (sections, labels, etc.)
+        for _, child in ipairs(tab.Container:GetChildren()) do
+            if child:IsA("Frame") then
+                local childMatches = false
+                
+                if child.Name:find("Section") then
+                    -- Check section title
+                    local titleLabel = child:FindFirstChild("Title")
+                    if titleLabel and titleLabel:IsA("TextLabel") then
+                        local sectionTitle = titleLabel.Text:lower()
+                        if sectionTitle:find(searchText) then
+                            childMatches = true
+                            tabMatches = tabMatches + 1
+                        end
+                    end
+                    
+                    -- Search within section content
+                    local content = child:FindFirstChild("Content")
+                    if content then
+                        for _, contentChild in ipairs(content:GetChildren()) do
+                            if contentChild:IsA("Frame") then
+                                local nameLabel = contentChild:FindFirstChild("Name") or contentChild:FindFirstChild("Text")
+                                if nameLabel and nameLabel:IsA("TextLabel") then
+                                    local componentName = nameLabel.Text:lower()
+                                    if componentName:find(searchText) then
+                                        contentChild.Visible = true
+                                        childMatches = true
+                                        tabMatches = tabMatches + 1
+                                    else
+                                        contentChild.Visible = false
+                                    end
+                                end
+                            end
+                        end
+                    end
+                else
+                    -- Check other frame types (labels, paragraphs, etc.)
+                    local nameLabel = child:FindFirstChild("Name") or child:FindFirstChild("Text") or child:FindFirstChild("Title")
+                    if nameLabel and nameLabel:IsA("TextLabel") then
+                        local componentName = nameLabel.Text:lower()
+                        if componentName:find(searchText) then
+                            childMatches = true
+                            tabMatches = tabMatches + 1
+                        end
+                    end
+                end
+                
+                child.Visible = childMatches
+            end
+        end
+        
+        -- Calculate tab match score (tab name match + component matches)
+        local tabScore = tabMatches + (tabNameMatch and 10 or 0)
+        if tabScore > bestMatchScore then
+            bestMatchScore = tabScore
+            bestMatchTab = tab
+        end
+    end
+    
+    -- Switch to the tab with the best matches if we found any
+    if bestMatchTab and bestMatchTab ~= self.ActiveTab and #foundMatches > 0 then
+        self:SelectTab(bestMatchTab)
     end
 end
 
@@ -7107,55 +7134,6 @@ local ObjectTree = {
         },
         {
             {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
                 19,
                 2,
                 {
@@ -7170,17 +7148,10 @@ local ObjectTree = {
                 }
             },
             {
-                15,
+                14,
                 2,
                 {
-                    "Tab"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
+                    "Slider"
                 }
             },
             {
@@ -7191,17 +7162,17 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                11,
                 2,
                 {
-                    "Loading"
+                    "Notifications"
                 }
             },
             {
-                18,
+                4,
                 2,
                 {
-                    "Window"
+                    "Credits"
                 }
             },
             {
@@ -7212,10 +7183,17 @@ local ObjectTree = {
                 }
             },
             {
-                8,
+                12,
                 2,
                 {
-                    "Label"
+                    "OptionsManager"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
                 }
             },
             {
@@ -7226,10 +7204,59 @@ local ObjectTree = {
                 }
             },
             {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
                 2,
                 2,
                 {
                     "Button"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
                 }
             }
         }
@@ -7240,23 +7267,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    304,
-    460,
-    988,
-    1326,
-    2149,
-    2731,
-    2785,
-    3129,
-    3376,
-    3679,
-    3776,
-    3914,
-    4159,
-    4610,
-    4784,
-    5101,
-    6274
+    292,
+    448,
+    976,
+    1314,
+    2137,
+    2719,
+    2773,
+    3117,
+    3364,
+    3667,
+    3764,
+    3902,
+    4147,
+    4598,
+    4772,
+    5020,
+    6302
 }
 
 -- Misc AOT variable imports
