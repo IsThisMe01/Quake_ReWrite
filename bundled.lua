@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- hello
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -107,50 +107,98 @@ end
 function Button:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Button"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 58 or 44)
-    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 54)
+    self.Container.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
+    
+    -- Enhanced gradient background
+    self.GradientFrame = Instance.new("Frame")
+    self.GradientFrame.Name = "GradientFrame"
+    self.GradientFrame.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientFrame.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientFrame.BackgroundTransparency = 0.95
+    self.GradientFrame.BorderSizePixel = 0
+    self.GradientFrame.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientFrame
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 80, 160))
+    })
+    gradient.Rotation = 45
+    gradient.Parent = self.GradientFrame
+    
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Color = Color3.fromRGB(60, 70, 80)
     border.Thickness = 1
+    border.Transparency = 0.4
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 7)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.Parent = self.IconContainer
+    
+    -- Icon gradient
+    local iconGradient = Instance.new("UIGradient")
+    iconGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
+    })
+    iconGradient.Rotation = 45
+    iconGradient.Parent = self.IconContainer
+    
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
-    self.ButtonLeftIcon.Size = UDim2.new(0, 20, 0, 20)
-    self.ButtonLeftIcon.Position = UDim2.new(0, 12, 0, self.Description ~= "" and 8 or 12)
+    self.ButtonLeftIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.ButtonLeftIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.ButtonLeftIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonLeftIcon.BackgroundTransparency = 1
     self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
-    self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.ButtonLeftIcon.Parent = self.Container
+    self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    self.ButtonLeftIcon.Parent = self.IconContainer
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
-    self.ButtonText.Size = UDim2.new(1, -80, 0, 20)
-    self.ButtonText.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
+    self.ButtonText.Size = UDim2.new(1, -120, 0, 22)
+    self.ButtonText.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 8 or 16)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
-    self.ButtonText.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.ButtonText.TextSize = 14
-    self.ButtonText.Font = Enum.Font.GothamSemibold
+    self.ButtonText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.ButtonText.TextSize = 16
+    self.ButtonText.Font = Enum.Font.GothamBold
     self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
     self.ButtonText.Parent = self.Container
     if self.Description ~= "" then
         self.ButtonDescription = Instance.new("TextLabel")
         self.ButtonDescription.Name = "Description"
-        self.ButtonDescription.Size = UDim2.new(0, 250, 0, 14)
-        self.ButtonDescription.Position = UDim2.new(0, 38, 0, 28)
+        self.ButtonDescription.Size = UDim2.new(1, -150, 0, 16)
+        self.ButtonDescription.Position = UDim2.new(0, 68, 0, 32)
         self.ButtonDescription.BackgroundTransparency = 1
         self.ButtonDescription.Text = self.Description
-        self.ButtonDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.ButtonDescription.TextSize = 11
+        self.ButtonDescription.TextColor3 = Color3.fromRGB(190, 200, 210)
+        self.ButtonDescription.TextSize = 13
         self.ButtonDescription.Font = Enum.Font.Gotham
         self.ButtonDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.ButtonDescription.TextWrapped = true
         self.ButtonDescription.Parent = self.Container
     end
     if self.HasKeybind then
@@ -184,15 +232,35 @@ function Button:Create()
             end
         end)
     end
+    -- Action indicator with modern design
+    self.ActionIndicator = Instance.new("Frame")
+    self.ActionIndicator.Name = "ActionIndicator"
+    self.ActionIndicator.Size = UDim2.new(0, 32, 0, 32)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and -76 or -44, 0.5, 0)
+    self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
+    self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
+    self.ActionIndicator.BorderSizePixel = 0
+    self.ActionIndicator.Parent = self.Container
+    
+    local actionCorner = Instance.new("UICorner")
+    actionCorner.CornerRadius = UDim.new(0, 8)
+    actionCorner.Parent = self.ActionIndicator
+    
+    local actionBorder = Instance.new("UIStroke")
+    actionBorder.Color = Color3.fromRGB(70, 80, 90)
+    actionBorder.Thickness = 1
+    actionBorder.Transparency = 0.6
+    actionBorder.Parent = self.ActionIndicator
+    
     self.ButtonIcon = Instance.new("ImageLabel")
     self.ButtonIcon.Name = "Icon"
-    self.ButtonIcon.Size = UDim2.new(0, 20, 0, 20)
-    self.ButtonIcon.Position = UDim2.new(1, self.HasKeybind and -72 or -30, 0.5, 0) 
-    self.ButtonIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.ButtonIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.ButtonIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.ButtonIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonIcon.BackgroundTransparency = 1
-    self.ButtonIcon.Image = (success and Lucide and Lucide["fingerprint"]) or "rbxassetid://10723375250" 
-    self.ButtonIcon.ImageColor3 = self.Library.Colors.LightText
-    self.ButtonIcon.Parent = self.Container
+    self.ButtonIcon.Image = (success and Lucide and Lucide["play"]) or "rbxassetid://10723375250"
+    self.ButtonIcon.ImageColor3 = Color3.fromRGB(200, 210, 220)
+    self.ButtonIcon.Parent = self.ActionIndicator
     self.ButtonInteraction = Instance.new("TextButton")
     self.ButtonInteraction.Name = "Interaction"
     self.ButtonInteraction.Size = UDim2.new(1, self.HasKeybind and -42 or 0, 1, 0) 
@@ -227,32 +295,98 @@ function Button:Create()
         self.Callback()
     end)
     self.ButtonInteraction.MouseEnter:Connect(function()
+        -- Enhanced hover effects
         local hoverTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(30, 36, 45)}
         )
         hoverTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(70, 80, 90)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.2}
         )
         borderTween:Play()
+        
+        -- Gradient glow effect
+        local gradientTween = TweenService:Create(
+            self.GradientFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.85}
+        )
+        gradientTween:Play()
+        
+        -- Icon container glow
+        local iconTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
+        
+        -- Action indicator highlight
+        local actionTween = TweenService:Create(
+            self.ActionIndicator,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(50, 55, 63)}
+        )
+        actionTween:Play()
+        
+        local actionIconTween = TweenService:Create(
+            self.ButtonIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        actionIconTween:Play()
     end)
+    
     self.ButtonInteraction.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(25, 30, 38)}
         )
         leaveTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(55, 60, 67)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(60, 70, 80), Transparency = 0.4}
         )
         borderTween:Play()
+        
+        -- Reset gradient
+        local gradientTween = TweenService:Create(
+            self.GradientFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.95}
+        )
+        gradientTween:Play()
+        
+        -- Reset icon container
+        local iconTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+        )
+        iconTween:Play()
+        
+        -- Reset action indicator
+        local actionTween = TweenService:Create(
+            self.ActionIndicator,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(40, 45, 53)}
+        )
+        actionTween:Play()
+        
+        local actionIconTween = TweenService:Create(
+            self.ButtonIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(200, 210, 220)}
+        )
+        actionIconTween:Play()
     end)
     return self
 end
@@ -1350,17 +1484,33 @@ end
 function Dropdown:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Dropdown"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
-    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 78 or 62)
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
     self.Container.Parent = self.Tab.Container
+    
+    -- Enhanced gradient background
+    self.GradientBg = Instance.new("Frame")
+    self.GradientBg.Name = "GradientBg"
+    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientBg.BackgroundTransparency = 0.97
+    self.GradientBg.BorderSizePixel = 0
+    self.GradientBg.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientBg
+    
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(40, 45, 52)
+    border.Color = Color3.fromRGB(50, 60, 70)
     border.Thickness = 1
+    border.Transparency = 0.3
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12) 
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
@@ -1370,36 +1520,57 @@ function Dropdown:Create()
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 11)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Header
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(60, 70, 80)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.DropdownIcon = Instance.new("ImageLabel")
     self.DropdownIcon.Name = "Icon"
     self.DropdownIcon.Size = UDim2.new(0, 22, 0, 22)
-    self.DropdownIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
+    self.DropdownIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.DropdownIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.DropdownIcon.BackgroundTransparency = 1
     self.DropdownIcon.Image = (success and Lucide and Lucide["list"]) or "rbxassetid://10723433811"
-    self.DropdownIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.DropdownIcon.Parent = self.Header
+    self.DropdownIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 200, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 15)
+    self.NameLabel.Size = UDim2.new(0, 220, 0, 24)
+    self.NameLabel.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 10 or 19)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
-    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.NameLabel.TextSize = 15
-    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.NameLabel.TextSize = 16
+    self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Header
     if self.Description ~= "" then
         self.DescriptionLabel = Instance.new("TextLabel")
         self.DescriptionLabel.Name = "Description"
-        self.DescriptionLabel.Size = UDim2.new(0, 250, 0, 16)
-        self.DescriptionLabel.Position = UDim2.new(0, 44, 0, 32)
+        self.DescriptionLabel.Size = UDim2.new(1, -200, 0, 18)
+        self.DescriptionLabel.Position = UDim2.new(0, 68, 0, 36)
         self.DescriptionLabel.BackgroundTransparency = 1
         self.DescriptionLabel.Text = self.Description
-        self.DescriptionLabel.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.DescriptionLabel.TextSize = 12
+        self.DescriptionLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+        self.DescriptionLabel.TextSize = 13
         self.DescriptionLabel.Font = Enum.Font.Gotham
         self.DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
+        self.DescriptionLabel.TextWrapped = true
         self.DescriptionLabel.Parent = self.Header
     end
 
@@ -1416,15 +1587,35 @@ function Dropdown:Create()
     self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.SelectedLabel.Parent = self.Header
     self:UpdateSelectedText()
+    -- Enhanced arrow with container
+    self.ArrowContainer = Instance.new("Frame")
+    self.ArrowContainer.Name = "ArrowContainer"
+    self.ArrowContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.ArrowContainer.Position = UDim2.new(1, -44, 0.5, 0)
+    self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
+    self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
+    self.ArrowContainer.BorderSizePixel = 0
+    self.ArrowContainer.Parent = self.Header
+    
+    local arrowCorner = Instance.new("UICorner")
+    arrowCorner.CornerRadius = UDim.new(0, 8)
+    arrowCorner.Parent = self.ArrowContainer
+    
+    local arrowBorder = Instance.new("UIStroke")
+    arrowBorder.Color = Color3.fromRGB(70, 80, 90)
+    arrowBorder.Thickness = 1
+    arrowBorder.Transparency = 0.6
+    arrowBorder.Parent = self.ArrowContainer
+    
     self.ArrowIcon = Instance.new("ImageLabel")
     self.ArrowIcon.Name = "Arrow"
-    self.ArrowIcon.Size = UDim2.new(0, 16, 0, 16)
-    self.ArrowIcon.Position = UDim2.new(1, -20, 0.5, 0)
-    self.ArrowIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.ArrowIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.ArrowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.ArrowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ArrowIcon.BackgroundTransparency = 1
     self.ArrowIcon.Image = (success and Lucide and Lucide["chevron-down"]) or "rbxassetid://10709790948"
-    self.ArrowIcon.ImageColor3 = Color3.fromRGB(140, 150, 160)
-    self.ArrowIcon.Parent = self.Header
+    self.ArrowIcon.ImageColor3 = Color3.fromRGB(180, 190, 200)
+    self.ArrowIcon.Parent = self.ArrowContainer
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
     self.DropdownButton.Size = UDim2.new(1, 0, 1, 0)
@@ -1537,32 +1728,83 @@ function Dropdown:Create()
         if not self.Open then
             local hoverTween = TweenService:Create(
                 self.Container,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
             )
             hoverTween:Play()
+            
             local borderTween = TweenService:Create(
                 border,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {Color = Color3.fromRGB(0, 120, 215)}
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.1}
             )
             borderTween:Play()
+            
+            -- Gradient glow
+            local gradientTween = TweenService:Create(
+                self.GradientBg,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0.92}
+            )
+            gradientTween:Play()
+            
+            -- Icon glow
+            local iconTween = TweenService:Create(
+                self.DropdownIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+            )
+            iconTween:Play()
+            
+            -- Arrow highlight
+            local arrowTween = TweenService:Create(
+                self.ArrowIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+            )
+            arrowTween:Play()
         end
     end)
+    
     self.DropdownButton.MouseLeave:Connect(function()
         if not self.Open then
             local leaveTween = TweenService:Create(
                 self.Container,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
             )
             leaveTween:Play()
+            
             local borderTween = TweenService:Create(
                 border,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {Color = Color3.fromRGB(40, 45, 52)}
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(50, 60, 70), Transparency = 0.3}
             )
             borderTween:Play()
+            
+            -- Reset gradient
+            local gradientTween = TweenService:Create(
+                self.GradientBg,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0.97}
+            )
+            gradientTween:Play()
+            
+            -- Reset icon
+            local iconTween = TweenService:Create(
+                self.DropdownIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+            )
+            iconTween:Play()
+            
+            -- Reset arrow
+            local arrowTween = TweenService:Create(
+                self.ArrowIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(180, 190, 200)}
+            )
+            arrowTween:Play()
         end
     end)
     UserInputService.InputBegan:Connect(function(input)
@@ -3912,99 +4154,193 @@ end
 function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
-    -- Taller to prevent the track/knob from touching the labels
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 80 or 60)
-    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 90 or 70)
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
+    
+    -- Enhanced gradient background
+    self.GradientBg = Instance.new("Frame")
+    self.GradientBg.Name = "GradientBg"
+    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientBg.BackgroundTransparency = 0.97
+    self.GradientBg.BorderSizePixel = 0
+    self.GradientBg.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientBg
+    
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Color = Color3.fromRGB(50, 60, 70)
     border.Thickness = 1
+    border.Transparency = 0.3
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 15)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(60, 70, 80)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.SliderIcon = Instance.new("ImageLabel")
     self.SliderIcon.Name = "Icon"
-    self.SliderIcon.Size = UDim2.new(0, 18, 0, 18)
-    self.SliderIcon.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
+    self.SliderIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.SliderIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.SliderIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIcon.BackgroundTransparency = 1
     self.SliderIcon.Image = (success and Lucide and Lucide["sliders"]) or "rbxassetid://10734942565"
-    self.SliderIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.SliderIcon.Parent = self.Container
+    self.SliderIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.SliderIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -100, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 8 or 12)
+    self.NameLabel.Size = UDim2.new(1, -140, 0, 24)
+    self.NameLabel.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 10 or 18)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
-    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.NameLabel.TextSize = 15
-    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.NameLabel.TextSize = 16
+    self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     if self.Description ~= "" then
         self.SliderDescription = Instance.new("TextLabel")
         self.SliderDescription.Name = "Description"
-        self.SliderDescription.Size = UDim2.new(0, 250, 0, 16)
-        self.SliderDescription.Position = UDim2.new(0, 44, 0, 32)
+        self.SliderDescription.Size = UDim2.new(1, -180, 0, 18)
+        self.SliderDescription.Position = UDim2.new(0, 68, 0, 36)
         self.SliderDescription.BackgroundTransparency = 1
         self.SliderDescription.Text = self.Description
-        self.SliderDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.SliderDescription.TextSize = 12
+        self.SliderDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
+        self.SliderDescription.TextSize = 13
         self.SliderDescription.Font = Enum.Font.Gotham
         self.SliderDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.SliderDescription.TextWrapped = true
         self.SliderDescription.Parent = self.Container
     end
+    -- Enhanced value display
+    self.ValueContainer = Instance.new("Frame")
+    self.ValueContainer.Name = "ValueContainer"
+    self.ValueContainer.Size = UDim2.new(0, 60, 0, 32)
+    self.ValueContainer.Position = UDim2.new(1, -76, 0, self.Description ~= "" and 14 or 19)
+    self.ValueContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.ValueContainer.BorderSizePixel = 0
+    self.ValueContainer.Parent = self.Container
+    
+    local valueCorner = Instance.new("UICorner")
+    valueCorner.CornerRadius = UDim.new(0, 8)
+    valueCorner.Parent = self.ValueContainer
+    
+    -- Value gradient
+    local valueGradient = Instance.new("UIGradient")
+    valueGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
+    })
+    valueGradient.Rotation = 45
+    valueGradient.Parent = self.ValueContainer
+    
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
-    self.ValueLabel.Size = UDim2.new(0, 48, 1, 0)
-    self.ValueLabel.Position = UDim2.new(1, -16, 0.5, 0)
-    self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5) 
+    self.ValueLabel.Size = UDim2.new(1, 0, 1, 0)
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
-    self.ValueLabel.TextColor3 = self.Library.Colors.LightText
+    self.ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.ValueLabel.TextSize = 14
-    self.ValueLabel.Font = Enum.Font.GothamMedium
-    self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-    self.ValueLabel.Parent = self.Container
+    self.ValueLabel.Font = Enum.Font.GothamBold
+    self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Center
+    self.ValueLabel.Parent = self.ValueContainer
+    -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    -- Reserve more space on the right for the value and add vertical spacing below the text
-    self.SliderTrack.Size = UDim2.new(1, -80, 0, 4)
-    self.SliderTrack.Position = UDim2.new(0, 44, 0, self.Description ~= "" and 50 or 40)
-    self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5) 
-    self.SliderTrack.BackgroundColor3 = self.Library.Colors.Background
+    self.SliderTrack.Size = UDim2.new(1, -100, 0, 8)
+    self.SliderTrack.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 60 or 50)
+    self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
+    self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.SliderTrack.BorderSizePixel = 0
     self.SliderTrack.Parent = self.Container
+    
     local trackCorner = Instance.new("UICorner")
     trackCorner.CornerRadius = UDim.new(1, 0)
     trackCorner.Parent = self.SliderTrack
+    
+    -- Track border
+    local trackBorder = Instance.new("UIStroke")
+    trackBorder.Color = Color3.fromRGB(60, 70, 80)
+    trackBorder.Thickness = 1
+    trackBorder.Transparency = 0.6
+    trackBorder.Parent = self.SliderTrack
+    
+    -- Enhanced fill with gradient
     self.SliderFill = Instance.new("Frame")
     self.SliderFill.Name = "Fill"
-    self.SliderFill.Size = UDim2.new(0, 0, 1, 0) 
-    self.SliderFill.BackgroundColor3 = self.Library.Colors.Accent
+    self.SliderFill.Size = UDim2.new(0, 0, 1, 0)
+    self.SliderFill.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     self.SliderFill.BorderSizePixel = 0
     self.SliderFill.Parent = self.SliderTrack
+    
     local fillCorner = Instance.new("UICorner")
     fillCorner.CornerRadius = UDim.new(1, 0)
     fillCorner.Parent = self.SliderFill
+    
+    -- Fill gradient
+    local fillGradient = Instance.new("UIGradient")
+    fillGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
+    })
+    fillGradient.Rotation = 90
+    fillGradient.Parent = self.SliderFill
+    
+    -- Modern indicator
     self.SliderIndicator = Instance.new("TextButton")
     self.SliderIndicator.Name = "Indicator"
-    self.SliderIndicator.Size = UDim2.new(0, 12, 0, 12) 
-    self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0) 
+    self.SliderIndicator.Size = UDim2.new(0, 20, 0, 20)
+    self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderIndicator.BorderSizePixel = 0
     self.SliderIndicator.Text = ""
     self.SliderIndicator.AutoButtonColor = false
     self.SliderIndicator.Parent = self.SliderTrack
+    
     local indicatorCorner = Instance.new("UICorner")
     indicatorCorner.CornerRadius = UDim.new(1, 0)
     indicatorCorner.Parent = self.SliderIndicator
+    
+    -- Indicator shadow
+    self.IndicatorShadow = Instance.new("Frame")
+    self.IndicatorShadow.Name = "Shadow"
+    self.IndicatorShadow.Size = UDim2.new(1, 6, 1, 6)
+    self.IndicatorShadow.Position = UDim2.new(0, -3, 0, -3)
+    self.IndicatorShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    self.IndicatorShadow.BackgroundTransparency = 0.6
+    self.IndicatorShadow.BorderSizePixel = 0
+    self.IndicatorShadow.ZIndex = self.SliderIndicator.ZIndex - 1
+    self.IndicatorShadow.Parent = self.SliderIndicator
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(1, 0)
+    shadowCorner.Parent = self.IndicatorShadow
     self.SliderButton = Instance.new("TextButton")
     self.SliderButton.Name = "Button"
     self.SliderButton.Size = UDim2.new(1, 0, 1, 0)
@@ -4024,20 +4360,20 @@ function Slider:Create()
     self.SliderButton.MouseButton1Down:Connect(startDragging)
     self.SliderIndicator.MouseButton1Down:Connect(startDragging)
 
-    -- Setup hover effect for the indicator
+    -- Enhanced hover effects
     self.SliderIndicator.MouseEnter:Connect(function()
         TweenService:Create(
             self.SliderIndicator,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(240, 240, 240)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart),
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255), Size = UDim2.new(0, 24, 0, 24)}
         ):Play()
     end)
 
     self.SliderIndicator.MouseLeave:Connect(function()
         TweenService:Create(
             self.SliderIndicator,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart),
+            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 20, 0, 20)}
         ):Play()
     end)
 
@@ -4055,30 +4391,65 @@ function Slider:Create()
     self.Container.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         hoverTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(70, 80, 90)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.1}
         )
         borderTween:Play()
+        
+        -- Gradient glow
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.92}
+        )
+        gradientTween:Play()
+        
+        -- Icon glow
+        local iconTween = TweenService:Create(
+            self.SliderIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
     end)
+    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
         )
         leaveTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(55, 60, 67)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(50, 60, 70), Transparency = 0.3}
         )
         borderTween:Play()
+        
+        -- Reset gradient
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.97}
+        )
+        gradientTween:Play()
+        
+        -- Reset icon
+        local iconTween = TweenService:Create(
+            self.SliderIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
     end)
     return self
 end
@@ -4779,91 +5150,171 @@ end
 function Toggle:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Toggle"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 58 or 44)
-    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36) 
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 54)
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
+    
+    -- Enhanced border with gradient effect
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(40, 45, 52)
+    border.Color = Color3.fromRGB(45, 50, 58)
     border.Thickness = 1
+    border.Transparency = 0.3
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12) 
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
+    
+    -- Add subtle inner glow
+    self.InnerGlow = Instance.new("Frame")
+    self.InnerGlow.Name = "InnerGlow"
+    self.InnerGlow.Size = UDim2.new(1, -4, 1, -4)
+    self.InnerGlow.Position = UDim2.new(0, 2, 0, 2)
+    self.InnerGlow.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.InnerGlow.BackgroundTransparency = 0.95
+    self.InnerGlow.BorderSizePixel = 0
+    self.InnerGlow.Visible = false
+    self.InnerGlow.Parent = self.Container
+    
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(0, 14)
+    glowCorner.Parent = self.InnerGlow
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon with background
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 9)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(55, 60, 68)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.ToggleIcon = Instance.new("ImageLabel")
     self.ToggleIcon.Name = "Icon"
     self.ToggleIcon.Size = UDim2.new(0, 20, 0, 20)
-    self.ToggleIcon.Position = UDim2.new(0, 12, 0, self.Description ~= "" and 8 or 12)
+    self.ToggleIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.ToggleIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ToggleIcon.BackgroundTransparency = 1
     self.ToggleIcon.Image = (success and Lucide and Lucide["power"]) or "rbxassetid://10734930466"
-    self.ToggleIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.ToggleIcon.Parent = self.Container
+    self.ToggleIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.ToggleIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -130, 0, 20)
-    self.NameLabel.Position = UDim2.new(0, 38, 0, self.Description ~= "" and 6 or 12)
+    self.NameLabel.Size = UDim2.new(1, -150, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, 64, 0, self.Description ~= "" and 8 or 16)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
-    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.NameLabel.TextSize = 14
-    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.NameLabel.TextSize = 16
+    self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     if self.Description ~= "" then
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
-        self.ToggleDescription.Size = UDim2.new(0, 250, 0, 14)
-        self.ToggleDescription.Position = UDim2.new(0, 38, 0, 28)
+        self.ToggleDescription.Size = UDim2.new(1, -200, 0, 16)
+        self.ToggleDescription.Position = UDim2.new(0, 64, 0, 32)
         self.ToggleDescription.BackgroundTransparency = 1
         self.ToggleDescription.Text = self.Description
-        self.ToggleDescription.TextColor3 = Color3.fromRGB(160, 170, 180)
-        self.ToggleDescription.TextSize = 11
+        self.ToggleDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
+        self.ToggleDescription.TextSize = 13
         self.ToggleDescription.Font = Enum.Font.Gotham
         self.ToggleDescription.TextXAlignment = Enum.TextXAlignment.Left
+        self.ToggleDescription.TextWrapped = true
         self.ToggleDescription.Parent = self.Container
     end
+    -- Modern iOS-style toggle
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, 38, 0, 20) 
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -82 or -46, 0.5, 0) 
-    self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5) 
-    self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 65) 
+    self.ToggleBackground.Size = UDim2.new(0, 52, 0, 28)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -96 or -68, 0.5, 0)
+    self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
+    self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
     self.ToggleBackground.Parent = self.Container
+    
     local bgCorner = Instance.new("UICorner")
-    bgCorner.CornerRadius = UDim.new(1, 0) 
+    bgCorner.CornerRadius = UDim.new(1, 0)
     bgCorner.Parent = self.ToggleBackground
+    
+    -- Add inner shadow effect
+    self.InnerShadow = Instance.new("Frame")
+    self.InnerShadow.Name = "InnerShadow"
+    self.InnerShadow.Size = UDim2.new(1, -4, 1, -4)
+    self.InnerShadow.Position = UDim2.new(0, 2, 0, 2)
+    self.InnerShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    self.InnerShadow.BackgroundTransparency = 0.8
+    self.InnerShadow.BorderSizePixel = 0
+    self.InnerShadow.Parent = self.ToggleBackground
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(1, 0)
+    shadowCorner.Parent = self.InnerShadow
+    
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, 16, 0, 16) 
-    self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0) 
-    self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5) 
-    self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
+    self.ToggleIndicator.Size = UDim2.new(0, 24, 0, 24)
+    self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
+    self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5)
+    self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.ToggleIndicator.BorderSizePixel = 0
     self.ToggleIndicator.Parent = self.ToggleBackground
+    
     local indicatorCorner = Instance.new("UICorner")
-    indicatorCorner.CornerRadius = UDim.new(1, 0) 
+    indicatorCorner.CornerRadius = UDim.new(1, 0)
     indicatorCorner.Parent = self.ToggleIndicator
+    
+    -- Add subtle shadow to indicator
+    self.IndicatorShadow = Instance.new("Frame")
+    self.IndicatorShadow.Name = "Shadow"
+    self.IndicatorShadow.Size = UDim2.new(1, 4, 1, 4)
+    self.IndicatorShadow.Position = UDim2.new(0, -2, 0, -2)
+    self.IndicatorShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    self.IndicatorShadow.BackgroundTransparency = 0.7
+    self.IndicatorShadow.BorderSizePixel = 0
+    self.IndicatorShadow.ZIndex = self.ToggleIndicator.ZIndex - 1
+    self.IndicatorShadow.Parent = self.ToggleIndicator
+    
+    local indicatorShadowCorner = Instance.new("UICorner")
+    indicatorShadowCorner.CornerRadius = UDim.new(1, 0)
+    indicatorShadowCorner.Parent = self.IndicatorShadow
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, 32, 0, 24)
-        self.KeybindButton.Position = UDim2.new(1, -38, 0.5, 0) 
+        self.KeybindButton.Size = UDim2.new(0, 40, 0, 28)
+        self.KeybindButton.Position = UDim2.new(1, -52, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
-        self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
+        self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 50, 58)
         self.KeybindButton.Text = "⌨"
-        self.KeybindButton.TextColor3 = Color3.fromRGB(200, 205, 210)
-        self.KeybindButton.TextSize = 12
+        self.KeybindButton.TextColor3 = Color3.fromRGB(220, 225, 230)
+        self.KeybindButton.TextSize = 14
         self.KeybindButton.Font = Enum.Font.GothamBold
         self.KeybindButton.BorderSizePixel = 0
-        self.KeybindButton.ZIndex = 10 
+        self.KeybindButton.ZIndex = 10
         self.KeybindButton.Parent = self.Container
+        
         local keybindCorner = Instance.new("UICorner")
-        keybindCorner.CornerRadius = UDim.new(0, 6)
+        keybindCorner.CornerRadius = UDim.new(0, 8)
         keybindCorner.Parent = self.KeybindButton
+        
+        local keybindBorder = Instance.new("UIStroke")
+        keybindBorder.Color = Color3.fromRGB(65, 70, 78)
+        keybindBorder.Thickness = 1
+        keybindBorder.Transparency = 0.5
+        keybindBorder.Parent = self.KeybindButton
         self.KeybindButton.MouseButton1Click:Connect(function()
             self:StartKeybindListening()
         end)
@@ -4903,67 +5354,145 @@ function Toggle:Create()
     self.ToggleButton.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         hoverTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(0, 120, 215)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.1}
         )
         borderTween:Play()
+        
+        -- Show inner glow
+        self.InnerGlow.Visible = true
+        local glowTween = TweenService:Create(
+            self.InnerGlow,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.92}
+        )
+        glowTween:Play()
+        
+        -- Icon hover effect
+        local iconTween = TweenService:Create(
+            self.ToggleIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
     end)
+    
     self.ToggleButton.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
         )
         leaveTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(40, 45, 52)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(45, 50, 58), Transparency = 0.3}
         )
         borderTween:Play()
+        
+        -- Hide inner glow
+        local glowTween = TweenService:Create(
+            self.InnerGlow,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.95}
+        )
+        glowTween:Play()
+        glowTween.Completed:Connect(function()
+            if self.InnerGlow.BackgroundTransparency >= 0.95 then
+                self.InnerGlow.Visible = false
+            end
+        end)
+        
+        -- Icon leave effect
+        local iconTween = TweenService:Create(
+            self.ToggleIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
     end)
     return self
 end
 function Toggle:SetValue(value, callCallback)
     if callCallback == nil then callCallback = true end
     self.Value = value
+    
     if value then
+        -- Enhanced ON animation
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
-            self.Library.TweenInfo,
-            {Position = UDim2.new(0, 20, 0.5, 0)} 
+            TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Position = UDim2.new(0, 26, 0.5, 0)}
         )
         indicatorTween:Play()
+        
         local bgTween = TweenService:Create(
             self.ToggleBackground,
-            self.Library.TweenInfo,
-            {BackgroundColor3 = self.Library.Colors.Toggle}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}
         )
         bgTween:Play()
+        
+        -- Icon activation effect
+        local iconTween = TweenService:Create(
+            self.ToggleIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 200, 100)}
+        )
+        iconTween:Play()
+        
+        -- Icon container glow
+        local iconContainerTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(0, 80, 40)}
+        )
+        iconContainerTween:Play()
         
         -- Start the toggle function if it exists
         if self.Function and self.Tab.Window then
             self.Tab.Window:StartToggleFunction(self.Name)
         end
     else
+        -- Enhanced OFF animation
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
-            self.Library.TweenInfo,
-            {Position = UDim2.new(0, 2, 0.5, 0)} 
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Position = UDim2.new(0, 2, 0.5, 0)}
         )
         indicatorTween:Play()
+        
         local bgTween = TweenService:Create(
             self.ToggleBackground,
-            self.Library.TweenInfo,
-            {BackgroundColor3 = Color3.fromRGB(60, 60, 65)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(55, 60, 68)}
         )
         bgTween:Play()
+        
+        -- Icon deactivation effect
+        local iconTween = TweenService:Create(
+            self.ToggleIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
+        
+        -- Icon container reset
+        local iconContainerTween = TweenService:Create(
+            self.IconContainer,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(35, 40, 48)}
+        )
+        iconContainerTween:Play()
         
         -- Stop the toggle function if it exists
         if self.Function and self.Tab.Window then
@@ -7319,45 +7848,17 @@ local ObjectTree = {
         },
         {
             {
-                17,
+                3,
                 2,
                 {
-                    "Toggle"
+                    "Config"
                 }
             },
             {
-                9,
+                12,
                 2,
                 {
-                    "Loading"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
+                    "OptionsManager"
                 }
             },
             {
@@ -7368,45 +7869,10 @@ local ObjectTree = {
                 }
             },
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                11,
+                5,
                 2,
                 {
-                    "Notifications"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
+                    "DraggableKeybind"
                 }
             },
             {
@@ -7424,10 +7890,10 @@ local ObjectTree = {
                 }
             },
             {
-                15,
+                6,
                 2,
                 {
-                    "Tab"
+                    "Dropdown"
                 }
             },
             {
@@ -7438,10 +7904,73 @@ local ObjectTree = {
                 }
             },
             {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
                 13,
                 2,
                 {
                     "Paragraph"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             }
         }
@@ -7452,23 +7981,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    292,
-    448,
-    976,
-    1314,
-    2112,
-    2698,
-    2752,
-    3096,
-    3344,
-    3647,
-    3744,
-    3882,
-    4127,
-    4578,
-    4752,
-    5016,
-    6487
+    426,
+    582,
+    1110,
+    1448,
+    2354,
+    2940,
+    2994,
+    3338,
+    3586,
+    3889,
+    3986,
+    4124,
+    4498,
+    4949,
+    5123,
+    5545,
+    7016
 }
 
 -- Misc AOT variable imports
