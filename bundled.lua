@@ -1,5 +1,4 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- soo dumb
 
 -- Will be used later for getting flattened globals
 local ImportGlobals
@@ -1585,7 +1584,8 @@ function Dropdown:CreateItems()
             child:Destroy()
         end
     end
-    local itemsToShow = #self.FilteredItems > 0 and self.FilteredItems or self.Items
+    -- Use filtered items if search is active, otherwise use all items
+    local itemsToShow = self.FilteredItems
     for i, item in ipairs(itemsToShow) do
         local itemContainer = Instance.new("Frame")
         itemContainer.Name = "Item_" .. i
@@ -1880,6 +1880,15 @@ function Dropdown:Toggle(state)
 end
 function Dropdown:SetItems(items)
     self.Items = items
+    -- Reset filtered items to show all new items
+    self.FilteredItems = {}
+    for _, item in ipairs(self.Items) do
+        table.insert(self.FilteredItems, item)
+    end
+    -- Clear search box to show all items
+    if self.SearchBox then
+        self.SearchBox.Text = ""
+    end
     self:CreateItems()
     if not self.Multiselect then
         local found = false
@@ -2133,6 +2142,7 @@ function FloatingControls:CreateGui()
     self.ScreenGui.Name = "FloatingControls"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.DisplayOrder = 2147483644 -- Maximum z-index for floating controls
     self.ScreenGui.Parent = playerGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "FloatingPanel"
@@ -2156,8 +2166,11 @@ function FloatingControls:CreateGui()
     shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     shadow.BackgroundTransparency = 0.6
     shadow.BorderSizePixel = 0
-    shadow.ZIndex = self.MainFrame.ZIndex - 1
+    shadow.ZIndex = 1
     shadow.Parent = self.MainFrame
+    
+    -- Ensure main frame has high z-index
+    self.MainFrame.ZIndex = 10
     local shadowCorner = Instance.new("UICorner")
     shadowCorner.CornerRadius = UDim.new(0, 12)
     shadowCorner.Parent = shadow
@@ -3103,6 +3116,7 @@ function MobileFloatingIcon:CreateGui()
     self.ScreenGui.Name = "MobileFloatingIcon"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.DisplayOrder = 2147483643 -- Maximum z-index for mobile icon
     self.ScreenGui.Parent = playerGui
     self.Container = Instance.new("Frame")
     self.Container.Name = "IconContainer"
@@ -5043,7 +5057,7 @@ function Window:CreateGui()
     self.ScreenGui.Name = "ProjectMadaraUI"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.DisplayOrder = 999999999 -- Always on top
+    self.ScreenGui.DisplayOrder = 2147483647 -- Maximum possible DisplayOrder
     self.ScreenGui.Parent = playerGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
@@ -5080,8 +5094,27 @@ function Window:CreateGui()
     self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
     self.TitleBar.BorderSizePixel = 0
     self.TitleBar.ClipsDescendants = true
-    self.TitleBar.ZIndex = 2
+    self.TitleBar.ZIndex = 10
     self.TitleBar.Parent = self.MainFrame
+    
+    -- Add drag handle for pulling UI down
+    self.DragHandle = Instance.new("Frame")
+    self.DragHandle.Name = "DragHandle"
+    self.DragHandle.Size = UDim2.new(0, 60, 0, 8)
+    self.DragHandle.Position = UDim2.new(0.5, 0, 0, -4)
+    self.DragHandle.AnchorPoint = Vector2.new(0.5, 0)
+    self.DragHandle.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.DragHandle.BackgroundTransparency = 0.3
+    self.DragHandle.BorderSizePixel = 0
+    self.DragHandle.ZIndex = 15
+    self.DragHandle.Parent = self.MainFrame
+    
+    local handleCorner = Instance.new("UICorner")
+    handleCorner.CornerRadius = UDim.new(0, 4)
+    handleCorner.Parent = self.DragHandle
+    
+    -- Make drag handle draggable
+    self:MakeDragHandleDraggable()
     local titleCorner = Instance.new("UICorner")
     titleCorner.CornerRadius = UDim.new(0, 15) 
     titleCorner.Parent = self.TitleBar
@@ -5374,7 +5407,7 @@ function Window:CreateGui()
     end
     self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.ContentContainer.BorderSizePixel = 0
-    self.ContentContainer.ZIndex = 1
+    self.ContentContainer.ZIndex = 5
     self.ContentContainer.ClipsDescendants = true
     self.ContentContainer.Parent = self.MainFrame
     local contentBorder = Instance.new("UIStroke")
@@ -5395,6 +5428,7 @@ function Window:CreateGui()
     self:MakeDraggable()
     self:SetupKeybindSystem()
     self:UpdateKeybindDisplay() 
+    self:SetupGlobalDragDetection()
     self.IsMinimized = false
     self.OriginalSize = self.MainFrame.Size
     self.ToggleKeybind = Enum.KeyCode.Insert 
@@ -5562,6 +5596,80 @@ function Window:MakeDraggable()
         end
     end)
 end
+
+function Window:MakeDragHandleDraggable()
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    -- Make drag handle respond to input
+    self.DragHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = self.MainFrame.Position
+            
+            -- Visual feedback
+            local feedbackTween = TweenService:Create(
+                self.DragHandle,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0.1, Size = UDim2.new(0, 80, 0, 10)}
+            )
+            feedbackTween:Play()
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    -- Reset visual feedback
+                    local resetTween = TweenService:Create(
+                        self.DragHandle,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                        {BackgroundTransparency = 0.3, Size = UDim2.new(0, 60, 0, 8)}
+                    )
+                    resetTween:Play()
+                end
+            end)
+        end
+    end)
+    
+    self.DragHandle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateInput(input)
+        end
+    end)
+    
+    -- Add hover effects for drag handle
+    self.DragHandle.MouseEnter:Connect(function()
+        local hoverTween = TweenService:Create(
+            self.DragHandle,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.1}
+        )
+        hoverTween:Play()
+    end)
+    
+    self.DragHandle.MouseLeave:Connect(function()
+        if not dragging then
+            local leaveTween = TweenService:Create(
+                self.DragHandle,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0.3}
+            )
+            leaveTween:Play()
+        end
+    end)
+end
 function Window:Tab(options)
     options = options or {}
     options.Name = options.Name or "Tab"
@@ -5615,7 +5723,7 @@ function Window:CreateMobileIcon()
     self.MobileIcon.Name = "ProjectMadaraMobile"
     self.MobileIcon.ResetOnSpawn = false
     self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.MobileIcon.DisplayOrder = 999999998 -- Always on top, just below main UI
+    self.MobileIcon.DisplayOrder = 2147483646 -- Maximum z-index, just below main UI
     self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.MobileContainer = Instance.new("Frame")
     self.MobileContainer.Name = "MobileContainer"
@@ -5815,6 +5923,50 @@ function Window:UpdateKeybindDisplay()
     self.KeybindButton.Text = keyName:upper()
     self.KeybindButton.TextSize = #keyName > 3 and 10 or 12 
 end
+
+function Window:SetupGlobalDragDetection()
+    -- Create invisible drag detector that covers the entire screen
+    self.GlobalDragDetector = Instance.new("Frame")
+    self.GlobalDragDetector.Name = "GlobalDragDetector"
+    self.GlobalDragDetector.Size = UDim2.new(1, 0, 1, 0)
+    self.GlobalDragDetector.Position = UDim2.new(0, 0, 0, 0)
+    self.GlobalDragDetector.BackgroundTransparency = 1
+    self.GlobalDragDetector.ZIndex = 1
+    self.GlobalDragDetector.Visible = false -- Only show when UI is hidden
+    self.GlobalDragDetector.Parent = self.ScreenGui
+    
+    local isDragging = false
+    local dragStart = nil
+    local dragThreshold = 50 -- Minimum drag distance to trigger
+    
+    self.GlobalDragDetector.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            dragStart = input.Position
+        end
+    end)
+    
+    self.GlobalDragDetector.InputChanged:Connect(function(input)
+        if isDragging and dragStart and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local dragDistance = (input.Position - dragStart).Magnitude
+            local dragDirection = input.Position - dragStart
+            
+            -- Check if dragging down from top of screen
+            if dragDistance > dragThreshold and dragDirection.Y > 0 and dragStart.Y < 100 then
+                self:Show()
+                self.GlobalDragDetector.Visible = false
+                isDragging = false
+            end
+        end
+    end)
+    
+    self.GlobalDragDetector.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = false
+            dragStart = nil
+        end
+    end)
+end
 function Window:ToggleVisibility()
     self.ScreenGui.Enabled = not self.ScreenGui.Enabled
 end
@@ -5837,6 +5989,9 @@ function Window:FilterComponents(searchText)
 end
 function Window:Show()
     self.ScreenGui.Enabled = true
+    if self.GlobalDragDetector then
+        self.GlobalDragDetector.Visible = false
+    end
     self.MainFrame.Size = UDim2.new(0, 0, 0, 0)
     local showTween = TweenService:Create(
         self.MainFrame,
@@ -5847,10 +6002,17 @@ function Window:Show()
 end
 function Window:Hide()
     self.ScreenGui.Enabled = false
+    if self.GlobalDragDetector then
+        self.GlobalDragDetector.Visible = true
+    end
 end
 function Window:ToggleVisibility()
     if self.ScreenGui.Enabled then
         self.ScreenGui.Enabled = false
+        -- Show global drag detector when UI is hidden
+        if self.GlobalDragDetector then
+            self.GlobalDragDetector.Visible = true
+        end
         if self.MobileContainer then
             self.MobileContainer.Visible = true
         end
@@ -5877,6 +6039,10 @@ function Window:ToggleVisibility()
         end
     else
         self.ScreenGui.Enabled = true
+        -- Hide global drag detector when UI is visible
+        if self.GlobalDragDetector then
+            self.GlobalDragDetector.Visible = false
+        end
         if self.MobileContainer then
             self.MobileContainer.Visible = false
         end
@@ -5897,7 +6063,7 @@ function Window:CreateMobileToggleButton()
     self.MobileToggleGui.Name = "ProjectMadaraToggleControls"
     self.MobileToggleGui.ResetOnSpawn = false
     self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.MobileToggleGui.DisplayOrder = 999999997 -- Always on top, below main UI and mobile icon
+    self.MobileToggleGui.DisplayOrder = 2147483645 -- Maximum z-index, below main UI and mobile icon
     self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.ToggleContainer = Instance.new("Frame")
     self.ToggleContainer.Name = "ToggleContainer"
@@ -7153,52 +7319,10 @@ local ObjectTree = {
         },
         {
             {
-                7,
+                17,
                 2,
                 {
-                    "FloatingControls"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
+                    "Toggle"
                 }
             },
             {
@@ -7209,24 +7333,31 @@ local ObjectTree = {
                 }
             },
             {
-                3,
+                8,
                 2,
                 {
-                    "Config"
+                    "Label"
                 }
             },
             {
-                17,
+                10,
                 2,
                 {
-                    "Toggle"
+                    "MobileFloatingIcon"
                 }
             },
             {
-                18,
+                6,
                 2,
                 {
-                    "Window"
+                    "Dropdown"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
                 }
             },
             {
@@ -7237,10 +7368,24 @@ local ObjectTree = {
                 }
             },
             {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
                 11,
                 2,
                 {
                     "Notifications"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
                 }
             },
             {
@@ -7251,6 +7396,20 @@ local ObjectTree = {
                 }
             },
             {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
                 4,
                 2,
                 {
@@ -7258,10 +7417,10 @@ local ObjectTree = {
                 }
             },
             {
-                14,
+                7,
                 2,
                 {
-                    "Slider"
+                    "FloatingControls"
                 }
             },
             {
@@ -7272,10 +7431,17 @@ local ObjectTree = {
                 }
             },
             {
-                2,
+                14,
                 2,
                 {
-                    "Button"
+                    "Slider"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
                 }
             }
         }
@@ -7290,19 +7456,19 @@ local LineOffsets = {
     448,
     976,
     1314,
-    2102,
-    2684,
-    2738,
-    3082,
-    3329,
-    3632,
-    3729,
-    3867,
-    4112,
-    4563,
-    4737,
-    5001,
-    6320
+    2112,
+    2698,
+    2752,
+    3096,
+    3344,
+    3647,
+    3744,
+    3882,
+    4127,
+    4578,
+    4752,
+    5016,
+    6487
 }
 
 -- Misc AOT variable imports
@@ -7799,4 +7965,3 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
-
