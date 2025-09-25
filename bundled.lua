@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hello again
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -107,6 +107,8 @@ end
 function Button:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Button"
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
     self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 54)
     self.Container.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
     self.Container.BorderSizePixel = 0
@@ -140,8 +142,9 @@ function Button:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 7)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
@@ -165,12 +168,12 @@ function Button:Create()
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
     self.ButtonText.Size = UDim2.new(1, -120, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 8 or 16)
+    self.ButtonText.Position = UDim2.new(0, isMobile and 44 or 60, 0, self.Description ~= "" and 8 or 16)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
     self.ButtonText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.ButtonText.TextSize = 16
-    self.ButtonText.Font = Enum.Font.GothamBold
+    self.ButtonText.TextSize = isMobile and 14 or 16
+    self.ButtonText.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
     self.ButtonText.Parent = self.Container
     if self.Description ~= "" then
@@ -190,8 +193,8 @@ function Button:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, 32, 0, 24)
-        self.KeybindButton.Position = UDim2.new(1, -42, 0.5, 0)
+        self.KeybindButton.Size = UDim2.new(0, isMobile and 36 or 32, 0, isMobile and 28 or 24)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -44 or -42, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
@@ -221,8 +224,8 @@ function Button:Create()
     -- Action indicator with modern design
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
-    self.ActionIndicator.Size = UDim2.new(0, 32, 0, 32)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and -76 or -44, 0.5, 0)
+    self.ActionIndicator.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -76) or (isMobile and -48 or -44), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1484,7 +1487,9 @@ end
 function Dropdown:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Dropdown"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 78 or 62)
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 78 or 62)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
@@ -1514,7 +1519,7 @@ function Dropdown:Create()
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
-    self.Header.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 52)
+    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 68 or 52)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
     local success, Lucide = pcall(function()
@@ -1523,8 +1528,9 @@ function Dropdown:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 15)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Header
@@ -1551,16 +1557,16 @@ function Dropdown:Create()
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -250, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 19)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -150 or -250, 0, 24)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 60, 0, 19)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.NameLabel.TextSize = 16
-    self.NameLabel.Font = Enum.Font.GothamBold
+    self.NameLabel.TextSize = isMobile and 14 or 16
+    self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Header
-    if self.Description ~= "" then
+    if self.Description ~= "" and not isMobile then
         self.DescriptionLabel = Instance.new("TextLabel")
         self.DescriptionLabel.Name = "Description"
         self.DescriptionLabel.Size = UDim2.new(1, -200, 0, 18)
@@ -1578,8 +1584,8 @@ function Dropdown:Create()
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
-    self.SelectedContainer.Size = UDim2.new(0, 160, 0, 28)
-    self.SelectedContainer.Position = UDim2.new(1, -204, 0.5, 0)
+    self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 160, 0, 28)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -136 or -204, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1601,7 +1607,7 @@ function Dropdown:Create()
     self.SelectedLabel.Position = UDim2.new(0, 8, 0, 0)
     self.SelectedLabel.BackgroundTransparency = 1
     self.SelectedLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
-    self.SelectedLabel.TextSize = 13
+    self.SelectedLabel.TextSize = isMobile and 12 or 13
     self.SelectedLabel.Font = Enum.Font.GothamMedium
     self.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -1610,7 +1616,7 @@ function Dropdown:Create()
     -- Enhanced arrow with container
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
-    self.ArrowContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.ArrowContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
     self.ArrowContainer.Position = UDim2.new(1, -36, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
@@ -1852,7 +1858,8 @@ function Dropdown:CreateItems()
     for i, item in ipairs(itemsToShow) do
         local itemContainer = Instance.new("Frame")
         itemContainer.Name = "Item_" .. i
-        itemContainer.Size = UDim2.new(1, 0, 0, 40) 
+        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+        itemContainer.Size = UDim2.new(1, 0, 0, isMobile and 48 or 40) 
         itemContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
         itemContainer.BorderSizePixel = 0
         itemContainer.LayoutOrder = i
@@ -1869,11 +1876,11 @@ function Dropdown:CreateItems()
         local itemText = Instance.new("TextLabel")
         itemText.Name = "Text"
         itemText.Size = UDim2.new(1, self.Multiselect and -50 or -40, 1, 0)
-        itemText.Position = UDim2.new(0, 16, 0, 0)
+        itemText.Position = UDim2.new(0, isMobile and 20 or 16, 0, 0)
         itemText.BackgroundTransparency = 1
         itemText.Text = item
         itemText.TextColor3 = Color3.fromRGB(220, 230, 240)
-        itemText.TextSize = 13
+        itemText.TextSize = isMobile and 14 or 13
         itemText.Font = Enum.Font.Gotham
         itemText.TextXAlignment = Enum.TextXAlignment.Left
         itemText.TextYAlignment = Enum.TextYAlignment.Center
@@ -2399,14 +2406,14 @@ function FloatingControls.new(options, library)
     return self
 end
 function FloatingControls:CreateGui()
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "FloatingControls"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.DisplayOrder = 2147483644 -- Maximum z-index for floating controls
-    self.ScreenGui.Parent = playerGui
+    self.ScreenGui.IgnoreGuiInset = true
+    self.ScreenGui.Parent = CoreGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "FloatingPanel"
     self.MainFrame.Size = UDim2.new(0, 280, 0, 60) 
@@ -3033,14 +3040,14 @@ function Loading.new(options, library)
     return self
 end
 function Loading:Create()
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "ProjectMadaraLoading"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.DisplayOrder = 999 
-    self.ScreenGui.Parent = playerGui
+    self.ScreenGui.DisplayOrder = 2147483647
+    self.ScreenGui.IgnoreGuiInset = true
+    self.ScreenGui.Parent = CoreGui
     self.Background = Instance.new("Frame")
     self.Background.Name = "Background"
     self.Background.Size = UDim2.new(1, 0, 1, 0)
@@ -3372,14 +3379,14 @@ function MobileFloatingIcon.new(options, floatingControls)
     return self
 end
 function MobileFloatingIcon:CreateGui()
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "MobileFloatingIcon"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.DisplayOrder = 2147483643 -- Maximum z-index for mobile icon
-    self.ScreenGui.Parent = playerGui
+    self.ScreenGui.IgnoreGuiInset = true
+    self.ScreenGui.Parent = CoreGui
     self.Container = Instance.new("Frame")
     self.Container.Name = "IconContainer"
     self.Container.Size = UDim2.new(0, self.Size + 10, 0, self.Size + 10)
@@ -3638,14 +3645,14 @@ function Notifications.new()
     return self
 end
 function Notifications:CreateContainer()
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "ProjectMadaraNotifications"
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.DisplayOrder = 999 
-    self.ScreenGui.Parent = playerGui
+    self.ScreenGui.DisplayOrder = 2147483640
+    self.ScreenGui.IgnoreGuiInset = true
+    self.ScreenGui.Parent = CoreGui
     self.Container = Instance.new("Frame")
     self.Container.Name = "NotificationContainer"
     self.Container.Size = UDim2.new(0, 350, 1, 0) 
@@ -4259,7 +4266,8 @@ end
 function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 90 or 70)
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and (isMobile and 80 or 90) or (isMobile and 60 or 70))
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4292,8 +4300,8 @@ function Slider:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0, self.Description ~= "" and (isMobile and 10 or 12) or (isMobile and 15 or 17))
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
@@ -4320,24 +4328,24 @@ function Slider:Create()
     self.SliderIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -140, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 18)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 0, 24)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 48 or 60, 0, self.Description ~= "" and (isMobile and 8 or 10) or (isMobile and 16 or 18))
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.NameLabel.TextSize = 16
-    self.NameLabel.Font = Enum.Font.GothamBold
+    self.NameLabel.TextSize = isMobile and 14 or 16
+    self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     if self.Description ~= "" then
         self.SliderDescription = Instance.new("TextLabel")
         self.SliderDescription.Name = "Description"
-        self.SliderDescription.Size = UDim2.new(1, -180, 0, 18)
-        self.SliderDescription.Position = UDim2.new(0, 60, 0, 36)
+        self.SliderDescription.Size = UDim2.new(1, isMobile and -120 or -180, 0, 18)
+        self.SliderDescription.Position = UDim2.new(0, isMobile and 48 or 60, 0, isMobile and 30 or 36)
         self.SliderDescription.BackgroundTransparency = 1
         self.SliderDescription.Text = self.Description
         self.SliderDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
-        self.SliderDescription.TextSize = 13
+        self.SliderDescription.TextSize = isMobile and 11 or 13
         self.SliderDescription.Font = Enum.Font.Gotham
         self.SliderDescription.TextXAlignment = Enum.TextXAlignment.Left
         self.SliderDescription.TextWrapped = true
@@ -4346,8 +4354,8 @@ function Slider:Create()
     -- Simple value display
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
-    self.ValueLabel.Size = UDim2.new(0, 50, 0, 20)
-    self.ValueLabel.Position = UDim2.new(1, -66, 0, self.Description ~= "" and 18 or 23)
+    self.ValueLabel.Size = UDim2.new(0, isMobile and 40 or 50, 0, 20)
+    self.ValueLabel.Position = UDim2.new(1, isMobile and -48 or -66, 0, self.Description ~= "" and (isMobile and 16 or 18) or (isMobile and 21 or 23))
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
     self.ValueLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -4358,8 +4366,8 @@ function Slider:Create()
     -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -130, 0, 8)
-    self.SliderTrack.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 60 or 50)
+    self.SliderTrack.Size = UDim2.new(1, isMobile and -96 or -130, 0, isMobile and 10 or 8)
+    self.SliderTrack.Position = UDim2.new(0, isMobile and 48 or 60, 0, self.Description ~= "" and (isMobile and 52 or 60) or (isMobile and 42 or 50))
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.SliderTrack.BorderSizePixel = 0
@@ -4400,7 +4408,7 @@ function Slider:Create()
     -- Modern indicator
     self.SliderIndicator = Instance.new("TextButton")
     self.SliderIndicator.Name = "Indicator"
-    self.SliderIndicator.Size = UDim2.new(0, 16, 0, 16)
+    self.SliderIndicator.Size = UDim2.new(0, isMobile and 20 or 16, 0, isMobile and 20 or 16)
     self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -4451,7 +4459,7 @@ function Slider:Create()
         TweenService:Create(
             self.SliderIndicator,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(0, 150, 255), Size = UDim2.new(0, 18, 0, 18)}
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255), Size = UDim2.new(0, isMobile and 22 or 18, 0, isMobile and 22 or 18)}
         ):Play()
     end)
 
@@ -4459,7 +4467,7 @@ function Slider:Create()
         TweenService:Create(
             self.SliderIndicator,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 16, 0, 16)}
+            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, isMobile and 20 or 16, 0, isMobile and 20 or 16)}
         ):Play()
     end)
 
@@ -4633,8 +4641,8 @@ function Tab:Create()
     if self.Icon and self.Icon ~= "" and success and Lucide and Lucide[self.Icon] then
         self.IconContainer = Instance.new("Frame")
         self.IconContainer.Name = "IconContainer"
-        self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-        self.IconContainer.Position = UDim2.new(0, 12, 0.5, 0)
+        self.IconContainer.Size = UDim2.new(0, self.Window.IsMobile and 32 or 32, 0, self.Window.IsMobile and 32 or 32)
+        self.IconContainer.Position = UDim2.new(0, self.Window.IsMobile and 12 or 12, 0.5, 0)
         self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
         self.IconContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
         self.IconContainer.BackgroundTransparency = 0.9 
@@ -4645,7 +4653,7 @@ function Tab:Create()
         iconCorner.Parent = self.IconContainer
         self.TabIcon = Instance.new("ImageLabel")
         self.TabIcon.Name = "Icon"
-        self.TabIcon.Size = UDim2.new(0, 18, 0, 18)
+        self.TabIcon.Size = UDim2.new(0, self.Window.IsMobile and 18 or 18, 0, self.Window.IsMobile and 18 or 18)
         self.TabIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
         self.TabIcon.AnchorPoint = Vector2.new(0.5, 0.5)
         self.TabIcon.BackgroundTransparency = 1
@@ -4705,13 +4713,20 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, 10) 
+    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 10) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
-    containerPadding.PaddingLeft = UDim.new(0, 12) 
-    containerPadding.PaddingRight = UDim.new(0, 12)
-    containerPadding.PaddingTop = UDim.new(0, 10)
-    containerPadding.PaddingBottom = UDim.new(0, 10)
+    if self.Window.IsMobile then
+        containerPadding.PaddingLeft = UDim.new(0, 8)
+        containerPadding.PaddingRight = UDim.new(0, 8)
+        containerPadding.PaddingTop = UDim.new(0, 8)
+        containerPadding.PaddingBottom = UDim.new(0, 8)
+    else
+        containerPadding.PaddingLeft = UDim.new(0, 12)
+        containerPadding.PaddingRight = UDim.new(0, 12)
+        containerPadding.PaddingTop = UDim.new(0, 10)
+        containerPadding.PaddingBottom = UDim.new(0, 10)
+    end
     containerPadding.Parent = self.Container
     self.TabButton.MouseButton1Click:Connect(function()
         self.Window:SelectTab(self)
@@ -4898,18 +4913,18 @@ function Tab:Section(name)
     section.Parent = self.Container
     local title = Instance.new("TextLabel")
     title.Name = "Title"
-    title.Size = UDim2.new(1, 0, 0, 18) 
+    title.Size = UDim2.new(1, 0, 0, self.Window.IsMobile and 16 or 18)
     title.BackgroundTransparency = 1
     title.Text = name
     title.TextColor3 = self.Library.Colors.LightText
-    title.TextSize = 14 
+    title.TextSize = self.Window.IsMobile and 12 or 14 
     title.Font = Enum.Font.GothamBold
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = section
     local content = Instance.new("Frame")
     content.Name = "Content"
     content.Size = UDim2.new(1, 0, 0, 0) 
-    content.Position = UDim2.new(0, 0, 0, 22) 
+    content.Position = UDim2.new(0, 0, 0, self.Window.IsMobile and 20 or 22) 
     content.BackgroundTransparency = 1
     content.BorderSizePixel = 0
     content.AutomaticSize = Enum.AutomaticSize.Y
@@ -4917,11 +4932,11 @@ function Tab:Section(name)
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Vertical
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 4) 
+    layout.Padding = UDim.new(0, self.Window.IsMobile and 3 or 4) 
     layout.Parent = content
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         content.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
-        section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + 30)
+        section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + (self.Window.IsMobile and 26 or 30))
     end)
     return content
 end
@@ -5053,7 +5068,7 @@ function TextBox:Create()
     self.Container.Name = self.Name .. "TextBox"
     -- Taller on mobile to accommodate stacked layout
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = isMobile and UDim2.new(1, 0, 0, 70) or UDim2.new(1, 0, 0, 54)
+    self.Container.Size = UDim2.new(1, 0, 0, 54)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5086,8 +5101,8 @@ function TextBox:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.IconContainer.Position = UDim2.new(0, 16, 0.5, 0)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
@@ -5117,8 +5132,8 @@ function TextBox:Create()
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
     if isMobile then
-        self.NameLabel.Size = UDim2.new(1, -60, 0, 20)
-        self.NameLabel.Position = UDim2.new(0, 44, 0, 8)
+        self.NameLabel.Size = UDim2.new(0, 80, 0, 20)
+        self.NameLabel.Position = UDim2.new(0, 44, 0, 16)
     else
         self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
         self.NameLabel.Position = UDim2.new(0, 60, 0, 15)
@@ -5126,17 +5141,17 @@ function TextBox:Create()
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.NameLabel.TextSize = 16
-    self.NameLabel.Font = Enum.Font.GothamBold
+    self.NameLabel.TextSize = isMobile and 14 or 16
+    self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
     if isMobile then
-        -- Full width input under the label
-        self.InputBackground.Size = UDim2.new(1, -60, 0, 30)
-        self.InputBackground.Position = UDim2.new(0, 44, 0, 36)
-        self.InputBackground.AnchorPoint = Vector2.new(0, 0)
+        -- Input next to label on same line
+        self.InputBackground.Size = UDim2.new(1, -140, 0, 30)
+        self.InputBackground.Position = UDim2.new(0, 130, 0, 15)
+        self.InputBackground.AnchorPoint = Vector2.new(0, 0.5)
     else
         self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
         self.InputBackground.Position = UDim2.new(1, -16, 0.5, 0)
@@ -5161,7 +5176,7 @@ function TextBox:Create()
     self.Input.PlaceholderText = self.Placeholder
     self.Input.PlaceholderColor3 = Color3.fromRGB(120, 130, 140)
     self.Input.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.Input.TextSize = 13
+    self.Input.TextSize = isMobile and 14 or 13
     self.Input.Font = Enum.Font.Gotham
     self.Input.TextXAlignment = Enum.TextXAlignment.Left
     self.Input.ClearTextOnFocus = false
@@ -5308,7 +5323,9 @@ end
 function Toggle:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Toggle"
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 54)
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 68 or 54)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5344,8 +5361,9 @@ function Toggle:Create()
     -- Enhanced icon with background
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 11)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
@@ -5373,15 +5391,15 @@ function Toggle:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -150, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 8 or 16)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 60, 0, 16)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.NameLabel.TextSize = 16
-    self.NameLabel.Font = Enum.Font.GothamBold
+    self.NameLabel.TextSize = isMobile and 14 or 16
+    self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    if self.Description ~= "" then
+    if self.Description ~= "" and not isMobile then
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
         self.ToggleDescription.Size = UDim2.new(1, -200, 0, 16)
@@ -5398,8 +5416,8 @@ function Toggle:Create()
     -- Modern iOS-style toggle
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, 52, 0, 28)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and -96 or -68, 0.5, 0)
+    self.ToggleBackground.Size = UDim2.new(0, isMobile and 48 or 52, 0, isMobile and 26 or 28)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -108 or -96) or (isMobile and -72 or -68), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -5425,7 +5443,7 @@ function Toggle:Create()
     
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, 24, 0, 24)
+    self.ToggleIndicator.Size = UDim2.new(0, isMobile and 22 or 24, 0, isMobile and 22 or 24)
     self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
     self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5453,8 +5471,8 @@ function Toggle:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, 40, 0, 28)
-        self.KeybindButton.Position = UDim2.new(1, -52, 0.5, 0)
+        self.KeybindButton.Size = UDim2.new(0, isMobile and 44 or 40, 0, isMobile and 32 or 28)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -56 or -52, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 50, 58)
         self.KeybindButton.Text = "⌨"
@@ -5590,7 +5608,7 @@ function Toggle:SetValue(value, callCallback)
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Position = UDim2.new(0, 26, 0.5, 0)}
+            {Position = UDim2.new(0, isMobile and 30 or 26, 0.5, 0)}
         )
         indicatorTween:Play()
         
@@ -5737,8 +5755,7 @@ function Window.new(options, library)
     return self
 end
 function Window:CreateGui()
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
     self.ScreenGui = Instance.new("ScreenGui")
@@ -5747,15 +5764,16 @@ function Window:CreateGui()
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.DisplayOrder = 2147483647 -- Maximum possible DisplayOrder
     self.ScreenGui.IgnoreGuiInset = true -- Ignore topbar and other UI elements
-    self.ScreenGui.Parent = playerGui
+    self.ScreenGui.Parent = CoreGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
     if isMobile then
-        self.MainFrame.Size = UDim2.new(0, 800, 0, 550)
+        self.MainFrame.Size = UDim2.new(0, 380, 0, 520)
+        self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     else
-        self.MainFrame.Size = UDim2.new(0, 675, 0, 550)
+        self.MainFrame.Size = UDim2.new(0, 650, 0, 520)
+        self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     end
-    self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     self.MainFrame.BackgroundColor3 = self.Library.Colors.Background
     self.MainFrame.BorderSizePixel = 0
@@ -5764,9 +5782,11 @@ function Window:CreateGui()
 
     local sizeConstraint = Instance.new("UISizeConstraint")
     if isMobile then
-        sizeConstraint.MaxSize = Vector2.new(600, 450)
+        sizeConstraint.MinSize = Vector2.new(350, 480)
+        sizeConstraint.MaxSize = Vector2.new(420, 580)
     else
-        sizeConstraint.MaxSize = Vector2.new(675, 550)
+        sizeConstraint.MinSize = Vector2.new(600, 480)
+        sizeConstraint.MaxSize = Vector2.new(750, 600)
     end
     sizeConstraint.Parent = self.MainFrame
 
@@ -5778,7 +5798,7 @@ function Window:CreateGui()
 
     self.TitleBar = Instance.new("Frame")
     self.TitleBar.Name = "TitleBar"
-    self.TitleBar.Size = UDim2.new(1, 0, 0, 70)
+    self.TitleBar.Size = UDim2.new(1, 0, 0, isMobile and 60 or 70)
     self.TitleBar.Position = UDim2.new(0, 0, 0, 0)
     self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
     self.TitleBar.BorderSizePixel = 0
@@ -5817,8 +5837,8 @@ function Window:CreateGui()
     glowCorner.Parent = self.TitleGlow
     self.AppIcon = Instance.new("Frame")
     self.AppIcon.Name = "AppIcon"
-    self.AppIcon.Size = UDim2.new(0, 40, 0, 40)
-    self.AppIcon.Position = UDim2.new(0, 20, 0.5, 0)
+    self.AppIcon.Size = UDim2.new(0, isMobile and 32 or 40, 0, isMobile and 32 or 40)
+    self.AppIcon.Position = UDim2.new(0, isMobile and 12 or 20, 0.5, 0)
     self.AppIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.AppIcon.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
     self.AppIcon.BorderSizePixel = 0
@@ -5839,133 +5859,134 @@ function Window:CreateGui()
     self.AppIconText.Parent = self.AppIcon
     self.TitleText = Instance.new("TextLabel")
     self.TitleText.Name = "TitleText"
-    self.TitleText.Size = UDim2.new(0, 250, 0, 24)
-    self.TitleText.Position = UDim2.new(0, 75, 0, 12)
+    self.TitleText.Size = UDim2.new(0, isMobile and 180 or 250, 0, isMobile and 20 or 24)
+    self.TitleText.Position = UDim2.new(0, isMobile and 52 or 75, 0, isMobile and 8 or 12)
     self.TitleText.BackgroundTransparency = 1
     self.TitleText.Text = self.Title
     self.TitleText.TextColor3 = Color3.fromRGB(255, 255, 255) 
-    self.TitleText.TextSize = 18
+    self.TitleText.TextSize = isMobile and 14 or 18
     self.TitleText.Font = Enum.Font.GothamBold
     self.TitleText.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleText.Parent = self.TitleBar
     self.SubtitleText = Instance.new("TextLabel")
     self.SubtitleText.Name = "SubtitleText"
-    self.SubtitleText.Size = UDim2.new(0, 350, 0, 16)
-    self.SubtitleText.Position = UDim2.new(0, 75, 0, 38)
+    self.SubtitleText.Size = UDim2.new(0, isMobile and 200 or 350, 0, isMobile and 14 or 16)
+    self.SubtitleText.Position = UDim2.new(0, isMobile and 52 or 75, 0, isMobile and 30 or 38)
     self.SubtitleText.BackgroundTransparency = 1
     self.SubtitleText.Text = self.Subtitle
     self.SubtitleText.TextColor3 = Color3.fromRGB(160, 180, 200) 
-    self.SubtitleText.TextSize = 12
+    self.SubtitleText.TextSize = isMobile and 10 or 12
     self.SubtitleText.Font = Enum.Font.Gotham
     self.SubtitleText.TextXAlignment = Enum.TextXAlignment.Left
     self.SubtitleText.Parent = self.TitleBar
-    self.SearchBackground = Instance.new("Frame")
-    self.SearchBackground.Name = "SearchBackground"
-    if isMobile then
-        self.SearchBackground.Size = UDim2.new(0.28, 0, 0, 28)
-        self.SearchBackground.Position = UDim2.new(0.5, 65, 0.5, 0)
-        self.SearchBackground.AnchorPoint = Vector2.new(0.5, 0.5)
-    else
+    if not isMobile then
+        self.SearchBackground = Instance.new("Frame")
+        self.SearchBackground.Name = "SearchBackground"
         self.SearchBackground.Size = UDim2.new(0, 220, 0, 32)
         self.SearchBackground.Position = UDim2.new(1, -390, 0.5, 0)
         self.SearchBackground.AnchorPoint = Vector2.new(0, 0.5)
+        self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+        self.SearchBackground.BorderSizePixel = 0
+        self.SearchBackground.Parent = self.TitleBar
     end
-    self.SearchBackground.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
-    self.SearchBackground.BorderSizePixel = 0
-    self.SearchBackground.Parent = self.TitleBar
-    local searchBorder = Instance.new("UIStroke")
-    searchBorder.Color = Color3.fromRGB(40, 50, 60) 
-    searchBorder.Thickness = 1
-    searchBorder.Parent = self.SearchBackground
-    local searchCorner = Instance.new("UICorner")
-    searchCorner.CornerRadius = UDim.new(0, 12) 
-    searchCorner.Parent = self.SearchBackground
+    if not isMobile then
+        local searchBorder = Instance.new("UIStroke")
+        searchBorder.Color = Color3.fromRGB(40, 50, 60) 
+        searchBorder.Thickness = 1
+        searchBorder.Parent = self.SearchBackground
+        local searchCorner = Instance.new("UICorner")
+        searchCorner.CornerRadius = UDim.new(0, 12) 
+        searchCorner.Parent = self.SearchBackground
+    end
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    self.SearchIcon = Instance.new("ImageLabel")
-    self.SearchIcon.Name = "SearchIcon"
-    if isMobile then
-        self.SearchIcon.Size = UDim2.new(0, 16, 0, 16)
-    else
+    if not isMobile then
+        self.SearchIcon = Instance.new("ImageLabel")
+        self.SearchIcon.Name = "SearchIcon"
         self.SearchIcon.Size = UDim2.new(0, 18, 0, 18)
+        self.SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
+        self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+        self.SearchIcon.BackgroundTransparency = 1
+        self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10723416057"
+        self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 140, 160) 
+        self.SearchIcon.Parent = self.SearchBackground
     end
-    self.SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
-    self.SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
-    self.SearchIcon.BackgroundTransparency = 1
-    self.SearchIcon.Image = (success and Lucide and Lucide["search"]) or "rbxassetid://10723416057"
-    self.SearchIcon.ImageColor3 = Color3.fromRGB(120, 140, 160) 
-    self.SearchIcon.Parent = self.SearchBackground
-    self.SearchBox = Instance.new("TextBox")
-    self.SearchBox.Name = "SearchBox"
-    self.SearchBox.Size = UDim2.new(1, -45, 1, 0)
-    self.SearchBox.Position = UDim2.new(0, 40, 0, 0)
-    self.SearchBox.BackgroundTransparency = 1
-    self.SearchBox.Text = ""
-    self.SearchBox.PlaceholderText = "Search components..."
-    self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) 
-    self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) 
-    self.SearchBox.TextSize = 14
-    if isMobile then
-        self.SearchBox.TextSize = 12
+    if not isMobile then
+        self.SearchBox = Instance.new("TextBox")
+        self.SearchBox.Name = "SearchBox"
+        self.SearchBox.Size = UDim2.new(1, -45, 1, 0)
+        self.SearchBox.Position = UDim2.new(0, 40, 0, 0)
+        self.SearchBox.BackgroundTransparency = 1
+        self.SearchBox.Text = ""
+        self.SearchBox.PlaceholderText = "Search components..."
+        self.SearchBox.TextColor3 = Color3.fromRGB(240, 245, 250) 
+        self.SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 140, 160) 
+        self.SearchBox.TextSize = 14
+        self.SearchBox.Font = Enum.Font.Gotham
+        self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+        self.SearchBox.Parent = self.SearchBackground
     end
-    self.SearchBox.Font = Enum.Font.Gotham
-    self.SearchBox.TextXAlignment = Enum.TextXAlignment.Left
-    self.SearchBox.Parent = self.SearchBackground
-    self.SearchBox.Changed:Connect(function(property)
-        if property == "Text" then
-            self:FilterComponents(self.SearchBox.Text)
-        end
-    end)
-    self.SearchBox.Focused:Connect(function()
-        local bgTween = TweenService:Create(
-            self.SearchBackground,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(28, 35, 42)}
-        )
-        bgTween:Play()
-        local borderTween = TweenService:Create(
-            searchBorder,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(0, 120, 215)}
-        )
-        borderTween:Play()
-        local iconTween = TweenService:Create(
-            self.SearchIcon,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
-        )
-        iconTween:Play()
-    end)
-    self.SearchBox.FocusLost:Connect(function()
-        local bgTween = TweenService:Create(
-            self.SearchBackground,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
-        )
-        bgTween:Play()
-        local borderTween = TweenService:Create(
-            searchBorder,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(40, 50, 60)}
-        )
-        borderTween:Play()
-        local iconTween = TweenService:Create(
-            self.SearchIcon,
-            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {ImageColor3 = Color3.fromRGB(120, 140, 160)}
-        )
-        iconTween:Play()
-    end)
+    if not isMobile then
+        self.SearchBox.Changed:Connect(function(property)
+            if property == "Text" then
+                self:FilterComponents(self.SearchBox.Text)
+            end
+        end)
+    end
+    if not isMobile then
+        self.SearchBox.Focused:Connect(function()
+            local bgTween = TweenService:Create(
+                self.SearchBackground,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(28, 35, 42)}
+            )
+            bgTween:Play()
+            local borderTween = TweenService:Create(
+                searchBorder,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(0, 120, 215)}
+            )
+            borderTween:Play()
+            local iconTween = TweenService:Create(
+                self.SearchIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+            )
+            iconTween:Play()
+        end)
+    end
+    if not isMobile then
+        self.SearchBox.FocusLost:Connect(function()
+            local bgTween = TweenService:Create(
+                self.SearchBackground,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
+            )
+            bgTween:Play()
+            local borderTween = TweenService:Create(
+                searchBorder,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {Color = Color3.fromRGB(40, 50, 60)}
+            )
+            borderTween:Play()
+            local iconTween = TweenService:Create(
+                self.SearchIcon,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                {ImageColor3 = Color3.fromRGB(120, 140, 160)}
+            )
+            iconTween:Play()
+        end)
+    end
     self.KeybindButton = Instance.new("TextButton")
     self.KeybindButton.Name = "KeybindButton"
-    self.KeybindButton.Size = UDim2.new(0, 36, 0, 36)
-    self.KeybindButton.Position = UDim2.new(1, -140, 0.5, 0) 
+    self.KeybindButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.KeybindButton.Position = UDim2.new(1, isMobile and -96 or -120, 0.5, 0) 
     self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
     self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) 
     self.KeybindButton.Text = "⌨"
     self.KeybindButton.TextColor3 = Color3.fromRGB(200, 220, 240)
-    self.KeybindButton.TextSize = 16
+    self.KeybindButton.TextSize = isMobile and 12 or 16
     self.KeybindButton.Font = Enum.Font.GothamBold
     self.KeybindButton.BorderSizePixel = 0
     self.KeybindButton.Parent = self.TitleBar
@@ -5978,13 +5999,13 @@ function Window:CreateGui()
     keybindCorner.Parent = self.KeybindButton
     self.MinimizeButton = Instance.new("TextButton")
     self.MinimizeButton.Name = "MinimizeButton"
-    self.MinimizeButton.Size = UDim2.new(0, 36, 0, 36)
-    self.MinimizeButton.Position = UDim2.new(1, -92, 0.5, 0) 
+    self.MinimizeButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.MinimizeButton.Position = UDim2.new(1, isMobile and -64 or -80, 0.5, 0) 
     self.MinimizeButton.AnchorPoint = Vector2.new(0, 0.5)
     self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 70, 80) 
     self.MinimizeButton.Text = "−"
     self.MinimizeButton.TextColor3 = Color3.fromRGB(220, 230, 240)
-    self.MinimizeButton.TextSize = 18
+    self.MinimizeButton.TextSize = isMobile and 14 or 18
     self.MinimizeButton.Font = Enum.Font.GothamBold
     self.MinimizeButton.BorderSizePixel = 0
     self.MinimizeButton.Parent = self.TitleBar
@@ -5997,13 +6018,13 @@ function Window:CreateGui()
     minimizeCorner.Parent = self.MinimizeButton
     self.CloseButton = Instance.new("TextButton")
     self.CloseButton.Name = "CloseButton"
-    self.CloseButton.Size = UDim2.new(0, 36, 0, 36)
-    self.CloseButton.Position = UDim2.new(1, -44, 0.5, 0) 
+    self.CloseButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.CloseButton.Position = UDim2.new(1, isMobile and -32 or -36, 0.5, 0) 
     self.CloseButton.AnchorPoint = Vector2.new(0, 0.5)
     self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70) 
     self.CloseButton.Text = "×"
     self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.CloseButton.TextSize = 18
+    self.CloseButton.TextSize = isMobile and 14 or 18
     self.CloseButton.Font = Enum.Font.GothamBold
     self.CloseButton.BorderSizePixel = 0
     self.CloseButton.Parent = self.TitleBar
@@ -6017,11 +6038,12 @@ function Window:CreateGui()
     self.Sidebar = Instance.new("Frame")
     self.Sidebar.Name = "Sidebar"
     if isMobile then
-        self.Sidebar.Size = UDim2.new(0, 150, 1, -70) 
+        self.Sidebar.Size = UDim2.new(0, 140, 1, -60)
+        self.Sidebar.Position = UDim2.new(0, 0, 0, 60)
     else
-        self.Sidebar.Size = UDim2.new(0, 200, 1, -70)
+        self.Sidebar.Size = UDim2.new(0, 180, 1, -70)
+        self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
     end
-    self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
     self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28)
     self.Sidebar.BorderSizePixel = 0
     self.Sidebar.ClipsDescendants = true
@@ -6064,19 +6086,26 @@ function Window:CreateGui()
     self.TabListLayout.Padding = UDim.new(0, 2) 
     self.TabListLayout.Parent = self.TabListContainer
     local tabPadding = Instance.new("UIPadding")
-    tabPadding.PaddingLeft = UDim.new(0, 8)
-    tabPadding.PaddingRight = UDim.new(0, 8)
-    tabPadding.PaddingTop = UDim.new(0, 8)
-    tabPadding.PaddingBottom = UDim.new(0, 8)
+    if isMobile then
+        tabPadding.PaddingLeft = UDim.new(0, 6)
+        tabPadding.PaddingRight = UDim.new(0, 6)
+        tabPadding.PaddingTop = UDim.new(0, 8)
+        tabPadding.PaddingBottom = UDim.new(0, 8)
+    else
+        tabPadding.PaddingLeft = UDim.new(0, 10)
+        tabPadding.PaddingRight = UDim.new(0, 10)
+        tabPadding.PaddingTop = UDim.new(0, 12)
+        tabPadding.PaddingBottom = UDim.new(0, 12)
+    end
     tabPadding.Parent = self.TabListContainer
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
     if isMobile then
-        self.ContentContainer.Size = UDim2.new(1, -150, 1, -70)
-        self.ContentContainer.Position = UDim2.new(0, 150, 0, 70)
+        self.ContentContainer.Size = UDim2.new(1, -140, 1, -60)
+        self.ContentContainer.Position = UDim2.new(0, 140, 0, 60)
     else
-        self.ContentContainer.Size = UDim2.new(1, -200, 1, -70)
-        self.ContentContainer.Position = UDim2.new(0, 200, 0, 70)
+        self.ContentContainer.Size = UDim2.new(1, -180, 1, -70)
+        self.ContentContainer.Position = UDim2.new(0, 180, 0, 70)
     end
     self.ContentContainer.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.ContentContainer.BorderSizePixel = 0
@@ -6093,10 +6122,17 @@ function Window:CreateGui()
     contentCorner.CornerRadius = UDim.new(0, 10)
     contentCorner.Parent = self.ContentContainer
     local contentPadding = Instance.new("UIPadding")
-    contentPadding.PaddingLeft = UDim.new(0, 8)
-    contentPadding.PaddingRight = UDim.new(0, 8)
-    contentPadding.PaddingTop = UDim.new(0, 8)
-    contentPadding.PaddingBottom = UDim.new(0, 8)
+    if isMobile then
+        contentPadding.PaddingLeft = UDim.new(0, 8)
+        contentPadding.PaddingRight = UDim.new(0, 8)
+        contentPadding.PaddingTop = UDim.new(0, 8)
+        contentPadding.PaddingBottom = UDim.new(0, 8)
+    else
+        contentPadding.PaddingLeft = UDim.new(0, 12)
+        contentPadding.PaddingRight = UDim.new(0, 12)
+        contentPadding.PaddingTop = UDim.new(0, 12)
+        contentPadding.PaddingBottom = UDim.new(0, 12)
+    end
     contentPadding.Parent = self.ContentContainer
     self:MakeDraggable()
     self:SetupKeybindSystem()
@@ -6363,7 +6399,7 @@ function Window:CreateMobileIcon()
     self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileIcon.DisplayOrder = 2147483646 -- Maximum z-index, just below main UI
         self.MobileIcon.IgnoreGuiInset = true
-    self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    self.MobileIcon.Parent = game:GetService("CoreGui")
     self.MobileContainer = Instance.new("Frame")
     self.MobileContainer.Name = "MobileContainer"
     self.MobileContainer.Size = UDim2.new(0, 60, 0, 60)
@@ -6610,7 +6646,7 @@ function Window:ToggleVisibility()
     self.ScreenGui.Enabled = not self.ScreenGui.Enabled
 end
 function Window:FilterComponents(searchText)
-    if not self.ActiveTab then return end
+    if not self.ActiveTab or not self.SearchBox then return end
     searchText = searchText:lower()
     for _, child in ipairs(self.ActiveTab.Container:GetChildren()) do
         if child:IsA("Frame") and child.Name:find("Button") or child.Name:find("Toggle") or child.Name:find("TextBox") or child.Name:find("Dropdown") or child.Name:find("Slider") then
@@ -6704,7 +6740,7 @@ function Window:CreateMobileToggleButton()
     self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileToggleGui.DisplayOrder = 2147483645 -- Maximum z-index, below main UI and mobile icon
         self.MobileToggleGui.IgnoreGuiInset = true
-    self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    self.MobileToggleGui.Parent = game:GetService("CoreGui")
     self.ToggleContainer = Instance.new("Frame")
     self.ToggleContainer.Name = "ToggleContainer"
     self.ToggleContainer.Size = UDim2.new(0, 70, 0, 70)
@@ -7959,20 +7995,6 @@ local ObjectTree = {
         },
         {
             {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
                 8,
                 2,
                 {
@@ -7980,17 +8002,10 @@ local ObjectTree = {
                 }
             },
             {
-                4,
+                9,
                 2,
                 {
-                    "Credits"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
+                    "Loading"
                 }
             },
             {
@@ -8001,24 +8016,10 @@ local ObjectTree = {
                 }
             },
             {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
                 10,
                 2,
                 {
                     "MobileFloatingIcon"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
                 }
             },
             {
@@ -8029,17 +8030,31 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                2,
                 2,
                 {
-                    "DraggableKeybind"
+                    "Button"
                 }
             },
             {
-                19,
+                12,
                 2,
                 {
-                    "lucide"
+                    "OptionsManager"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
                 }
             },
             {
@@ -8050,10 +8065,24 @@ local ObjectTree = {
                 }
             },
             {
-                17,
+                13,
                 2,
                 {
-                    "Toggle"
+                    "Paragraph"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
                 }
             },
             {
@@ -8064,13 +8093,6 @@ local ObjectTree = {
                 }
             },
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
                 15,
                 2,
                 {
@@ -8078,10 +8100,24 @@ local ObjectTree = {
                 }
             },
             {
-                14,
+                5,
                 2,
                 {
-                    "Slider"
+                    "DraggableKeybind"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             }
         }
@@ -8092,23 +8128,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    426,
-    582,
-    1110,
-    1448,
-    2375,
-    2961,
-    3014,
-    3358,
-    3606,
-    3909,
-    4006,
-    4229,
-    4584,
-    5035,
-    5281,
-    5704,
-    7127
+    429,
+    585,
+    1113,
+    1451,
+    2382,
+    2968,
+    3021,
+    3365,
+    3613,
+    3916,
+    4013,
+    4236,
+    4592,
+    5050,
+    5296,
+    5722,
+    7163
 }
 
 -- Misc AOT variable imports
