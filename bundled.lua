@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hello
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -112,26 +112,18 @@ function Button:Create()
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
     
-    -- Enhanced gradient background
+    -- Subtle gradient background to match other components
     self.GradientFrame = Instance.new("Frame")
     self.GradientFrame.Name = "GradientFrame"
     self.GradientFrame.Size = UDim2.new(1, 0, 1, 0)
     self.GradientFrame.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.GradientFrame.BackgroundTransparency = 0.95
+    self.GradientFrame.BackgroundTransparency = 0.97
     self.GradientFrame.BorderSizePixel = 0
     self.GradientFrame.Parent = self.Container
     
     local gradientCorner = Instance.new("UICorner")
     gradientCorner.CornerRadius = UDim.new(0, 16)
     gradientCorner.Parent = self.GradientFrame
-    
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 215)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 80, 160))
-    })
-    gradient.Rotation = 45
-    gradient.Parent = self.GradientFrame
     
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(60, 70, 80)
@@ -150,7 +142,7 @@ function Button:Create()
     self.IconContainer.Name = "IconContainer"
     self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
     self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 7)
-    self.IconContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
     
@@ -158,14 +150,7 @@ function Button:Create()
     iconCorner.CornerRadius = UDim.new(0, 12)
     iconCorner.Parent = self.IconContainer
     
-    -- Icon gradient
-    local iconGradient = Instance.new("UIGradient")
-    iconGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
-    })
-    iconGradient.Rotation = 45
-    iconGradient.Parent = self.IconContainer
+
     
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
@@ -174,7 +159,7 @@ function Button:Create()
     self.ButtonLeftIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonLeftIcon.BackgroundTransparency = 1
     self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
-    self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
     self.ButtonLeftIcon.Parent = self.IconContainer
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
@@ -322,9 +307,16 @@ function Button:Create()
         local iconTween = TweenService:Create(
             self.IconContainer,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}
+            {BackgroundColor3 = Color3.fromRGB(45, 50, 58)}
         )
         iconTween:Play()
+        
+        local iconImageTween = TweenService:Create(
+            self.ButtonLeftIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconImageTween:Play()
         
         -- Action indicator highlight
         local actionTween = TweenService:Create(
@@ -369,9 +361,16 @@ function Button:Create()
         local iconTween = TweenService:Create(
             self.IconContainer,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+            {BackgroundColor3 = Color3.fromRGB(35, 40, 48)}
         )
         iconTween:Play()
+        
+        local iconImageTween = TweenService:Create(
+            self.ButtonLeftIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconImageTween:Play()
         
         -- Reset action indicator
         local actionTween = TweenService:Create(
@@ -1576,8 +1575,8 @@ function Dropdown:Create()
 
     self.SelectedLabel = Instance.new("TextLabel")
     self.SelectedLabel.Name = "Selected"
-    self.SelectedLabel.Size = UDim2.new(1, -90, 1, 0)
-    self.SelectedLabel.Position = UDim2.new(1, -32, 0.5, 0)
+    self.SelectedLabel.Size = UDim2.new(1, -320, 1, 0)
+    self.SelectedLabel.Position = UDim2.new(1, -88, 0.5, 0)
     self.SelectedLabel.AnchorPoint = Vector2.new(1, 0.5)
     self.SelectedLabel.BackgroundTransparency = 1
     self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -2950,34 +2949,74 @@ end
 function Label:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = "Label"
-    self.Container.Size = UDim2.new(1, 0, 0, 52)
-    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
+    self.Container.Size = UDim2.new(1, 0, 0, 54)
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
+    
+    -- Subtle gradient background
+    self.GradientBg = Instance.new("Frame")
+    self.GradientBg.Name = "GradientBg"
+    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientBg.BackgroundTransparency = 0.97
+    self.GradientBg.BorderSizePixel = 0
+    self.GradientBg.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientBg
+    
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(50, 60, 70)
+    border.Thickness = 1
+    border.Transparency = 0.3
+    border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
+    self.IconContainer.Position = UDim2.new(0, 16, 0.5, 0)
+    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(55, 60, 68)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.LabelIcon = Instance.new("ImageLabel")
     self.LabelIcon.Name = "Icon"
     self.LabelIcon.Size = UDim2.new(0, 18, 0, 18)
-    self.LabelIcon.Position = UDim2.new(0, 16, 0.5, 0)
-    self.LabelIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.LabelIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.LabelIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.LabelIcon.BackgroundTransparency = 1
     self.LabelIcon.Image = (success and Lucide and Lucide["tag"]) or "rbxassetid://10723416057"
-    self.LabelIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.LabelIcon.Parent = self.Container
+    self.LabelIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.LabelIcon.Parent = self.IconContainer
     self.TextLabel = Instance.new("TextLabel")
     self.TextLabel.Name = "Text"
-    self.TextLabel.Size = UDim2.new(1, -50, 1, 0)
-    self.TextLabel.Position = UDim2.new(0, 44, 0, 0)
+    self.TextLabel.Size = UDim2.new(1, -68, 1, 0)
+    self.TextLabel.Position = UDim2.new(0, 64, 0, 0)
     self.TextLabel.BackgroundTransparency = 1
     self.TextLabel.Text = self.Text
-    self.TextLabel.TextColor3 = Color3.fromRGB(220, 230, 240)
-    self.TextLabel.TextSize = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and 16 or 14
-    self.TextLabel.Font = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and Enum.Font.GothamBold or Enum.Font.Gotham
+    self.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.TextLabel.TextSize = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and 16 or 15
+    self.TextLabel.Font = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and Enum.Font.GothamBold or Enum.Font.GothamSemibold
     self.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TextLabel.TextWrapped = true
@@ -3999,63 +4038,110 @@ function Paragraph:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Paragraph"
     self.Container.Size = UDim2.new(1, 0, 0, 0) 
-    self.Container.BackgroundColor3 = Color3.fromRGB(28, 33, 40) 
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
-    self.Container.AutomaticSize = Enum.AutomaticSize.Y 
+    self.Container.AutomaticSize = Enum.AutomaticSize.Y
     self.Container.Parent = self.Tab.Container
+    
+    -- Subtle gradient background
+    self.GradientBg = Instance.new("Frame")
+    self.GradientBg.Name = "GradientBg"
+    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientBg.BackgroundTransparency = 0.97
+    self.GradientBg.BorderSizePixel = 0
+    self.GradientBg.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientBg
+    
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(45, 55, 65) 
+    border.Color = Color3.fromRGB(50, 60, 70)
     border.Thickness = 1
+    border.Transparency = 0.3
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
+    -- Enhanced accent line
     self.AccentLine = Instance.new("Frame")
     self.AccentLine.Name = "AccentLine"
-    self.AccentLine.Size = UDim2.new(0, 3, 1, -24) 
-    self.AccentLine.Position = UDim2.new(0, 12, 0, 12)
-    self.AccentLine.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
+    self.AccentLine.Size = UDim2.new(0, 4, 1, -24)
+    self.AccentLine.Position = UDim2.new(0, 16, 0, 12)
+    self.AccentLine.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
     self.AccentLine.BorderSizePixel = 0
     self.AccentLine.Parent = self.Container
+    
     local accentCorner = Instance.new("UICorner")
     accentCorner.CornerRadius = UDim.new(0, 2)
     accentCorner.Parent = self.AccentLine
+    
+    -- Accent gradient
+    local accentGradient = Instance.new("UIGradient")
+    accentGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
+    })
+    accentGradient.Rotation = 90
+    accentGradient.Parent = self.AccentLine
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
+    self.IconContainer.Position = UDim2.new(0, 32, 0, 16)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(55, 60, 68)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.ParagraphIcon = Instance.new("ImageLabel")
     self.ParagraphIcon.Name = "Icon"
     self.ParagraphIcon.Size = UDim2.new(0, 20, 0, 20)
-    self.ParagraphIcon.Position = UDim2.new(0, 24, 0, 16)
+    self.ParagraphIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.ParagraphIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ParagraphIcon.BackgroundTransparency = 1
     self.ParagraphIcon.Image = (success and Lucide and Lucide["file-text"]) or "rbxassetid://10723416057"
-    self.ParagraphIcon.ImageColor3 = Color3.fromRGB(100, 140, 180) 
-    self.ParagraphIcon.Parent = self.Container
+    self.ParagraphIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.ParagraphIcon.Parent = self.IconContainer
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -60, 0, 24)
-    self.TitleLabel.Position = UDim2.new(0, 52, 0, 12)
+    self.TitleLabel.Size = UDim2.new(1, -84, 0, 24)
+    self.TitleLabel.Position = UDim2.new(0, 80, 0, 16)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Name
-    self.TitleLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.TitleLabel.TextSize = 16
+    self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.TitleLabel.TextSize = 17
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TitleLabel.Parent = self.Container
     self.ContentLabel = Instance.new("TextLabel")
     self.ContentLabel.Name = "Content"
-    self.ContentLabel.Size = UDim2.new(1, -60, 0, 0) 
-    self.ContentLabel.Position = UDim2.new(0, 52, 0, 44)
+    self.ContentLabel.Size = UDim2.new(1, -84, 0, 0)
+    self.ContentLabel.Position = UDim2.new(0, 80, 0, 44)
     self.ContentLabel.BackgroundTransparency = 1
     self.ContentLabel.Text = self.Subtitle
-    self.ContentLabel.TextColor3 = Color3.fromRGB(180, 195, 210) 
-    self.ContentLabel.TextSize = 13
+    self.ContentLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
+    self.ContentLabel.TextSize = 14
     self.ContentLabel.Font = Enum.Font.Gotham
     self.ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
-    self.ContentLabel.TextWrapped = true 
-    self.ContentLabel.AutomaticSize = Enum.AutomaticSize.Y 
+    self.ContentLabel.TextWrapped = true
+    self.ContentLabel.AutomaticSize = Enum.AutomaticSize.Y
     self.ContentLabel.Parent = self.Container
     local padding = Instance.new("UIPadding")
     padding.PaddingLeft = UDim.new(0, 0)
@@ -4071,39 +4157,76 @@ function Paragraph:Create()
         local hoverTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         hoverTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(60, 70, 80)}
+            {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.1}
         )
         borderTween:Play()
+        
+        -- Gradient glow
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.92}
+        )
+        gradientTween:Play()
+        
+        -- Icon glow
+        local iconTween = TweenService:Create(
+            self.ParagraphIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
+        
         local accentTween = TweenService:Create(
             self.AccentLine,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(0, 140, 235)}
+            {BackgroundColor3 = Color3.fromRGB(0, 180, 255)}
         )
         accentTween:Play()
     end)
+    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
+            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
         )
         leaveTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(45, 55, 65)}
+            {Color = Color3.fromRGB(50, 60, 70), Transparency = 0.3}
         )
         borderTween:Play()
+        
+        -- Reset gradient
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.97}
+        )
+        gradientTween:Play()
+        
+        -- Reset icon
+        local iconTween = TweenService:Create(
+            self.ParagraphIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
+        
         local accentTween = TweenService:Create(
             self.AccentLine,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(0, 120, 215)}
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}
         )
         accentTween:Play()
     end)
@@ -4314,7 +4437,7 @@ function Slider:Create()
     -- Modern indicator
     self.SliderIndicator = Instance.new("TextButton")
     self.SliderIndicator.Name = "Indicator"
-    self.SliderIndicator.Size = UDim2.new(0, 20, 0, 20)
+    self.SliderIndicator.Size = UDim2.new(0, 16, 0, 16)
     self.SliderIndicator.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -4330,10 +4453,10 @@ function Slider:Create()
     -- Indicator shadow
     self.IndicatorShadow = Instance.new("Frame")
     self.IndicatorShadow.Name = "Shadow"
-    self.IndicatorShadow.Size = UDim2.new(1, 6, 1, 6)
-    self.IndicatorShadow.Position = UDim2.new(0, -3, 0, -3)
+    self.IndicatorShadow.Size = UDim2.new(1, 4, 1, 4)
+    self.IndicatorShadow.Position = UDim2.new(0, -2, 0, -2)
     self.IndicatorShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    self.IndicatorShadow.BackgroundTransparency = 0.6
+    self.IndicatorShadow.BackgroundTransparency = 0.7
     self.IndicatorShadow.BorderSizePixel = 0
     self.IndicatorShadow.ZIndex = self.SliderIndicator.ZIndex - 1
     self.IndicatorShadow.Parent = self.SliderIndicator
@@ -4365,7 +4488,7 @@ function Slider:Create()
         TweenService:Create(
             self.SliderIndicator,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(0, 150, 255), Size = UDim2.new(0, 24, 0, 24)}
+            {BackgroundColor3 = Color3.fromRGB(0, 150, 255), Size = UDim2.new(0, 18, 0, 18)}
         ):Play()
     end)
 
@@ -4373,7 +4496,7 @@ function Slider:Create()
         TweenService:Create(
             self.SliderIndicator,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart),
-            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 20, 0, 20)}
+            {BackgroundColor3 = Color3.fromRGB(255, 255, 255), Size = UDim2.new(0, 16, 0, 16)}
         ):Play()
     end)
 
@@ -4967,29 +5090,65 @@ function TextBox:Create()
     self.Container.Name = self.Name .. "TextBox"
     -- Taller on mobile to accommodate stacked layout
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = isMobile and UDim2.new(1, 0, 0, 70) or UDim2.new(1, 0, 0, 52)
-    self.Container.BackgroundColor3 = Color3.fromRGB(32, 37, 44)
+    self.Container.Size = isMobile and UDim2.new(1, 0, 0, 70) or UDim2.new(1, 0, 0, 54)
+    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
+    
+    -- Subtle gradient background
+    self.GradientBg = Instance.new("Frame")
+    self.GradientBg.Name = "GradientBg"
+    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
+    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.GradientBg.BackgroundTransparency = 0.97
+    self.GradientBg.BorderSizePixel = 0
+    self.GradientBg.Parent = self.Container
+    
+    local gradientCorner = Instance.new("UICorner")
+    gradientCorner.CornerRadius = UDim.new(0, 16)
+    gradientCorner.Parent = self.GradientBg
+    
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(55, 60, 67)
+    border.Color = Color3.fromRGB(50, 60, 70)
     border.Thickness = 1
+    border.Transparency = 0.3
     border.Parent = self.Container
+    
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
+    -- Enhanced icon container
+    self.IconContainer = Instance.new("Frame")
+    self.IconContainer.Name = "IconContainer"
+    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
+    self.IconContainer.Position = UDim2.new(0, 16, 0.5, 0)
+    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
+    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+    self.IconContainer.BorderSizePixel = 0
+    self.IconContainer.Parent = self.Container
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.Parent = self.IconContainer
+    
+    local iconBorder = Instance.new("UIStroke")
+    iconBorder.Color = Color3.fromRGB(55, 60, 68)
+    iconBorder.Thickness = 1
+    iconBorder.Transparency = 0.5
+    iconBorder.Parent = self.IconContainer
+    
     self.TextBoxIcon = Instance.new("ImageLabel")
     self.TextBoxIcon.Name = "Icon"
     self.TextBoxIcon.Size = UDim2.new(0, 18, 0, 18)
-    self.TextBoxIcon.Position = UDim2.new(0, 16, 0.5, 0)
-    self.TextBoxIcon.AnchorPoint = Vector2.new(0, 0.5)
+    self.TextBoxIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.TextBoxIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.TextBoxIcon.BackgroundTransparency = 1
     self.TextBoxIcon.Image = (success and Lucide and Lucide["type"]) or "rbxassetid://10723367606"
-    self.TextBoxIcon.ImageColor3 = Color3.fromRGB(120, 140, 160)
-    self.TextBoxIcon.Parent = self.Container
+    self.TextBoxIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.TextBoxIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
@@ -5002,9 +5161,9 @@ function TextBox:Create()
     end
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
-    self.NameLabel.TextColor3 = Color3.fromRGB(240, 245, 250)
-    self.NameLabel.TextSize = 15
-    self.NameLabel.Font = Enum.Font.GothamSemibold
+    self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.NameLabel.TextSize = 16
+    self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
@@ -5080,30 +5239,65 @@ function TextBox:Create()
     self.Container.MouseEnter:Connect(function()
         local hoverTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(38, 43, 50)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
         )
         hoverTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(70, 80, 90)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(0, 120, 215), Transparency = 0.1}
         )
         borderTween:Play()
+        
+        -- Gradient glow
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.92}
+        )
+        gradientTween:Play()
+        
+        -- Icon glow
+        local iconTween = TweenService:Create(
+            self.TextBoxIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(0, 150, 255)}
+        )
+        iconTween:Play()
     end)
+    
     self.Container.MouseLeave:Connect(function()
         local leaveTween = TweenService:Create(
             self.Container,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
         )
         leaveTween:Play()
+        
         local borderTween = TweenService:Create(
             border,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Color = Color3.fromRGB(55, 60, 67)}
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Color = Color3.fromRGB(50, 60, 70), Transparency = 0.3}
         )
         borderTween:Play()
+        
+        -- Reset gradient
+        local gradientTween = TweenService:Create(
+            self.GradientBg,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.97}
+        )
+        gradientTween:Play()
+        
+        -- Reset icon
+        local iconTween = TweenService:Create(
+            self.TextBoxIcon,
+            TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageColor3 = Color3.fromRGB(140, 160, 180)}
+        )
+        iconTween:Play()
     end)
     return self
 end
@@ -7848,24 +8042,17 @@ local ObjectTree = {
         },
         {
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
                 16,
                 2,
                 {
                     "TextBox"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             },
             {
@@ -7876,66 +8063,10 @@ local ObjectTree = {
                 }
             },
             {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
                 17,
                 2,
                 {
                     "Toggle"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
                 }
             },
             {
@@ -7953,13 +8084,6 @@ local ObjectTree = {
                 }
             },
             {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
                 13,
                 2,
                 {
@@ -7967,10 +8091,80 @@ local ObjectTree = {
                 }
             },
             {
-                19,
+                6,
                 2,
                 {
-                    "lucide"
+                    "Dropdown"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             }
         }
@@ -7981,23 +8175,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    426,
-    582,
-    1110,
-    1448,
-    2354,
-    2940,
-    2994,
-    3338,
-    3586,
-    3889,
-    3986,
-    4124,
-    4498,
-    4949,
-    5123,
-    5545,
-    7016
+    425,
+    581,
+    1109,
+    1447,
+    2353,
+    2939,
+    3033,
+    3377,
+    3625,
+    3928,
+    4025,
+    4247,
+    4621,
+    5072,
+    5317,
+    5739,
+    7210
 }
 
 -- Misc AOT variable imports
