@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- sup
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -140,21 +140,21 @@ function Button:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
     self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 7)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
 
     
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
-    self.ButtonLeftIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.ButtonLeftIcon.Size = UDim2.new(0, 16, 0, 16)
     self.ButtonLeftIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ButtonLeftIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonLeftIcon.BackgroundTransparency = 1
@@ -164,7 +164,7 @@ function Button:Create()
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
     self.ButtonText.Size = UDim2.new(1, -120, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 8 or 16)
+    self.ButtonText.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 8 or 16)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
     self.ButtonText.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -176,7 +176,7 @@ function Button:Create()
         self.ButtonDescription = Instance.new("TextLabel")
         self.ButtonDescription.Name = "Description"
         self.ButtonDescription.Size = UDim2.new(1, -150, 0, 16)
-        self.ButtonDescription.Position = UDim2.new(0, 68, 0, 32)
+        self.ButtonDescription.Position = UDim2.new(0, 60, 0, 32)
         self.ButtonDescription.BackgroundTransparency = 1
         self.ButtonDescription.Text = self.Description
         self.ButtonDescription.TextColor3 = Color3.fromRGB(190, 200, 210)
@@ -1522,14 +1522,14 @@ function Dropdown:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 11)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 15)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Header
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
     local iconBorder = Instance.new("UIStroke")
@@ -1540,7 +1540,7 @@ function Dropdown:Create()
     
     self.DropdownIcon = Instance.new("ImageLabel")
     self.DropdownIcon.Name = "Icon"
-    self.DropdownIcon.Size = UDim2.new(0, 22, 0, 22)
+    self.DropdownIcon.Size = UDim2.new(0, 16, 0, 16)
     self.DropdownIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.DropdownIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.DropdownIcon.BackgroundTransparency = 1
@@ -1550,7 +1550,7 @@ function Dropdown:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(0, 220, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 10 or 19)
+    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 19)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1562,7 +1562,7 @@ function Dropdown:Create()
         self.DescriptionLabel = Instance.new("TextLabel")
         self.DescriptionLabel.Name = "Description"
         self.DescriptionLabel.Size = UDim2.new(1, -200, 0, 18)
-        self.DescriptionLabel.Position = UDim2.new(0, 68, 0, 36)
+        self.DescriptionLabel.Position = UDim2.new(0, 60, 0, 36)
         self.DescriptionLabel.BackgroundTransparency = 1
         self.DescriptionLabel.Text = self.Description
         self.DescriptionLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -1573,18 +1573,37 @@ function Dropdown:Create()
         self.DescriptionLabel.Parent = self.Header
     end
 
+    -- Enhanced selected value container
+    self.SelectedContainer = Instance.new("Frame")
+    self.SelectedContainer.Name = "SelectedContainer"
+    self.SelectedContainer.Size = UDim2.new(0, 180, 0, 28)
+    self.SelectedContainer.Position = UDim2.new(1, -224, 0.5, 0)
+    self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
+    self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
+    self.SelectedContainer.BorderSizePixel = 0
+    self.SelectedContainer.Parent = self.Header
+    
+    local selectedCorner = Instance.new("UICorner")
+    selectedCorner.CornerRadius = UDim.new(0, 8)
+    selectedCorner.Parent = self.SelectedContainer
+    
+    local selectedBorder = Instance.new("UIStroke")
+    selectedBorder.Color = Color3.fromRGB(55, 65, 75)
+    selectedBorder.Thickness = 1
+    selectedBorder.Transparency = 0.4
+    selectedBorder.Parent = self.SelectedContainer
+    
     self.SelectedLabel = Instance.new("TextLabel")
     self.SelectedLabel.Name = "Selected"
-    self.SelectedLabel.Size = UDim2.new(1, -320, 1, 0)
-    self.SelectedLabel.Position = UDim2.new(1, -88, 0.5, 0)
-    self.SelectedLabel.AnchorPoint = Vector2.new(1, 0.5)
+    self.SelectedLabel.Size = UDim2.new(1, -16, 1, 0)
+    self.SelectedLabel.Position = UDim2.new(0, 8, 0, 0)
     self.SelectedLabel.BackgroundTransparency = 1
-    self.SelectedLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+    self.SelectedLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
     self.SelectedLabel.TextSize = 13
-    self.SelectedLabel.Font = Enum.Font.Gotham
-    self.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Right
+    self.SelectedLabel.Font = Enum.Font.GothamMedium
+    self.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Center
     self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
-    self.SelectedLabel.Parent = self.Header
+    self.SelectedLabel.Parent = self.SelectedContainer
     self:UpdateSelectedText()
     -- Enhanced arrow with container
     self.ArrowContainer = Instance.new("Frame")
@@ -2949,74 +2968,32 @@ end
 function Label:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = "Label"
-    self.Container.Size = UDim2.new(1, 0, 0, 54)
-    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+    self.Container.Size = UDim2.new(1, 0, 0, 44)
+    self.Container.BackgroundTransparency = 1
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
-    
-    -- Subtle gradient background
-    self.GradientBg = Instance.new("Frame")
-    self.GradientBg.Name = "GradientBg"
-    self.GradientBg.Size = UDim2.new(1, 0, 1, 0)
-    self.GradientBg.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.GradientBg.BackgroundTransparency = 0.97
-    self.GradientBg.BorderSizePixel = 0
-    self.GradientBg.Parent = self.Container
-    
-    local gradientCorner = Instance.new("UICorner")
-    gradientCorner.CornerRadius = UDim.new(0, 16)
-    gradientCorner.Parent = self.GradientBg
-    
-    local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(50, 60, 70)
-    border.Thickness = 1
-    border.Transparency = 0.3
-    border.Parent = self.Container
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
-    corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
     end)
-    -- Enhanced icon container
-    self.IconContainer = Instance.new("Frame")
-    self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
-    self.IconContainer.Position = UDim2.new(0, 16, 0.5, 0)
-    self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
-    self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
-    self.IconContainer.BorderSizePixel = 0
-    self.IconContainer.Parent = self.Container
-    
-    local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 10)
-    iconCorner.Parent = self.IconContainer
-    
-    local iconBorder = Instance.new("UIStroke")
-    iconBorder.Color = Color3.fromRGB(55, 60, 68)
-    iconBorder.Thickness = 1
-    iconBorder.Transparency = 0.5
-    iconBorder.Parent = self.IconContainer
-    
+    -- Simple icon without container
     self.LabelIcon = Instance.new("ImageLabel")
     self.LabelIcon.Name = "Icon"
-    self.LabelIcon.Size = UDim2.new(0, 18, 0, 18)
-    self.LabelIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-    self.LabelIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.LabelIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.LabelIcon.Position = UDim2.new(0, 16, 0.5, 0)
+    self.LabelIcon.AnchorPoint = Vector2.new(0, 0.5)
     self.LabelIcon.BackgroundTransparency = 1
-    self.LabelIcon.Image = (success and Lucide and Lucide["tag"]) or "rbxassetid://10723416057"
-    self.LabelIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
-    self.LabelIcon.Parent = self.IconContainer
+    self.LabelIcon.Image = (success and Lucide and Lucide["info"]) or "rbxassetid://10723416057"
+    self.LabelIcon.ImageColor3 = Color3.fromRGB(100, 120, 140)
+    self.LabelIcon.Parent = self.Container
     self.TextLabel = Instance.new("TextLabel")
     self.TextLabel.Name = "Text"
     self.TextLabel.Size = UDim2.new(1, -68, 1, 0)
-    self.TextLabel.Position = UDim2.new(0, 64, 0, 0)
+    self.TextLabel.Position = UDim2.new(0, 40, 0, 0)
     self.TextLabel.BackgroundTransparency = 1
     self.TextLabel.Text = self.Text
-    self.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TextLabel.TextSize = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and 16 or 15
-    self.TextLabel.Font = self.Text:find("📝") or self.Text:find("🎛️") or self.Text:find("⚙️") or self.Text:find("ℹ️") and Enum.Font.GothamBold or Enum.Font.GothamSemibold
+    self.TextLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
+    self.TextLabel.TextSize = 14
+    self.TextLabel.Font = Enum.Font.Gotham
     self.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.TextLabel.TextWrapped = true
@@ -4092,14 +4069,14 @@ function Paragraph:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
-    self.IconContainer.Position = UDim2.new(0, 32, 0, 16)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.IconContainer.Position = UDim2.new(0, 28, 0, 16)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
     local iconBorder = Instance.new("UIStroke")
@@ -4110,7 +4087,7 @@ function Paragraph:Create()
     
     self.ParagraphIcon = Instance.new("ImageLabel")
     self.ParagraphIcon.Name = "Icon"
-    self.ParagraphIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ParagraphIcon.Size = UDim2.new(0, 16, 0, 16)
     self.ParagraphIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ParagraphIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ParagraphIcon.BackgroundTransparency = 1
@@ -4120,7 +4097,7 @@ function Paragraph:Create()
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
     self.TitleLabel.Size = UDim2.new(1, -84, 0, 24)
-    self.TitleLabel.Position = UDim2.new(0, 80, 0, 16)
+    self.TitleLabel.Position = UDim2.new(0, 72, 0, 16)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Name
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -4132,7 +4109,7 @@ function Paragraph:Create()
     self.ContentLabel = Instance.new("TextLabel")
     self.ContentLabel.Name = "Content"
     self.ContentLabel.Size = UDim2.new(1, -84, 0, 0)
-    self.ContentLabel.Position = UDim2.new(0, 80, 0, 44)
+    self.ContentLabel.Position = UDim2.new(0, 72, 0, 44)
     self.ContentLabel.BackgroundTransparency = 1
     self.ContentLabel.Text = self.Subtitle
     self.ContentLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
@@ -4310,14 +4287,14 @@ function Slider:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 40, 0, 40)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 15)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 12 or 17)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 12)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
     local iconBorder = Instance.new("UIStroke")
@@ -4328,7 +4305,7 @@ function Slider:Create()
     
     self.SliderIcon = Instance.new("ImageLabel")
     self.SliderIcon.Name = "Icon"
-    self.SliderIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.SliderIcon.Size = UDim2.new(0, 16, 0, 16)
     self.SliderIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.SliderIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIcon.BackgroundTransparency = 1
@@ -4338,7 +4315,7 @@ function Slider:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -140, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 10 or 18)
+    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 18)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -4350,7 +4327,7 @@ function Slider:Create()
         self.SliderDescription = Instance.new("TextLabel")
         self.SliderDescription.Name = "Description"
         self.SliderDescription.Size = UDim2.new(1, -180, 0, 18)
-        self.SliderDescription.Position = UDim2.new(0, 68, 0, 36)
+        self.SliderDescription.Position = UDim2.new(0, 60, 0, 36)
         self.SliderDescription.BackgroundTransparency = 1
         self.SliderDescription.Text = self.Description
         self.SliderDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -4360,43 +4337,23 @@ function Slider:Create()
         self.SliderDescription.TextWrapped = true
         self.SliderDescription.Parent = self.Container
     end
-    -- Enhanced value display
-    self.ValueContainer = Instance.new("Frame")
-    self.ValueContainer.Name = "ValueContainer"
-    self.ValueContainer.Size = UDim2.new(0, 60, 0, 32)
-    self.ValueContainer.Position = UDim2.new(1, -76, 0, self.Description ~= "" and 14 or 19)
-    self.ValueContainer.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.ValueContainer.BorderSizePixel = 0
-    self.ValueContainer.Parent = self.Container
-    
-    local valueCorner = Instance.new("UICorner")
-    valueCorner.CornerRadius = UDim.new(0, 8)
-    valueCorner.Parent = self.ValueContainer
-    
-    -- Value gradient
-    local valueGradient = Instance.new("UIGradient")
-    valueGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 200))
-    })
-    valueGradient.Rotation = 45
-    valueGradient.Parent = self.ValueContainer
-    
+    -- Simple value display
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
-    self.ValueLabel.Size = UDim2.new(1, 0, 1, 0)
+    self.ValueLabel.Size = UDim2.new(0, 50, 0, 20)
+    self.ValueLabel.Position = UDim2.new(1, -66, 0, self.Description ~= "" and 18 or 23)
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
-    self.ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.ValueLabel.TextSize = 14
-    self.ValueLabel.Font = Enum.Font.GothamBold
-    self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Center
-    self.ValueLabel.Parent = self.ValueContainer
+    self.ValueLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
+    self.ValueLabel.TextSize = 13
+    self.ValueLabel.Font = Enum.Font.GothamMedium
+    self.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    self.ValueLabel.Parent = self.Container
     -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -100, 0, 8)
-    self.SliderTrack.Position = UDim2.new(0, 68, 0, self.Description ~= "" and 60 or 50)
+    self.SliderTrack.Size = UDim2.new(1, -130, 0, 8)
+    self.SliderTrack.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 60 or 50)
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.SliderTrack.BorderSizePixel = 0
@@ -5123,7 +5080,7 @@ function TextBox:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
     self.IconContainer.Position = UDim2.new(0, 16, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
@@ -5131,7 +5088,7 @@ function TextBox:Create()
     self.IconContainer.Parent = self.Container
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
     local iconBorder = Instance.new("UIStroke")
@@ -5142,7 +5099,7 @@ function TextBox:Create()
     
     self.TextBoxIcon = Instance.new("ImageLabel")
     self.TextBoxIcon.Name = "Icon"
-    self.TextBoxIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.TextBoxIcon.Size = UDim2.new(0, 16, 0, 16)
     self.TextBoxIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.TextBoxIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.TextBoxIcon.BackgroundTransparency = 1
@@ -5157,7 +5114,7 @@ function TextBox:Create()
         self.NameLabel.Position = UDim2.new(0, 44, 0, 8)
     else
         self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
-        self.NameLabel.Position = UDim2.new(0, 44, 0, 15)
+        self.NameLabel.Position = UDim2.new(0, 60, 0, 15)
     end
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -5380,14 +5337,14 @@ function Toggle:Create()
     -- Enhanced icon with background
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, 36, 0, 36)
-    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 8 or 9)
+    self.IconContainer.Size = UDim2.new(0, 32, 0, 32)
+    self.IconContainer.Position = UDim2.new(0, 16, 0, self.Description ~= "" and 10 or 11)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
     self.IconContainer.Parent = self.Container
     
     local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 10)
+    iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = self.IconContainer
     
     local iconBorder = Instance.new("UIStroke")
@@ -5398,7 +5355,7 @@ function Toggle:Create()
     
     self.ToggleIcon = Instance.new("ImageLabel")
     self.ToggleIcon.Name = "Icon"
-    self.ToggleIcon.Size = UDim2.new(0, 20, 0, 20)
+    self.ToggleIcon.Size = UDim2.new(0, 16, 0, 16)
     self.ToggleIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ToggleIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ToggleIcon.BackgroundTransparency = 1
@@ -5408,7 +5365,7 @@ function Toggle:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -150, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, 64, 0, self.Description ~= "" and 8 or 16)
+    self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 8 or 16)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5420,7 +5377,7 @@ function Toggle:Create()
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
         self.ToggleDescription.Size = UDim2.new(1, -200, 0, 16)
-        self.ToggleDescription.Position = UDim2.new(0, 64, 0, 32)
+        self.ToggleDescription.Position = UDim2.new(0, 60, 0, 32)
         self.ToggleDescription.BackgroundTransparency = 1
         self.ToggleDescription.Text = self.Description
         self.ToggleDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -5781,6 +5738,7 @@ function Window:CreateGui()
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.DisplayOrder = 2147483647 -- Maximum possible DisplayOrder
+    self.ScreenGui.IgnoreGuiInset = true -- Ignore topbar and other UI elements
     self.ScreenGui.Parent = playerGui
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
@@ -6447,6 +6405,7 @@ function Window:CreateMobileIcon()
     self.MobileIcon.ResetOnSpawn = false
     self.MobileIcon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileIcon.DisplayOrder = 2147483646 -- Maximum z-index, just below main UI
+        self.MobileIcon.IgnoreGuiInset = true
     self.MobileIcon.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.MobileContainer = Instance.new("Frame")
     self.MobileContainer.Name = "MobileContainer"
@@ -6787,6 +6746,7 @@ function Window:CreateMobileToggleButton()
     self.MobileToggleGui.ResetOnSpawn = false
     self.MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.MobileToggleGui.DisplayOrder = 2147483645 -- Maximum z-index, below main UI and mobile icon
+        self.MobileToggleGui.IgnoreGuiInset = true
     self.MobileToggleGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     self.ToggleContainer = Instance.new("Frame")
     self.ToggleContainer.Name = "ToggleContainer"
@@ -8042,10 +8002,10 @@ local ObjectTree = {
         },
         {
             {
-                16,
+                3,
                 2,
                 {
-                    "TextBox"
+                    "Config"
                 }
             },
             {
@@ -8056,45 +8016,10 @@ local ObjectTree = {
                 }
             },
             {
-                5,
+                11,
                 2,
                 {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
+                    "Notifications"
                 }
             },
             {
@@ -8105,10 +8030,10 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                13,
                 2,
                 {
-                    "Loading"
+                    "Paragraph"
                 }
             },
             {
@@ -8119,10 +8044,24 @@ local ObjectTree = {
                 }
             },
             {
-                4,
+                17,
                 2,
                 {
-                    "Credits"
+                    "Toggle"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
                 }
             },
             {
@@ -8133,10 +8072,31 @@ local ObjectTree = {
                 }
             },
             {
-                14,
+                5,
                 2,
                 {
-                    "Slider"
+                    "DraggableKeybind"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
                 }
             },
             {
@@ -8147,24 +8107,24 @@ local ObjectTree = {
                 }
             },
             {
-                3,
+                14,
                 2,
                 {
-                    "Config"
+                    "Slider"
                 }
             },
             {
-                11,
+                9,
                 2,
                 {
-                    "Notifications"
+                    "Loading"
                 }
             },
             {
-                7,
+                2,
                 2,
                 {
-                    "FloatingControls"
+                    "Button"
                 }
             }
         }
@@ -8179,19 +8139,19 @@ local LineOffsets = {
     581,
     1109,
     1447,
-    2353,
-    2939,
-    3033,
-    3377,
-    3625,
-    3928,
-    4025,
-    4247,
-    4621,
-    5072,
-    5317,
-    5739,
-    7210
+    2372,
+    2958,
+    3010,
+    3354,
+    3602,
+    3905,
+    4002,
+    4224,
+    4578,
+    5029,
+    5274,
+    5696,
+    7170
 }
 
 -- Misc AOT variable imports
