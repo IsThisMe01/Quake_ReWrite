@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- sup
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -160,6 +160,7 @@ function Button:Create()
     self.ButtonLeftIcon.BackgroundTransparency = 1
     self.ButtonLeftIcon.Image = (success and Lucide and Lucide["mouse-pointer-click"]) or "rbxassetid://10723434711"
     self.ButtonLeftIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.ButtonLeftIcon.ScaleType = Enum.ScaleType.Fit
     self.ButtonLeftIcon.Parent = self.IconContainer
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
@@ -1546,10 +1547,11 @@ function Dropdown:Create()
     self.DropdownIcon.BackgroundTransparency = 1
     self.DropdownIcon.Image = (success and Lucide and Lucide["list"]) or "rbxassetid://10723433811"
     self.DropdownIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.DropdownIcon.ScaleType = Enum.ScaleType.Fit
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(0, 220, 0, 24)
+    self.NameLabel.Size = UDim2.new(1, -420, 0, 24)
     self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 19)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -1557,6 +1559,7 @@ function Dropdown:Create()
     self.NameLabel.TextSize = 16
     self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.NameLabel.Parent = self.Header
     if self.Description ~= "" then
         self.DescriptionLabel = Instance.new("TextLabel")
@@ -1576,8 +1579,8 @@ function Dropdown:Create()
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
-    self.SelectedContainer.Size = UDim2.new(0, 180, 0, 28)
-    self.SelectedContainer.Position = UDim2.new(1, -224, 0.5, 0)
+    self.SelectedContainer.Size = UDim2.new(0, 160, 0, 28)
+    self.SelectedContainer.Position = UDim2.new(1, -204, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1609,7 +1612,7 @@ function Dropdown:Create()
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
     self.ArrowContainer.Size = UDim2.new(0, 32, 0, 32)
-    self.ArrowContainer.Position = UDim2.new(1, -44, 0.5, 0)
+    self.ArrowContainer.Position = UDim2.new(1, -36, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -1627,12 +1630,13 @@ function Dropdown:Create()
     
     self.ArrowIcon = Instance.new("ImageLabel")
     self.ArrowIcon.Name = "Arrow"
-    self.ArrowIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.ArrowIcon.Size = UDim2.new(0, 16, 0, 16)
     self.ArrowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ArrowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ArrowIcon.BackgroundTransparency = 1
     self.ArrowIcon.Image = (success and Lucide and Lucide["chevron-down"]) or "rbxassetid://10709790948"
     self.ArrowIcon.ImageColor3 = Color3.fromRGB(180, 190, 200)
+    self.ArrowIcon.ScaleType = Enum.ScaleType.Fit
     self.ArrowIcon.Parent = self.ArrowContainer
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
@@ -2984,6 +2988,7 @@ function Label:Create()
     self.LabelIcon.BackgroundTransparency = 1
     self.LabelIcon.Image = (success and Lucide and Lucide["info"]) or "rbxassetid://10723416057"
     self.LabelIcon.ImageColor3 = Color3.fromRGB(100, 120, 140)
+    self.LabelIcon.ScaleType = Enum.ScaleType.Fit
     self.LabelIcon.Parent = self.Container
     self.TextLabel = Instance.new("TextLabel")
     self.TextLabel.Name = "Text"
@@ -4093,6 +4098,7 @@ function Paragraph:Create()
     self.ParagraphIcon.BackgroundTransparency = 1
     self.ParagraphIcon.Image = (success and Lucide and Lucide["file-text"]) or "rbxassetid://10723416057"
     self.ParagraphIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.ParagraphIcon.ScaleType = Enum.ScaleType.Fit
     self.ParagraphIcon.Parent = self.IconContainer
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
@@ -4311,6 +4317,7 @@ function Slider:Create()
     self.SliderIcon.BackgroundTransparency = 1
     self.SliderIcon.Image = (success and Lucide and Lucide["sliders"]) or "rbxassetid://10734942565"
     self.SliderIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.SliderIcon.ScaleType = Enum.ScaleType.Fit
     self.SliderIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
@@ -5105,6 +5112,7 @@ function TextBox:Create()
     self.TextBoxIcon.BackgroundTransparency = 1
     self.TextBoxIcon.Image = (success and Lucide and Lucide["type"]) or "rbxassetid://10723367606"
     self.TextBoxIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.TextBoxIcon.ScaleType = Enum.ScaleType.Fit
     self.TextBoxIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
@@ -5361,6 +5369,7 @@ function Toggle:Create()
     self.ToggleIcon.BackgroundTransparency = 1
     self.ToggleIcon.Image = (success and Lucide and Lucide["power"]) or "rbxassetid://10734930466"
     self.ToggleIcon.ImageColor3 = Color3.fromRGB(140, 160, 180)
+    self.ToggleIcon.ScaleType = Enum.ScaleType.Fit
     self.ToggleIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
@@ -8002,24 +8011,17 @@ local ObjectTree = {
         },
         {
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
                 11,
                 2,
                 {
                     "Notifications"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
                 }
             },
             {
@@ -8030,10 +8032,52 @@ local ObjectTree = {
                 }
             },
             {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
                 13,
                 2,
                 {
                     "Paragraph"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
                 }
             },
             {
@@ -8051,31 +8095,10 @@ local ObjectTree = {
                 }
             },
             {
-                16,
+                4,
                 2,
                 {
-                    "TextBox"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
+                    "Credits"
                 }
             },
             {
@@ -8086,45 +8109,31 @@ local ObjectTree = {
                 }
             },
             {
-                4,
+                16,
                 2,
                 {
-                    "Credits"
+                    "TextBox"
                 }
             },
             {
-                18,
+                19,
                 2,
                 {
-                    "Window"
+                    "lucide"
                 }
             },
             {
-                8,
+                5,
                 2,
                 {
-                    "Label"
+                    "DraggableKeybind"
                 }
             },
             {
-                14,
+                10,
                 2,
                 {
-                    "Slider"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
+                    "MobileFloatingIcon"
                 }
             }
         }
@@ -8135,23 +8144,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    425,
-    581,
-    1109,
-    1447,
-    2372,
-    2958,
-    3010,
-    3354,
-    3602,
-    3905,
-    4002,
-    4224,
-    4578,
-    5029,
-    5274,
-    5696,
-    7170
+    426,
+    582,
+    1110,
+    1448,
+    2376,
+    2962,
+    3015,
+    3359,
+    3607,
+    3910,
+    4007,
+    4230,
+    4585,
+    5036,
+    5282,
+    5705,
+    7179
 }
 
 -- Misc AOT variable imports
