@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- hello again
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -1551,7 +1551,7 @@ function Dropdown:Create()
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -420, 0, 24)
+    self.NameLabel.Size = UDim2.new(1, -250, 0, 24)
     self.NameLabel.Position = UDim2.new(0, 60, 0, self.Description ~= "" and 10 or 19)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -1559,7 +1559,6 @@ function Dropdown:Create()
     self.NameLabel.TextSize = 16
     self.NameLabel.Font = Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    self.NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.NameLabel.Parent = self.Header
     if self.Description ~= "" then
         self.DescriptionLabel = Instance.new("TextLabel")
@@ -5787,24 +5786,8 @@ function Window:CreateGui()
     self.TitleBar.ZIndex = 10
     self.TitleBar.Parent = self.MainFrame
     
-    -- Add drag handle for pulling UI down
-    self.DragHandle = Instance.new("Frame")
-    self.DragHandle.Name = "DragHandle"
-    self.DragHandle.Size = UDim2.new(0, 60, 0, 8)
-    self.DragHandle.Position = UDim2.new(0.5, 0, 0, -4)
-    self.DragHandle.AnchorPoint = Vector2.new(0.5, 0)
-    self.DragHandle.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    self.DragHandle.BackgroundTransparency = 0.3
-    self.DragHandle.BorderSizePixel = 0
-    self.DragHandle.ZIndex = 15
-    self.DragHandle.Parent = self.MainFrame
-    
-    local handleCorner = Instance.new("UICorner")
-    handleCorner.CornerRadius = UDim.new(0, 4)
-    handleCorner.Parent = self.DragHandle
-    
-    -- Make drag handle draggable
-    self:MakeDragHandleDraggable()
+    -- Make entire window draggable from anywhere
+    self:MakeWindowDraggable()
     local titleCorner = Instance.new("UICorner")
     titleCorner.CornerRadius = UDim.new(0, 15) 
     titleCorner.Parent = self.TitleBar
@@ -6287,47 +6270,33 @@ function Window:MakeDraggable()
     end)
 end
 
-function Window:MakeDragHandleDraggable()
+function Window:MakeWindowDraggable()
     local dragging = false
     local dragInput
     local dragStart
     local startPos
+    
     local function updateInput(input)
         local delta = input.Position - dragStart
         self.MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
     
-    -- Make drag handle respond to input
-    self.DragHandle.InputBegan:Connect(function(input)
+    -- Make entire main frame draggable
+    self.MainFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = self.MainFrame.Position
             
-            -- Visual feedback
-            local feedbackTween = TweenService:Create(
-                self.DragHandle,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundTransparency = 0.1, Size = UDim2.new(0, 80, 0, 10)}
-            )
-            feedbackTween:Play()
-            
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-                    -- Reset visual feedback
-                    local resetTween = TweenService:Create(
-                        self.DragHandle,
-                        TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                        {BackgroundTransparency = 0.3, Size = UDim2.new(0, 60, 0, 8)}
-                    )
-                    resetTween:Play()
                 end
             end)
         end
     end)
     
-    self.DragHandle.InputChanged:Connect(function(input)
+    self.MainFrame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
@@ -6336,27 +6305,6 @@ function Window:MakeDragHandleDraggable()
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             updateInput(input)
-        end
-    end)
-    
-    -- Add hover effects for drag handle
-    self.DragHandle.MouseEnter:Connect(function()
-        local hoverTween = TweenService:Create(
-            self.DragHandle,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundTransparency = 0.1}
-        )
-        hoverTween:Play()
-    end)
-    
-    self.DragHandle.MouseLeave:Connect(function()
-        if not dragging then
-            local leaveTween = TweenService:Create(
-                self.DragHandle,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundTransparency = 0.3}
-            )
-            leaveTween:Play()
         end
     end)
 end
@@ -8011,24 +7959,17 @@ local ObjectTree = {
         },
         {
             {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
                 11,
                 2,
                 {
                     "Notifications"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
                 }
             },
             {
@@ -8039,73 +7980,10 @@ local ObjectTree = {
                 }
             },
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "Credits"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
                 }
             },
             {
@@ -8116,10 +7994,38 @@ local ObjectTree = {
                 }
             },
             {
-                19,
+                6,
                 2,
                 {
-                    "lucide"
+                    "Dropdown"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             },
             {
@@ -8130,10 +8036,52 @@ local ObjectTree = {
                 }
             },
             {
-                10,
+                19,
                 2,
                 {
-                    "MobileFloatingIcon"
+                    "lucide"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
                 }
             }
         }
@@ -8148,19 +8096,19 @@ local LineOffsets = {
     582,
     1110,
     1448,
-    2376,
-    2962,
-    3015,
-    3359,
-    3607,
-    3910,
-    4007,
-    4230,
-    4585,
-    5036,
-    5282,
-    5705,
-    7179
+    2375,
+    2961,
+    3014,
+    3358,
+    3606,
+    3909,
+    4006,
+    4229,
+    4584,
+    5035,
+    5281,
+    5704,
+    7127
 }
 
 -- Misc AOT variable imports
