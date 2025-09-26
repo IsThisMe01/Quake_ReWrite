@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- uhhh
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -142,7 +142,7 @@ function Button:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
     self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
@@ -157,7 +157,7 @@ function Button:Create()
     
     self.ButtonLeftIcon = Instance.new("ImageLabel")
     self.ButtonLeftIcon.Name = "LeftIcon"
-    self.ButtonLeftIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.ButtonLeftIcon.Size = UDim2.new(0, 14, 0, 14)
     self.ButtonLeftIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ButtonLeftIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonLeftIcon.BackgroundTransparency = 1
@@ -243,7 +243,7 @@ function Button:Create()
     
     self.ButtonIcon = Instance.new("ImageLabel")
     self.ButtonIcon.Name = "Icon"
-    self.ButtonIcon.Size = UDim2.new(0, 18, 0, 18)
+    self.ButtonIcon.Size = UDim2.new(0, 16, 0, 16)
     self.ButtonIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ButtonIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ButtonIcon.BackgroundTransparency = 1
@@ -1528,7 +1528,7 @@ function Dropdown:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
     self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
@@ -1547,7 +1547,7 @@ function Dropdown:Create()
     
     self.DropdownIcon = Instance.new("ImageLabel")
     self.DropdownIcon.Name = "Icon"
-    self.DropdownIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.DropdownIcon.Size = UDim2.new(0, 14, 0, 14)
     self.DropdownIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.DropdownIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.DropdownIcon.BackgroundTransparency = 1
@@ -1636,7 +1636,7 @@ function Dropdown:Create()
     
     self.ArrowIcon = Instance.new("ImageLabel")
     self.ArrowIcon.Name = "Arrow"
-    self.ArrowIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.ArrowIcon.Size = UDim2.new(0, 14, 0, 14)
     self.ArrowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ArrowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ArrowIcon.BackgroundTransparency = 1
@@ -4272,7 +4272,7 @@ function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and (isMobile and 80 or 90) or (isMobile and 60 or 70))
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and (isMobile and 70 or 76) or (isMobile and 52 or 58))
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4305,7 +4305,7 @@ function Slider:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
     self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0, self.Description ~= "" and (isMobile and 10 or 12) or (isMobile and 15 or 17))
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
@@ -4323,7 +4323,7 @@ function Slider:Create()
     
     self.SliderIcon = Instance.new("ImageLabel")
     self.SliderIcon.Name = "Icon"
-    self.SliderIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.SliderIcon.Size = UDim2.new(0, 14, 0, 14)
     self.SliderIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.SliderIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderIcon.BackgroundTransparency = 1
@@ -5126,7 +5126,7 @@ function TextBox:Create()
     self.Container.Name = self.Name .. "TextBox"
     -- Taller on mobile to accommodate stacked layout
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 54)
+    self.Container.Size = UDim2.new(1, 0, 0, 44)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5159,7 +5159,7 @@ function TextBox:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
     self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
@@ -5178,7 +5178,7 @@ function TextBox:Create()
     
     self.TextBoxIcon = Instance.new("ImageLabel")
     self.TextBoxIcon.Name = "Icon"
-    self.TextBoxIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.TextBoxIcon.Size = UDim2.new(0, 14, 0, 14)
     self.TextBoxIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.TextBoxIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.TextBoxIcon.BackgroundTransparency = 1
@@ -5190,11 +5190,11 @@ function TextBox:Create()
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
     if isMobile then
-        self.NameLabel.Size = UDim2.new(0, 80, 0, 20)
-        self.NameLabel.Position = UDim2.new(0, 44, 0, 16)
+        self.NameLabel.Size = UDim2.new(0, 80, 0, 18)
+        self.NameLabel.Position = UDim2.new(0, 36, 0, 13)
     else
-        self.NameLabel.Size = UDim2.new(0, 150, 0, 22)
-        self.NameLabel.Position = UDim2.new(0, 60, 0, 15)
+        self.NameLabel.Size = UDim2.new(0, 150, 0, 20)
+        self.NameLabel.Position = UDim2.new(0, 44, 0, 12)
     end
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -5206,13 +5206,12 @@ function TextBox:Create()
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
     if isMobile then
-        -- Input next to label on same line
-        self.InputBackground.Size = UDim2.new(1, -140, 0, 30)
-        self.InputBackground.Position = UDim2.new(0, 130, 0, 15)
+        self.InputBackground.Size = UDim2.new(1, -130, 0, 26)
+        self.InputBackground.Position = UDim2.new(0, 120, 0.5, 0)
         self.InputBackground.AnchorPoint = Vector2.new(0, 0.5)
     else
-        self.InputBackground.Size = UDim2.new(0, 220, 0, 32)
-        self.InputBackground.Position = UDim2.new(1, -16, 0.5, 0)
+        self.InputBackground.Size = UDim2.new(0, 180, 0, 28)
+        self.InputBackground.Position = UDim2.new(1, -12, 0.5, 0)
         self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
     end
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
@@ -5419,7 +5418,7 @@ function Toggle:Create()
     -- Enhanced icon with background
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
     self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
@@ -5438,7 +5437,7 @@ function Toggle:Create()
     
     self.ToggleIcon = Instance.new("ImageLabel")
     self.ToggleIcon.Name = "Icon"
-    self.ToggleIcon.Size = UDim2.new(0, 16, 0, 16)
+    self.ToggleIcon.Size = UDim2.new(0, 14, 0, 14)
     self.ToggleIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     self.ToggleIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ToggleIcon.BackgroundTransparency = 1
@@ -8053,38 +8052,31 @@ local ObjectTree = {
         },
         {
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
                 13,
                 2,
                 {
                     "Paragraph"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
                 }
             },
             {
@@ -8095,17 +8087,24 @@ local ObjectTree = {
                 }
             },
             {
-                18,
+                6,
                 2,
                 {
-                    "Window"
+                    "Dropdown"
                 }
             },
             {
-                15,
+                4,
                 2,
                 {
-                    "Tab"
+                    "Credits"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
                 }
             },
             {
@@ -8113,27 +8112,6 @@ local ObjectTree = {
                 2,
                 {
                     "DraggableKeybind"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
                 }
             },
             {
@@ -8151,6 +8129,20 @@ local ObjectTree = {
                 }
             },
             {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
                 9,
                 2,
                 {
@@ -8158,10 +8150,17 @@ local ObjectTree = {
                 }
             },
             {
-                16,
+                15,
                 2,
                 {
-                    "TextBox"
+                    "Tab"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
                 }
             },
             {
@@ -8172,10 +8171,10 @@ local ObjectTree = {
                 }
             },
             {
-                19,
+                8,
                 2,
                 {
-                    "lucide"
+                    "Label"
                 }
             }
         }
@@ -8200,9 +8199,9 @@ local LineOffsets = {
     4241,
     4597,
     5108,
-    5354,
-    5780,
-    7221
+    5353,
+    5779,
+    7220
 }
 
 -- Misc AOT variable imports
