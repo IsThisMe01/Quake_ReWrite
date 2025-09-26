@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- hELLO
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -109,8 +109,8 @@ function Button:Create()
     self.Container.Name = self.Name .. "Button"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 68 or 54)
-    self.Container.BackgroundColor3 = Color3.fromRGB(25, 30, 38)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 72 or 58)
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
     
@@ -134,7 +134,7 @@ function Button:Create()
     border.Parent = self.Container
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
+    corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = self.Container
     local success, Lucide = pcall(function()
         return require(script.Parent.lucide)
@@ -142,8 +142,8 @@ function Button:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
-    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
@@ -167,8 +167,8 @@ function Button:Create()
     self.ButtonLeftIcon.Parent = self.IconContainer
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
-    self.ButtonText.Size = UDim2.new(1, -120, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, isMobile and 44 or 60, 0, self.Description ~= "" and 8 or 16)
+    self.ButtonText.Size = UDim2.new(1, -150, 0, 22)
+    self.ButtonText.Position = UDim2.new(0, isMobile and 52 or 68, 0, self.Description ~= "" and 12 or 18)
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
     self.ButtonText.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -179,8 +179,8 @@ function Button:Create()
     if self.Description ~= "" then
         self.ButtonDescription = Instance.new("TextLabel")
         self.ButtonDescription.Name = "Description"
-        self.ButtonDescription.Size = UDim2.new(1, -150, 0, 16)
-        self.ButtonDescription.Position = UDim2.new(0, 60, 0, 32)
+        self.ButtonDescription.Size = UDim2.new(1, -180, 0, 18)
+        self.ButtonDescription.Position = UDim2.new(0, 68, 0, 36)
         self.ButtonDescription.BackgroundTransparency = 1
         self.ButtonDescription.Text = self.Description
         self.ButtonDescription.TextColor3 = Color3.fromRGB(190, 200, 210)
@@ -193,8 +193,8 @@ function Button:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, isMobile and 36 or 32, 0, isMobile and 28 or 24)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -44 or -42, 0.5, 0)
+        self.KeybindButton.Size = UDim2.new(0, isMobile and 32 or 28, 0, isMobile and 24 or 22)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -40 or -36, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
@@ -225,7 +225,7 @@ function Button:Create()
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
     self.ActionIndicator.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -76) or (isMobile and -48 or -44), 0.5, 0)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -80 or -72) or (isMobile and -36 or -40), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -288,7 +288,7 @@ function Button:Create()
         local hoverTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(30, 36, 45)}
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         hoverTween:Play()
         
@@ -342,7 +342,7 @@ function Button:Create()
         local leaveTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(25, 30, 38)}
+            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
         )
         leaveTween:Play()
         
@@ -1489,8 +1489,8 @@ function Dropdown:Create()
     self.Container.Name = self.Name .. "Dropdown"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 78 or 62)
-    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 82 or 66)
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
     self.Container.Parent = self.Tab.Container
@@ -1515,11 +1515,11 @@ function Dropdown:Create()
     border.Parent = self.Container
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
+    corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
-    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 68 or 52)
+    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 72 or 56)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
     local success, Lucide = pcall(function()
@@ -1528,8 +1528,8 @@ function Dropdown:Create()
     -- Enhanced icon container
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
-    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
@@ -1557,8 +1557,8 @@ function Dropdown:Create()
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, isMobile and -150 or -250, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 60, 0, 19)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 0, 24)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 68, 0, isMobile and 16 or 20)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1569,8 +1569,8 @@ function Dropdown:Create()
     if self.Description ~= "" and not isMobile then
         self.DescriptionLabel = Instance.new("TextLabel")
         self.DescriptionLabel.Name = "Description"
-        self.DescriptionLabel.Size = UDim2.new(1, -200, 0, 18)
-        self.DescriptionLabel.Position = UDim2.new(0, 60, 0, 36)
+        self.DescriptionLabel.Size = UDim2.new(1, -220, 0, 20)
+        self.DescriptionLabel.Position = UDim2.new(0, 68, 0, 40)
         self.DescriptionLabel.BackgroundTransparency = 1
         self.DescriptionLabel.Text = self.Description
         self.DescriptionLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -1584,8 +1584,8 @@ function Dropdown:Create()
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
-    self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 160, 0, 28)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -136 or -204, 0.5, 0)
+    self.SelectedContainer.Size = UDim2.new(0, isMobile and 120 or 180, 0, 32)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -156 or -224, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1616,8 +1616,8 @@ function Dropdown:Create()
     -- Enhanced arrow with container
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
-    self.ArrowContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
-    self.ArrowContainer.Position = UDim2.new(1, -36, 0.5, 0)
+    self.ArrowContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
+    self.ArrowContainer.Position = UDim2.new(1, isMobile and -32 or -36, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -1798,7 +1798,7 @@ function Dropdown:Create()
             local leaveTween = TweenService:Create(
                 self.Container,
                 TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-                {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
+                {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
             )
             leaveTween:Play()
             
@@ -1859,7 +1859,7 @@ function Dropdown:CreateItems()
         local itemContainer = Instance.new("Frame")
         itemContainer.Name = "Item_" .. i
         local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        itemContainer.Size = UDim2.new(1, 0, 0, isMobile and 48 or 40) 
+        itemContainer.Size = UDim2.new(1, 0, 0, isMobile and 44 or 42) 
         itemContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
         itemContainer.BorderSizePixel = 0
         itemContainer.LayoutOrder = i
@@ -2138,7 +2138,7 @@ function Dropdown:Toggle(state)
         local bgTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
+            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
         )
         bgTween:Play()
         wait(0.25)
@@ -4713,7 +4713,7 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 10) 
+    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 12 or 16) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
     if self.Window.IsMobile then
@@ -4906,38 +4906,89 @@ end
 function Tab:Section(name)
     local section = Instance.new("Frame")
     section.Name = name .. "Section"
-    section.Size = UDim2.new(1, 0, 0, 0) 
-    section.BackgroundTransparency = 1
+    section.Size = UDim2.new(1, 0, 0, 0)
+    section.BackgroundColor3 = Color3.fromRGB(20, 24, 30)
     section.BorderSizePixel = 0
     section.AutomaticSize = Enum.AutomaticSize.Y
     section.Parent = self.Container
+    
+    local sectionCorner = Instance.new("UICorner")
+    sectionCorner.CornerRadius = UDim.new(0, 12)
+    sectionCorner.Parent = section
+    
+    local sectionBorder = Instance.new("UIStroke")
+    sectionBorder.Color = Color3.fromRGB(40, 45, 52)
+    sectionBorder.Thickness = 1
+    sectionBorder.Transparency = 0.5
+    sectionBorder.Parent = section
+    
+    local headerBar = Instance.new("Frame")
+    headerBar.Name = "HeaderBar"
+    headerBar.Size = UDim2.new(1, 0, 0, self.Window.IsMobile and 36 or 40)
+    headerBar.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+    headerBar.BorderSizePixel = 0
+    headerBar.Parent = section
+    
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 12)
+    headerCorner.Parent = headerBar
+    
+    local headerMask = Instance.new("Frame")
+    headerMask.Size = UDim2.new(1, 0, 0, 12)
+    headerMask.Position = UDim2.new(0, 0, 1, -12)
+    headerMask.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+    headerMask.BorderSizePixel = 0
+    headerMask.Parent = headerBar
+    
+    local icon = Instance.new("Frame")
+    icon.Size = UDim2.new(0, 6, 0, 6)
+    icon.Position = UDim2.new(0, 16, 0.5, 0)
+    icon.AnchorPoint = Vector2.new(0, 0.5)
+    icon.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    icon.BorderSizePixel = 0
+    icon.Parent = headerBar
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(1, 0)
+    iconCorner.Parent = icon
+    
     local title = Instance.new("TextLabel")
     title.Name = "Title"
-    title.Size = UDim2.new(1, 0, 0, self.Window.IsMobile and 16 or 18)
+    title.Size = UDim2.new(1, -40, 1, 0)
+    title.Position = UDim2.new(0, 30, 0, 0)
     title.BackgroundTransparency = 1
     title.Text = name
-    title.TextColor3 = self.Library.Colors.LightText
-    title.TextSize = self.Window.IsMobile and 12 or 14 
+    title.TextColor3 = Color3.fromRGB(240, 245, 250)
+    title.TextSize = self.Window.IsMobile and 13 or 15
     title.Font = Enum.Font.GothamBold
     title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = section
+    title.TextYAlignment = Enum.TextYAlignment.Center
+    title.Parent = headerBar
+    
     local content = Instance.new("Frame")
     content.Name = "Content"
-    content.Size = UDim2.new(1, 0, 0, 0) 
-    content.Position = UDim2.new(0, 0, 0, self.Window.IsMobile and 20 or 22) 
+    content.Size = UDim2.new(1, 0, 0, 0)
+    content.Position = UDim2.new(0, 0, 0, self.Window.IsMobile and 36 or 40)
     content.BackgroundTransparency = 1
     content.BorderSizePixel = 0
     content.AutomaticSize = Enum.AutomaticSize.Y
     content.Parent = section
+    
+    local contentPadding = Instance.new("UIPadding")
+    contentPadding.PaddingAll = UDim.new(0, self.Window.IsMobile and 12 or 16)
+    contentPadding.Parent = content
+    
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Vertical
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, self.Window.IsMobile and 3 or 4) 
+    layout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 10)
     layout.Parent = content
+    
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         content.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
-        section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + (self.Window.IsMobile and 26 or 30))
+        section.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + (self.Window.IsMobile and 36 or 40) + (self.Window.IsMobile and 24 or 32))
     end)
+    
     return content
 end
 function Tab:Toggle(options)
@@ -5325,20 +5376,20 @@ function Toggle:Create()
     self.Container.Name = self.Name .. "Toggle"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 68 or 54)
-    self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 72 or 58)
+    self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
     
     -- Enhanced border with gradient effect
     local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(45, 50, 58)
+    border.Color = Color3.fromRGB(50, 55, 63)
     border.Thickness = 1
-    border.Transparency = 0.3
+    border.Transparency = 0.2
     border.Parent = self.Container
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
+    corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = self.Container
     
     -- Add subtle inner glow
@@ -5361,8 +5412,8 @@ function Toggle:Create()
     -- Enhanced icon with background
     self.IconContainer = Instance.new("Frame")
     self.IconContainer.Name = "IconContainer"
-    self.IconContainer.Size = UDim2.new(0, isMobile and 24 or 32, 0, isMobile and 24 or 32)
-    self.IconContainer.Position = UDim2.new(0, isMobile and 12 or 16, 0.5, 0)
+    self.IconContainer.Size = UDim2.new(0, isMobile and 28 or 36, 0, isMobile and 28 or 36)
+    self.IconContainer.Position = UDim2.new(0, isMobile and 16 or 20, 0.5, 0)
     self.IconContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.IconContainer.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
     self.IconContainer.BorderSizePixel = 0
@@ -5390,8 +5441,8 @@ function Toggle:Create()
     self.ToggleIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -150, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 60, 0, 16)
+    self.NameLabel.Size = UDim2.new(1, -180, 0, 22)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 68, 0, isMobile and 12 or 16)
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5402,8 +5453,8 @@ function Toggle:Create()
     if self.Description ~= "" and not isMobile then
         self.ToggleDescription = Instance.new("TextLabel")
         self.ToggleDescription.Name = "Description"
-        self.ToggleDescription.Size = UDim2.new(1, -200, 0, 16)
-        self.ToggleDescription.Position = UDim2.new(0, 60, 0, 32)
+        self.ToggleDescription.Size = UDim2.new(1, -220, 0, 18)
+        self.ToggleDescription.Position = UDim2.new(0, 68, 0, 36)
         self.ToggleDescription.BackgroundTransparency = 1
         self.ToggleDescription.Text = self.Description
         self.ToggleDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -5416,8 +5467,8 @@ function Toggle:Create()
     -- Modern iOS-style toggle
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, isMobile and 48 or 52, 0, isMobile and 26 or 28)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -108 or -96) or (isMobile and -72 or -68), 0.5, 0)
+    self.ToggleBackground.Size = UDim2.new(0, isMobile and 44 or 48, 0, isMobile and 24 or 26)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -100 or -88) or (isMobile and -60 or -56), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -5443,7 +5494,7 @@ function Toggle:Create()
     
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, isMobile and 22 or 24, 0, isMobile and 22 or 24)
+    self.ToggleIndicator.Size = UDim2.new(0, isMobile and 20 or 22, 0, isMobile and 20 or 22)
     self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
     self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5471,8 +5522,8 @@ function Toggle:Create()
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
-        self.KeybindButton.Size = UDim2.new(0, isMobile and 44 or 40, 0, isMobile and 32 or 28)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -56 or -52, 0.5, 0)
+        self.KeybindButton.Size = UDim2.new(0, isMobile and 36 or 32, 0, isMobile and 24 or 22)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -48 or -44, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 50, 58)
         self.KeybindButton.Text = "⌨"
@@ -5532,7 +5583,7 @@ function Toggle:Create()
         local hoverTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(28, 33, 40)}
+            {BackgroundColor3 = Color3.fromRGB(32, 37, 44)}
         )
         hoverTween:Play()
         
@@ -5565,7 +5616,7 @@ function Toggle:Create()
         local leaveTween = TweenService:Create(
             self.Container,
             TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {BackgroundColor3 = Color3.fromRGB(22, 26, 32)}
+            {BackgroundColor3 = Color3.fromRGB(26, 30, 36)}
         )
         leaveTween:Play()
         
@@ -5608,7 +5659,7 @@ function Toggle:SetValue(value, callCallback)
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Position = UDim2.new(0, isMobile and 30 or 26, 0.5, 0)}
+            {Position = UDim2.new(0, isMobile and 22 or 24, 0.5, 0)}
         )
         indicatorTween:Play()
         
@@ -7995,31 +8046,17 @@ local ObjectTree = {
         },
         {
             {
-                8,
+                4,
                 2,
                 {
-                    "Label"
+                    "Credits"
                 }
             },
             {
-                9,
+                19,
                 2,
                 {
-                    "Loading"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
+                    "lucide"
                 }
             },
             {
@@ -8030,17 +8067,31 @@ local ObjectTree = {
                 }
             },
             {
-                2,
+                8,
                 2,
                 {
-                    "Button"
+                    "Label"
                 }
             },
             {
-                12,
+                6,
                 2,
                 {
-                    "OptionsManager"
+                    "Dropdown"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
                 }
             },
             {
@@ -8051,10 +8102,17 @@ local ObjectTree = {
                 }
             },
             {
-                11,
+                16,
                 2,
                 {
-                    "Notifications"
+                    "TextBox"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
                 }
             },
             {
@@ -8072,31 +8130,10 @@ local ObjectTree = {
                 }
             },
             {
-                16,
+                9,
                 2,
                 {
-                    "TextBox"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
+                    "Loading"
                 }
             },
             {
@@ -8107,17 +8144,31 @@ local ObjectTree = {
                 }
             },
             {
-                17,
+                15,
                 2,
                 {
-                    "Toggle"
+                    "Tab"
                 }
             },
             {
-                19,
+                12,
                 2,
                 {
-                    "lucide"
+                    "OptionsManager"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
                 }
             }
         }
@@ -8141,10 +8192,10 @@ local LineOffsets = {
     4013,
     4236,
     4592,
-    5050,
-    5296,
-    5722,
-    7163
+    5101,
+    5347,
+    5773,
+    7214
 }
 
 -- Misc AOT variable imports
