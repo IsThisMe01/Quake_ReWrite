@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- uhhh
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
