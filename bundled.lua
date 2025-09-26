@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- sup sup
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -214,7 +214,7 @@ function Button:Create()
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
     self.ActionIndicator.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -64 or -56) or (isMobile and -36 or -40), 0.5, 0)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -72 or -64) or (isMobile and -44 or -48), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1596,7 +1596,7 @@ function Dropdown:Create()
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
     self.ArrowContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ArrowContainer.Position = UDim2.new(1, isMobile and -36 or -40, 0.5, 0)
+    self.ArrowContainer.Position = UDim2.new(1, isMobile and -44 or -48, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -4631,8 +4631,8 @@ function Tab:Create()
         self.TabIcon.Parent = self.IconContainer
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -56, 1, 0)
-        self.TabText.Position = UDim2.new(0, 48, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -48, 1, 0)
+        self.TabText.Position = UDim2.new(0, 44, 0.5, 0)
         self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
@@ -4645,8 +4645,8 @@ function Tab:Create()
     else
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -24, 1, 0)
-        self.TabText.Position = UDim2.new(0, 16, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -16, 1, 0)
+        self.TabText.Position = UDim2.new(0, 12, 0.5, 0)
         self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
@@ -5417,7 +5417,7 @@ function Toggle:Create()
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
     self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -96 or -84) or (isMobile and -64 or -60), 0.5, 0)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -104 or -92) or (isMobile and -72 or -68), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -7995,24 +7995,10 @@ local ObjectTree = {
         },
         {
             {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                14,
+                4,
                 2,
                 {
-                    "Slider"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
+                    "Credits"
                 }
             },
             {
@@ -8023,17 +8009,24 @@ local ObjectTree = {
                 }
             },
             {
-                8,
+                9,
                 2,
                 {
-                    "Label"
+                    "Loading"
                 }
             },
             {
-                13,
+                3,
                 2,
                 {
-                    "Paragraph"
+                    "Config"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
                 }
             },
             {
@@ -8058,38 +8051,17 @@ local ObjectTree = {
                 }
             },
             {
-                6,
+                8,
                 2,
                 {
-                    "Dropdown"
+                    "Label"
                 }
             },
             {
-                4,
+                13,
                 2,
                 {
-                    "Credits"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
+                    "Paragraph"
                 }
             },
             {
@@ -8100,10 +8072,17 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                17,
                 2,
                 {
-                    "Loading"
+                    "Toggle"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
                 }
             },
             {
@@ -8114,10 +8093,31 @@ local ObjectTree = {
                 }
             },
             {
-                3,
+                6,
                 2,
                 {
-                    "Config"
+                    "Dropdown"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
                 }
             }
         }
