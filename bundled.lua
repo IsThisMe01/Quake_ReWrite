@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- sup
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -168,7 +168,7 @@ function Button:Create()
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
     self.ButtonText.Size = UDim2.new(1, -150, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.ButtonText.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.ButtonText.Size = UDim2.new(1, -150, 1, 0)
     self.ButtonText.TextYAlignment = Enum.TextYAlignment.Center
     self.ButtonText.BackgroundTransparency = 1
@@ -1547,7 +1547,7 @@ function Dropdown:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -1562,8 +1562,8 @@ function Dropdown:Create()
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
-    self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 140, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -124 or -164, 0.5, 0)
+    self.SelectedContainer.Size = UDim2.new(0, isMobile and 90 or 120, 0, 32)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -132 or -172, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -4308,7 +4308,7 @@ function Slider:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -5154,7 +5154,7 @@ function TextBox:Create()
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
     self.NameLabel.Size = UDim2.new(0, isMobile and 80 or 150, 1, 0)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -5402,7 +5402,7 @@ function Toggle:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -180, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 48 or 56, 0, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 56 or 64, 0, 0)
     self.NameLabel.Size = UDim2.new(1, -180, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -7995,17 +7995,10 @@ local ObjectTree = {
         },
         {
             {
-                8,
+                16,
                 2,
                 {
-                    "Label"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
+                    "TextBox"
                 }
             },
             {
@@ -8016,38 +8009,10 @@ local ObjectTree = {
                 }
             },
             {
-                12,
+                8,
                 2,
                 {
-                    "OptionsManager"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
+                    "Label"
                 }
             },
             {
@@ -8058,31 +8023,10 @@ local ObjectTree = {
                 }
             },
             {
-                13,
+                9,
                 2,
                 {
-                    "Paragraph"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
+                    "Loading"
                 }
             },
             {
@@ -8093,10 +8037,10 @@ local ObjectTree = {
                 }
             },
             {
-                4,
+                10,
                 2,
                 {
-                    "Credits"
+                    "MobileFloatingIcon"
                 }
             },
             {
@@ -8107,6 +8051,48 @@ local ObjectTree = {
                 }
             },
             {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
                 5,
                 2,
                 {
@@ -8114,10 +8100,24 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                12,
                 2,
                 {
-                    "Loading"
+                    "OptionsManager"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
                 }
             }
         }
