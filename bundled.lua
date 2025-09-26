@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hello hello test tes 
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -109,7 +109,7 @@ function Button:Create()
     self.Container.Name = self.Name .. "Button"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 60 or 48)
+    self.Container.Size = UDim2.new(1, 0, 0, 44)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -168,7 +168,9 @@ function Button:Create()
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
     self.ButtonText.Size = UDim2.new(1, -150, 0, 22)
-    self.ButtonText.Position = UDim2.new(0, isMobile and 52 or 68, 0, self.Description ~= "" and 12 or 18)
+    self.ButtonText.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.ButtonText.Size = UDim2.new(1, -150, 1, 0)
+    self.ButtonText.TextYAlignment = Enum.TextYAlignment.Center
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
     self.ButtonText.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -176,20 +178,7 @@ function Button:Create()
     self.ButtonText.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.ButtonText.TextXAlignment = Enum.TextXAlignment.Left
     self.ButtonText.Parent = self.Container
-    if self.Description ~= "" then
-        self.ButtonDescription = Instance.new("TextLabel")
-        self.ButtonDescription.Name = "Description"
-        self.ButtonDescription.Size = UDim2.new(1, -180, 0, 18)
-        self.ButtonDescription.Position = UDim2.new(0, 68, 0, 36)
-        self.ButtonDescription.BackgroundTransparency = 1
-        self.ButtonDescription.Text = self.Description
-        self.ButtonDescription.TextColor3 = Color3.fromRGB(190, 200, 210)
-        self.ButtonDescription.TextSize = 13
-        self.ButtonDescription.Font = Enum.Font.Gotham
-        self.ButtonDescription.TextXAlignment = Enum.TextXAlignment.Left
-        self.ButtonDescription.TextWrapped = true
-        self.ButtonDescription.Parent = self.Container
-    end
+
     if self.HasKeybind then
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
@@ -225,7 +214,7 @@ function Button:Create()
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
     self.ActionIndicator.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -72 or -64) or (isMobile and -32 or -36), 0.5, 0)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -64 or -56) or (isMobile and -36 or -40), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1489,7 +1478,7 @@ function Dropdown:Create()
     self.Container.Name = self.Name .. "Dropdown"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 70 or 56)
+    self.Container.Size = UDim2.new(1, 0, 0, 48)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
@@ -1519,7 +1508,7 @@ function Dropdown:Create()
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
-    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 60 or 48)
+    self.Header.Size = UDim2.new(1, 0, 0, 48)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
     local success, Lucide = pcall(function()
@@ -1558,7 +1547,9 @@ function Dropdown:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 68, 0, isMobile and 16 or 20)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 1, 0)
+    self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1566,26 +1557,13 @@ function Dropdown:Create()
     self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Header
-    if self.Description ~= "" and not isMobile then
-        self.DescriptionLabel = Instance.new("TextLabel")
-        self.DescriptionLabel.Name = "Description"
-        self.DescriptionLabel.Size = UDim2.new(1, -220, 0, 20)
-        self.DescriptionLabel.Position = UDim2.new(0, 68, 0, 40)
-        self.DescriptionLabel.BackgroundTransparency = 1
-        self.DescriptionLabel.Text = self.Description
-        self.DescriptionLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
-        self.DescriptionLabel.TextSize = 13
-        self.DescriptionLabel.Font = Enum.Font.Gotham
-        self.DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
-        self.DescriptionLabel.TextWrapped = true
-        self.DescriptionLabel.Parent = self.Header
-    end
+
 
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
     self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 140, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -136 or -184, 0.5, 0)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -116 or -156, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1618,7 +1596,7 @@ function Dropdown:Create()
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
     self.ArrowContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ArrowContainer.Position = UDim2.new(1, isMobile and -32 or -36, 0.5, 0)
+    self.ArrowContainer.Position = UDim2.new(1, isMobile and -36 or -40, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -1653,7 +1631,7 @@ function Dropdown:Create()
     self.SearchContainer = Instance.new("Frame")
     self.SearchContainer.Name = "SearchContainer"
     self.SearchContainer.Size = UDim2.new(1, -20, 0, 36)
-    self.SearchContainer.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and not isMobile and 60 or 48) + 8)
+    self.SearchContainer.Position = UDim2.new(0, 10, 0, 56)
     self.SearchContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.SearchContainer.BorderSizePixel = 0
     self.SearchContainer.Visible = false
@@ -1734,7 +1712,7 @@ function Dropdown:Create()
     self.Content = Instance.new("ScrollingFrame")
     self.Content.Name = "Content"
     self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) 
-    self.Content.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and not isMobile and 60 or 48) + 52)
+    self.Content.Position = UDim2.new(0, 10, 0, 100)
     self.Content.BackgroundTransparency = 1
     self.Content.BorderSizePixel = 0
     self.Content.ScrollBarThickness = 4
@@ -2097,9 +2075,7 @@ function Dropdown:Toggle(state)
     else
         self.Open = not self.Open
     end
-    local UserInputService = game:GetService("UserInputService")
-    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    local baseHeight = self.Description ~= "" and not isMobile and 60 or 48
+    local baseHeight = 48
     local searchHeight = 44
     local contentHeight = math.min(240, #self.Items * 44) 
     if self.Open then
@@ -2201,9 +2177,7 @@ function Dropdown:FilterItems(searchText)
     end
     self:CreateItems()
     local contentHeight = math.min(240, #self.FilteredItems * 44) 
-    local UserInputService = game:GetService("UserInputService")
-    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    local baseHeight = self.Description ~= "" and not isMobile and 60 or 48
+    local baseHeight = 48
     local searchHeight = 44
     if self.Open then
         local sizeTween = TweenService:Create(
@@ -4272,7 +4246,7 @@ function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and (isMobile and 70 or 76) or (isMobile and 52 or 58))
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4334,7 +4308,9 @@ function Slider:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 0, 24)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 48 or 60, 0, self.Description ~= "" and (isMobile and 8 or 10) or (isMobile and 16 or 18))
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 1, 0)
+    self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -4342,25 +4318,13 @@ function Slider:Create()
     self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    if self.Description ~= "" then
-        self.SliderDescription = Instance.new("TextLabel")
-        self.SliderDescription.Name = "Description"
-        self.SliderDescription.Size = UDim2.new(1, isMobile and -120 or -180, 0, 18)
-        self.SliderDescription.Position = UDim2.new(0, isMobile and 48 or 60, 0, isMobile and 30 or 36)
-        self.SliderDescription.BackgroundTransparency = 1
-        self.SliderDescription.Text = self.Description
-        self.SliderDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
-        self.SliderDescription.TextSize = isMobile and 11 or 13
-        self.SliderDescription.Font = Enum.Font.Gotham
-        self.SliderDescription.TextXAlignment = Enum.TextXAlignment.Left
-        self.SliderDescription.TextWrapped = true
-        self.SliderDescription.Parent = self.Container
-    end
+
     -- Simple value display
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
     self.ValueLabel.Size = UDim2.new(0, isMobile and 40 or 50, 0, 20)
-    self.ValueLabel.Position = UDim2.new(1, isMobile and -48 or -66, 0, self.Description ~= "" and (isMobile and 16 or 18) or (isMobile and 21 or 23))
+    self.ValueLabel.Position = UDim2.new(1, isMobile and -56 or -74, 0.5, 0)
+    self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
     self.ValueLabel.TextColor3 = Color3.fromRGB(180, 190, 200)
@@ -4371,8 +4335,8 @@ function Slider:Create()
     -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, isMobile and -96 or -130, 0, isMobile and 10 or 8)
-    self.SliderTrack.Position = UDim2.new(0, isMobile and 48 or 60, 0, self.Description ~= "" and (isMobile and 52 or 60) or (isMobile and 42 or 50))
+    self.SliderTrack.Size = UDim2.new(1, isMobile and -112 or -138, 0, isMobile and 10 or 8)
+    self.SliderTrack.Position = UDim2.new(0, isMobile and 44 or 52, 1, -16)
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.SliderTrack.BorderSizePixel = 0
@@ -5189,13 +5153,9 @@ function TextBox:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
-    if isMobile then
-        self.NameLabel.Size = UDim2.new(0, 80, 0, 18)
-        self.NameLabel.Position = UDim2.new(0, 36, 0, 13)
-    else
-        self.NameLabel.Size = UDim2.new(0, 150, 0, 20)
-        self.NameLabel.Position = UDim2.new(0, 44, 0, 12)
-    end
+    self.NameLabel.Size = UDim2.new(0, isMobile and 80 or 150, 1, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5205,15 +5165,9 @@ function TextBox:Create()
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
-    if isMobile then
-        self.InputBackground.Size = UDim2.new(1, -130, 0, 26)
-        self.InputBackground.Position = UDim2.new(0, 120, 0.5, 0)
-        self.InputBackground.AnchorPoint = Vector2.new(0, 0.5)
-    else
-        self.InputBackground.Size = UDim2.new(0, 180, 0, 28)
-        self.InputBackground.Position = UDim2.new(1, -12, 0.5, 0)
-        self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
-    end
+    self.InputBackground.Size = UDim2.new(0, isMobile and 100 or 180, 0, isMobile and 26 or 28)
+    self.InputBackground.Position = UDim2.new(1, isMobile and -16 or -20, 0.5, 0)
+    self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.InputBackground.BorderSizePixel = 0
     self.InputBackground.Parent = self.Container
@@ -5382,7 +5336,7 @@ function Toggle:Create()
     self.Container.Name = self.Name .. "Toggle"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 60 or 48)
+    self.Container.Size = UDim2.new(1, 0, 0, 44)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5448,7 +5402,9 @@ function Toggle:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -180, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 68, 0, isMobile and 12 or 16)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Size = UDim2.new(1, -180, 1, 0)
+    self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
     self.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5456,25 +5412,12 @@ function Toggle:Create()
     self.NameLabel.Font = isMobile and Enum.Font.Gotham or Enum.Font.GothamBold
     self.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.NameLabel.Parent = self.Container
-    if self.Description ~= "" and not isMobile then
-        self.ToggleDescription = Instance.new("TextLabel")
-        self.ToggleDescription.Name = "Description"
-        self.ToggleDescription.Size = UDim2.new(1, -220, 0, 18)
-        self.ToggleDescription.Position = UDim2.new(0, 68, 0, 36)
-        self.ToggleDescription.BackgroundTransparency = 1
-        self.ToggleDescription.Text = self.Description
-        self.ToggleDescription.TextColor3 = Color3.fromRGB(180, 190, 200)
-        self.ToggleDescription.TextSize = 13
-        self.ToggleDescription.Font = Enum.Font.Gotham
-        self.ToggleDescription.TextXAlignment = Enum.TextXAlignment.Left
-        self.ToggleDescription.TextWrapped = true
-        self.ToggleDescription.Parent = self.Container
-    end
+
     -- Modern iOS-style toggle
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
     self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -100 or -88) or (isMobile and -60 or -56), 0.5, 0)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -76) or (isMobile and -56 or -52), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -8052,73 +7995,10 @@ local ObjectTree = {
         },
         {
             {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
                 4,
                 2,
                 {
                     "Credits"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
                 }
             },
             {
@@ -8129,24 +8009,45 @@ local ObjectTree = {
                 }
             },
             {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
                 9,
                 2,
                 {
                     "Loading"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
                 }
             },
             {
@@ -8157,10 +8058,38 @@ local ObjectTree = {
                 }
             },
             {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
                 18,
                 2,
                 {
                     "Window"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
                 }
             },
             {
@@ -8171,10 +8100,24 @@ local ObjectTree = {
                 }
             },
             {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
                 8,
                 2,
                 {
                     "Label"
+                }
+            },
+            {
+                3,
+                2,
+                {
+                    "Config"
                 }
             }
         }
@@ -8185,23 +8128,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    429,
-    585,
-    1113,
-    1451,
-    2387,
-    2973,
-    3026,
-    3370,
-    3618,
-    3921,
-    4018,
-    4241,
-    4597,
-    5108,
-    5353,
-    5779,
-    7220
+    418,
+    574,
+    1102,
+    1440,
+    2361,
+    2947,
+    3000,
+    3344,
+    3592,
+    3895,
+    3992,
+    4215,
+    4561,
+    5072,
+    5307,
+    5722,
+    7163
 }
 
 -- Misc AOT variable imports
@@ -8698,4 +8641,3 @@ end
 
 -- AoT adjustment: Load init module (MainModule behavior)
 return LoadScript(RealObjectRoot:GetChildren()[1])
-
