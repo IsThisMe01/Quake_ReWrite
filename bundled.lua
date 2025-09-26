@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
--- hELLO
+
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -109,7 +109,7 @@ function Button:Create()
     self.Container.Name = self.Name .. "Button"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 72 or 58)
+    self.Container.Size = UDim2.new(1, 0, 0, self.Description ~= "" and 60 or 48)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -224,8 +224,8 @@ function Button:Create()
     -- Action indicator with modern design
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
-    self.ActionIndicator.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -80 or -72) or (isMobile and -36 or -40), 0.5, 0)
+    self.ActionIndicator.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -72 or -64) or (isMobile and -32 or -36), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1489,7 +1489,7 @@ function Dropdown:Create()
     self.Container.Name = self.Name .. "Dropdown"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 82 or 66)
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 70 or 56)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
@@ -1519,7 +1519,7 @@ function Dropdown:Create()
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
-    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 72 or 56)
+    self.Header.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 60 or 48)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
     local success, Lucide = pcall(function()
@@ -1584,8 +1584,8 @@ function Dropdown:Create()
     -- Enhanced selected value container
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
-    self.SelectedContainer.Size = UDim2.new(0, isMobile and 120 or 180, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -156 or -224, 0.5, 0)
+    self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 140, 0, 32)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -136 or -184, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1603,8 +1603,9 @@ function Dropdown:Create()
     
     self.SelectedLabel = Instance.new("TextLabel")
     self.SelectedLabel.Name = "Selected"
-    self.SelectedLabel.Size = UDim2.new(1, -16, 1, 0)
-    self.SelectedLabel.Position = UDim2.new(0, 8, 0, 0)
+    self.SelectedLabel.Size = UDim2.new(1, -12, 1, 0)
+    self.SelectedLabel.Position = UDim2.new(0, 6, 0, 0)
+    self.SelectedLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.SelectedLabel.BackgroundTransparency = 1
     self.SelectedLabel.TextColor3 = Color3.fromRGB(200, 210, 220)
     self.SelectedLabel.TextSize = isMobile and 12 or 13
@@ -1652,7 +1653,7 @@ function Dropdown:Create()
     self.SearchContainer = Instance.new("Frame")
     self.SearchContainer.Name = "SearchContainer"
     self.SearchContainer.Size = UDim2.new(1, -20, 0, 36)
-    self.SearchContainer.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and 68 or 52) + 8)
+    self.SearchContainer.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and not isMobile and 60 or 48) + 8)
     self.SearchContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.SearchContainer.BorderSizePixel = 0
     self.SearchContainer.Visible = false
@@ -1733,7 +1734,7 @@ function Dropdown:Create()
     self.Content = Instance.new("ScrollingFrame")
     self.Content.Name = "Content"
     self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) 
-    self.Content.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and 68 or 52) + 52)
+    self.Content.Position = UDim2.new(0, 10, 0, (self.Description ~= "" and not isMobile and 60 or 48) + 52)
     self.Content.BackgroundTransparency = 1
     self.Content.BorderSizePixel = 0
     self.Content.ScrollBarThickness = 4
@@ -2096,7 +2097,9 @@ function Dropdown:Toggle(state)
     else
         self.Open = not self.Open
     end
-    local baseHeight = self.Description ~= "" and 68 or 52
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    local baseHeight = self.Description ~= "" and not isMobile and 60 or 48
     local searchHeight = 44
     local contentHeight = math.min(240, #self.Items * 44) 
     if self.Open then
@@ -2198,7 +2201,9 @@ function Dropdown:FilterItems(searchText)
     end
     self:CreateItems()
     local contentHeight = math.min(240, #self.FilteredItems * 44) 
-    local baseHeight = self.Description ~= "" and 68 or 52
+    local UserInputService = game:GetService("UserInputService")
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    local baseHeight = self.Description ~= "" and not isMobile and 60 or 48
     local searchHeight = 44
     if self.Open then
         local sizeTween = TweenService:Create(
@@ -3447,8 +3452,8 @@ function MobileFloatingIcon:CreateGui()
     self.BadgeText.Parent = self.Badge
     self.CloseButton = Instance.new("TextButton")
     self.CloseButton.Name = "CloseButton"
-    self.CloseButton.Size = UDim2.new(0, 25, 0, 25)
-    self.CloseButton.Position = UDim2.new(0, -8, 0, -8) 
+    self.CloseButton.Size = UDim2.new(0, 22, 0, 22)
+    self.CloseButton.Position = UDim2.new(1, -17, 0, -8) 
     self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
     self.CloseButton.Text = "×"
     self.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -3476,7 +3481,7 @@ function MobileFloatingIcon:CreateGui()
         local scaleTween = TweenService:Create(
             self.CloseButton,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 30, 0, 30), BackgroundColor3 = Color3.fromRGB(255, 100, 100)}
+            {Size = UDim2.new(0, 26, 0, 26), BackgroundColor3 = Color3.fromRGB(255, 100, 100)}
         )
         scaleTween:Play()
     end)
@@ -3484,7 +3489,7 @@ function MobileFloatingIcon:CreateGui()
         local scaleTween = TweenService:Create(
             self.CloseButton,
             TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 25, 0, 25), BackgroundColor3 = Color3.fromRGB(255, 60, 60)}
+            {Size = UDim2.new(0, 22, 0, 22), BackgroundColor3 = Color3.fromRGB(255, 60, 60)}
         )
         scaleTween:Play()
     end)
@@ -4662,8 +4667,9 @@ function Tab:Create()
         self.TabIcon.Parent = self.IconContainer
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -60, 1, 0)
-        self.TabText.Position = UDim2.new(0, 52, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -56, 1, 0)
+        self.TabText.Position = UDim2.new(0, 48, 0.5, 0)
+        self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
         self.TabText.Text = self.Name
@@ -4675,8 +4681,9 @@ function Tab:Create()
     else
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -32, 1, 0)
-        self.TabText.Position = UDim2.new(0, 20, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -24, 1, 0)
+        self.TabText.Position = UDim2.new(0, 16, 0.5, 0)
+        self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
         self.TabText.Text = self.Name
@@ -4713,7 +4720,7 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 12 or 16) 
+    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 12) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
     if self.Window.IsMobile then
@@ -4981,7 +4988,7 @@ function Tab:Section(name)
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Vertical
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 10)
+    layout.Padding = UDim.new(0, self.Window.IsMobile and 6 or 8)
     layout.Parent = content
     
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -5376,7 +5383,7 @@ function Toggle:Create()
     self.Container.Name = self.Name .. "Toggle"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 72 or 58)
+    self.Container.Size = UDim2.new(1, 0, 0, (self.Description ~= "" and not isMobile) and 60 or 48)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5467,7 +5474,7 @@ function Toggle:Create()
     -- Modern iOS-style toggle
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
-    self.ToggleBackground.Size = UDim2.new(0, isMobile and 44 or 48, 0, isMobile and 24 or 26)
+    self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
     self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -100 or -88) or (isMobile and -60 or -56), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
@@ -5494,7 +5501,7 @@ function Toggle:Create()
     
     self.ToggleIndicator = Instance.new("Frame")
     self.ToggleIndicator.Name = "Indicator"
-    self.ToggleIndicator.Size = UDim2.new(0, isMobile and 20 or 22, 0, isMobile and 20 or 22)
+    self.ToggleIndicator.Size = UDim2.new(0, isMobile and 18 or 20, 0, isMobile and 18 or 20)
     self.ToggleIndicator.Position = UDim2.new(0, 2, 0.5, 0)
     self.ToggleIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5659,7 +5666,7 @@ function Toggle:SetValue(value, callCallback)
         local indicatorTween = TweenService:Create(
             self.ToggleIndicator,
             TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Position = UDim2.new(0, isMobile and 22 or 24, 0.5, 0)}
+            {Position = UDim2.new(0, isMobile and 20 or 22, 0.5, 0)}
         )
         indicatorTween:Play()
         
@@ -5819,7 +5826,7 @@ function Window:CreateGui()
     self.MainFrame = Instance.new("Frame")
     self.MainFrame.Name = "MainFrame"
     if isMobile then
-        self.MainFrame.Size = UDim2.new(0, 380, 0, 520)
+        self.MainFrame.Size = UDim2.new(0, 360, 0, 480)
         self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     else
         self.MainFrame.Size = UDim2.new(0, 650, 0, 520)
@@ -5833,8 +5840,8 @@ function Window:CreateGui()
 
     local sizeConstraint = Instance.new("UISizeConstraint")
     if isMobile then
-        sizeConstraint.MinSize = Vector2.new(350, 480)
-        sizeConstraint.MaxSize = Vector2.new(420, 580)
+        sizeConstraint.MinSize = Vector2.new(320, 440)
+        sizeConstraint.MaxSize = Vector2.new(400, 560)
     else
         sizeConstraint.MinSize = Vector2.new(600, 480)
         sizeConstraint.MaxSize = Vector2.new(750, 600)
@@ -6032,7 +6039,7 @@ function Window:CreateGui()
     self.KeybindButton = Instance.new("TextButton")
     self.KeybindButton.Name = "KeybindButton"
     self.KeybindButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.KeybindButton.Position = UDim2.new(1, isMobile and -96 or -120, 0.5, 0) 
+    self.KeybindButton.Position = UDim2.new(1, isMobile and -104 or -132, 0.5, 0) 
     self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
     self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 55, 65) 
     self.KeybindButton.Text = "⌨"
@@ -6051,7 +6058,7 @@ function Window:CreateGui()
     self.MinimizeButton = Instance.new("TextButton")
     self.MinimizeButton.Name = "MinimizeButton"
     self.MinimizeButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.MinimizeButton.Position = UDim2.new(1, isMobile and -64 or -80, 0.5, 0) 
+    self.MinimizeButton.Position = UDim2.new(1, isMobile and -72 or -88, 0.5, 0) 
     self.MinimizeButton.AnchorPoint = Vector2.new(0, 0.5)
     self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(60, 70, 80) 
     self.MinimizeButton.Text = "−"
@@ -6070,7 +6077,7 @@ function Window:CreateGui()
     self.CloseButton = Instance.new("TextButton")
     self.CloseButton.Name = "CloseButton"
     self.CloseButton.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.CloseButton.Position = UDim2.new(1, isMobile and -32 or -36, 0.5, 0) 
+    self.CloseButton.Position = UDim2.new(1, isMobile and -40 or -44, 0.5, 0) 
     self.CloseButton.AnchorPoint = Vector2.new(0, 0.5)
     self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70) 
     self.CloseButton.Text = "×"
@@ -6089,7 +6096,7 @@ function Window:CreateGui()
     self.Sidebar = Instance.new("Frame")
     self.Sidebar.Name = "Sidebar"
     if isMobile then
-        self.Sidebar.Size = UDim2.new(0, 140, 1, -60)
+        self.Sidebar.Size = UDim2.new(0, 120, 1, -60)
         self.Sidebar.Position = UDim2.new(0, 0, 0, 60)
     else
         self.Sidebar.Size = UDim2.new(0, 180, 1, -70)
@@ -6152,8 +6159,8 @@ function Window:CreateGui()
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
     if isMobile then
-        self.ContentContainer.Size = UDim2.new(1, -140, 1, -60)
-        self.ContentContainer.Position = UDim2.new(0, 140, 0, 60)
+        self.ContentContainer.Size = UDim2.new(1, -120, 1, -60)
+        self.ContentContainer.Position = UDim2.new(0, 120, 0, 60)
     else
         self.ContentContainer.Size = UDim2.new(1, -180, 1, -70)
         self.ContentContainer.Position = UDim2.new(0, 180, 0, 70)
@@ -6420,27 +6427,27 @@ function Window:ToggleMinimize()
     if not self.IsMinimized then
         self.IsMinimized = true
         self.MinimizeButton.Text = "+"
+        -- Hide content immediately to prevent grey box
         self.ContentContainer.Visible = false
         self.Sidebar.Visible = false
         local minimizeTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 400, 0, 60)}
+            {Size = UDim2.new(0, self.IsMobile and 350 or 400, 0, self.IsMobile and 50 or 60)}
         )
         minimizeTween:Play()
     else
         self.IsMinimized = false
         self.MinimizeButton.Text = "−"
+        -- Show content immediately when expanding
+        self.ContentContainer.Visible = true
+        self.Sidebar.Visible = true
         local restoreTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = self.OriginalSize}
         )
         restoreTween:Play()
-        restoreTween.Completed:Connect(function()
-            self.ContentContainer.Visible = true
-            self.Sidebar.Visible = true
-        end)
     end
 end
 function Window:CreateMobileIcon()
@@ -6775,11 +6782,11 @@ function Window:ToggleVisibility()
         if self.ToggleContainer then
             self.ToggleContainer.Visible = false
         end
-        self.MainFrame.Size = UDim2.new(0, 700, 0, 800)
+        self.MainFrame.Size = UDim2.new(0, 0, 0, 0)
         local showTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 675, 0, 550)}
+            {Size = self.OriginalSize}
         )
         showTween:Play()
     end
@@ -8046,31 +8053,10 @@ local ObjectTree = {
         },
         {
             {
-                4,
+                3,
                 2,
                 {
-                    "Credits"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
+                    "Config"
                 }
             },
             {
@@ -8081,13 +8067,6 @@ local ObjectTree = {
                 }
             },
             {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
                 10,
                 2,
                 {
@@ -8095,31 +8074,10 @@ local ObjectTree = {
                 }
             },
             {
-                14,
+                4,
                 2,
                 {
-                    "Slider"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
+                    "Credits"
                 }
             },
             {
@@ -8130,10 +8088,24 @@ local ObjectTree = {
                 }
             },
             {
-                9,
+                2,
                 2,
                 {
-                    "Loading"
+                    "Button"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
                 }
             },
             {
@@ -8144,10 +8116,24 @@ local ObjectTree = {
                 }
             },
             {
-                15,
+                17,
                 2,
                 {
-                    "Tab"
+                    "Toggle"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
                 }
             },
             {
@@ -8165,10 +8151,31 @@ local ObjectTree = {
                 }
             },
             {
-                2,
+                9,
                 2,
                 {
-                    "Button"
+                    "Loading"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
                 }
             }
         }
@@ -8183,19 +8190,19 @@ local LineOffsets = {
     585,
     1113,
     1451,
-    2382,
-    2968,
-    3021,
-    3365,
-    3613,
-    3916,
-    4013,
-    4236,
-    4592,
-    5101,
-    5347,
-    5773,
-    7214
+    2387,
+    2973,
+    3026,
+    3370,
+    3618,
+    3921,
+    4018,
+    4241,
+    4597,
+    5108,
+    5354,
+    5780,
+    7221
 }
 
 -- Misc AOT variable imports
