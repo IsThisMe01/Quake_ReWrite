@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- sup
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -1563,7 +1563,7 @@ function Dropdown:Create()
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
     self.SelectedContainer.Size = UDim2.new(0, isMobile and 100 or 140, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -116 or -156, 0.5, 0)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -124 or -164, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -5402,7 +5402,7 @@ function Toggle:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     self.NameLabel.Size = UDim2.new(1, -180, 0, 22)
-    self.NameLabel.Position = UDim2.new(0, isMobile and 44 or 52, 0, 0)
+    self.NameLabel.Position = UDim2.new(0, isMobile and 48 or 56, 0, 0)
     self.NameLabel.Size = UDim2.new(1, -180, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -6369,19 +6369,19 @@ function Window:ToggleMinimize()
     if not self.IsMinimized then
         self.IsMinimized = true
         self.MinimizeButton.Text = "+"
-        -- Hide content immediately to prevent grey box
-        self.ContentContainer.Visible = false
-        self.Sidebar.Visible = false
         local minimizeTween = TweenService:Create(
             self.MainFrame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = UDim2.new(0, self.IsMobile and 350 or 400, 0, self.IsMobile and 50 or 60)}
         )
         minimizeTween:Play()
+        minimizeTween.Completed:Connect(function()
+            self.ContentContainer.Visible = false
+            self.Sidebar.Visible = false
+        end)
     else
         self.IsMinimized = false
         self.MinimizeButton.Text = "−"
-        -- Show content immediately when expanding
         self.ContentContainer.Visible = true
         self.Sidebar.Visible = true
         local restoreTween = TweenService:Create(
@@ -7995,24 +7995,52 @@ local ObjectTree = {
         },
         {
             {
-                4,
+                8,
                 2,
                 {
-                    "Credits"
+                    "Label"
                 }
             },
             {
-                5,
+                19,
                 2,
                 {
-                    "DraggableKeybind"
+                    "lucide"
                 }
             },
             {
-                9,
+                15,
                 2,
                 {
-                    "Loading"
+                    "Tab"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
                 }
             },
             {
@@ -8023,10 +8051,24 @@ local ObjectTree = {
                 }
             },
             {
-                2,
+                18,
                 2,
                 {
-                    "Button"
+                    "Window"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
                 }
             },
             {
@@ -8044,69 +8086,6 @@ local ObjectTree = {
                 }
             },
             {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
                 14,
                 2,
                 {
@@ -8114,10 +8093,31 @@ local ObjectTree = {
                 }
             },
             {
-                12,
+                4,
                 2,
                 {
-                    "OptionsManager"
+                    "Credits"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
                 }
             }
         }
