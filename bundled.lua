@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- sup sup
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -1854,8 +1854,8 @@ function Dropdown:CreateItems()
         itemButton.Parent = itemContainer
         local itemText = Instance.new("TextLabel")
         itemText.Name = "Text"
-        itemText.Size = UDim2.new(1, self.Multiselect and -50 or -40, 1, 0)
-        itemText.Position = UDim2.new(0, isMobile and 20 or 16, 0, 0)
+        itemText.Size = UDim2.new(1, self.Multiselect and -46 or -36, 1, 0)
+        itemText.Position = UDim2.new(0, isMobile and 16 or 12, 0, 0)
         itemText.BackgroundTransparency = 1
         itemText.Text = item
         itemText.TextColor3 = Color3.fromRGB(220, 230, 240)
@@ -5417,7 +5417,7 @@ function Toggle:Create()
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
     self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -76) or (isMobile and -56 or -52), 0.5, 0)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -96 or -84) or (isMobile and -64 or -60), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -6044,29 +6044,29 @@ function Window:CreateGui()
         self.Sidebar.Size = UDim2.new(0, 180, 1, -70)
         self.Sidebar.Position = UDim2.new(0, 0, 0, 70)
     end
-    self.Sidebar.BackgroundColor3 = Color3.fromRGB(18, 22, 28)
+    self.Sidebar.BackgroundColor3 = Color3.fromRGB(16, 20, 26)
     self.Sidebar.BorderSizePixel = 0
     self.Sidebar.ClipsDescendants = true
     self.Sidebar.Parent = self.MainFrame
     local sidebarBorder = Instance.new("UIStroke")
-    sidebarBorder.Color = Color3.fromRGB(0, 120, 215) 
+    sidebarBorder.Color = Color3.fromRGB(35, 40, 48) 
     sidebarBorder.Thickness = 1
-    sidebarBorder.Transparency = 0.7 
+    sidebarBorder.Transparency = 0.4 
     sidebarBorder.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     sidebarBorder.Parent = self.Sidebar
     local sidebarCorner = Instance.new("UICorner")
-    sidebarCorner.CornerRadius = UDim.new(0, 10)
+    sidebarCorner.CornerRadius = UDim.new(0, 12)
     sidebarCorner.Parent = self.Sidebar
     self.SidebarShadow = Instance.new("Frame")
     self.SidebarShadow.Name = "InnerShadow"
     self.SidebarShadow.Size = UDim2.new(1, -4, 1, -4)
     self.SidebarShadow.Position = UDim2.new(0, 2, 0, 2)
-    self.SidebarShadow.BackgroundColor3 = Color3.fromRGB(15, 18, 24) 
-    self.SidebarShadow.BackgroundTransparency = 0.5
+    self.SidebarShadow.BackgroundColor3 = Color3.fromRGB(0, 120, 215) 
+    self.SidebarShadow.BackgroundTransparency = 0.96
     self.SidebarShadow.BorderSizePixel = 0
     self.SidebarShadow.Parent = self.Sidebar
     local shadowCorner = Instance.new("UICorner")
-    shadowCorner.CornerRadius = UDim.new(0, 10)
+    shadowCorner.CornerRadius = UDim.new(0, 12)
     shadowCorner.Parent = self.SidebarShadow
     self.TabListContainer = Instance.new("ScrollingFrame")
     self.TabListContainer.Name = "TabListContainer"
@@ -7995,73 +7995,10 @@ local ObjectTree = {
         },
         {
             {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
-                11,
-                2,
-                {
-                    "Notifications"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
                 2,
                 2,
                 {
                     "Button"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                15,
-                2,
-                {
-                    "Tab"
-                }
-            },
-            {
-                17,
-                2,
-                {
-                    "Toggle"
                 }
             },
             {
@@ -8072,10 +8009,45 @@ local ObjectTree = {
                 }
             },
             {
-                18,
+                12,
                 2,
                 {
-                    "Window"
+                    "OptionsManager"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                11,
+                2,
+                {
+                    "Notifications"
                 }
             },
             {
@@ -8086,17 +8058,24 @@ local ObjectTree = {
                 }
             },
             {
-                12,
+                6,
                 2,
                 {
-                    "OptionsManager"
+                    "Dropdown"
                 }
             },
             {
-                7,
+                4,
                 2,
                 {
-                    "FloatingControls"
+                    "Credits"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
                 }
             },
             {
@@ -8107,10 +8086,31 @@ local ObjectTree = {
                 }
             },
             {
-                8,
+                17,
                 2,
                 {
-                    "Label"
+                    "Toggle"
+                }
+            },
+            {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
                 }
             },
             {
