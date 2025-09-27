@@ -1,5 +1,5 @@
 -- ++++++++ WAX BUNDLED DATA BELOW ++++++++ --
-
+-- sup usp 
 -- Will be used later for getting flattened globals
 local ImportGlobals
 
@@ -182,7 +182,7 @@ function Button:Create()
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
         self.KeybindButton.Size = UDim2.new(0, isMobile and 32 or 28, 0, isMobile and 24 or 22)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -48 or -44, 0.5, 0)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -38 or -44, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
@@ -213,7 +213,7 @@ function Button:Create()
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
     self.ActionIndicator.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -80) or (isMobile and -56 or -60), 0.5, 0)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -78 or -80) or (isMobile and -46 or -60), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1545,7 +1545,7 @@ function Dropdown:Create()
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, isMobile and -200 or -300, 1, 0)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 1, 0)
     self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -1561,7 +1561,7 @@ function Dropdown:Create()
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
     self.SelectedContainer.Size = UDim2.new(0, isMobile and 90 or 120, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -148 or -188, 0.5, 0)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -128 or -178, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1594,7 +1594,7 @@ function Dropdown:Create()
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
     self.ArrowContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ArrowContainer.Position = UDim2.new(1, isMobile and -52 or -56, 0.5, 0)
+    self.ArrowContainer.Position = UDim2.new(1, isMobile and -32 or -46, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -4320,7 +4320,7 @@ function Slider:Create()
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
     self.ValueLabel.Size = UDim2.new(0, isMobile and 40 or 50, 0, 20)
-    self.ValueLabel.Position = UDim2.new(1, isMobile and -64 or -82, 0.5, 0)
+    self.ValueLabel.Position = UDim2.new(1, isMobile and -54 or -82, 0.5, 0)
     self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
@@ -4332,7 +4332,7 @@ function Slider:Create()
     -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, isMobile and -132 or -158, 0, isMobile and 10 or 8)
+    self.SliderTrack.Size = UDim2.new(1, isMobile and -122 or -158, 0, isMobile and 10 or 8)
     self.SliderTrack.Position = UDim2.new(0, isMobile and 44 or 52, 1, -18)
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
@@ -4577,7 +4577,7 @@ function Tab:Create()
     end)
     self.TabButton = Instance.new("TextButton")
     self.TabButton.Name = self.Name .. "Tab"
-    self.TabButton.Size = UDim2.new(1, 0, 0, 42) 
+    self.TabButton.Size = UDim2.new(1, 0, 0, 44) 
     self.TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32) 
     self.TabButton.BackgroundTransparency = 1 
     self.TabButton.BorderSizePixel = 0
@@ -4628,8 +4628,8 @@ function Tab:Create()
         self.TabIcon.Parent = self.IconContainer
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -48, 1, 0)
-        self.TabText.Position = UDim2.new(0, 44, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -52, 1, 0)
+        self.TabText.Position = UDim2.new(0, 48, 0.5, 0)
         self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
@@ -4642,8 +4642,8 @@ function Tab:Create()
     else
         self.TabText = Instance.new("TextLabel")
         self.TabText.Name = "Text"
-        self.TabText.Size = UDim2.new(1, -16, 1, 0)
-        self.TabText.Position = UDim2.new(0, 12, 0.5, 0)
+        self.TabText.Size = UDim2.new(1, -20, 1, 0)
+        self.TabText.Position = UDim2.new(0, 16, 0.5, 0)
         self.TabText.TextTruncate = Enum.TextTruncate.AtEnd
         self.TabText.AnchorPoint = Vector2.new(0, 0.5)
         self.TabText.BackgroundTransparency = 1
@@ -5162,8 +5162,8 @@ function TextBox:Create()
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
-    self.InputBackground.Size = UDim2.new(0, isMobile and 120 or 200, 0, isMobile and 30 or 32)
-    self.InputBackground.Position = UDim2.new(1, isMobile and -20 or -24, 0.5, 0)
+    self.InputBackground.Size = UDim2.new(0, isMobile and 110 or 200, 0, isMobile and 30 or 32)
+    self.InputBackground.Position = UDim2.new(1, isMobile and -16 or -24, 0.5, 0)
     self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.InputBackground.BorderSizePixel = 0
@@ -5413,7 +5413,7 @@ function Toggle:Create()
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
     self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -120 or -108) or (isMobile and -88 or -84), 0.5, 0)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -110 or -108) or (isMobile and -78 or -84), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -5468,7 +5468,7 @@ function Toggle:Create()
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
         self.KeybindButton.Size = UDim2.new(0, isMobile and 36 or 32, 0, isMobile and 24 or 22)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -56 or -52, 0.5, 0)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -46 or -52, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 50, 58)
         self.KeybindButton.Text = "⌨"
@@ -6034,7 +6034,7 @@ function Window:CreateGui()
     self.Sidebar = Instance.new("Frame")
     self.Sidebar.Name = "Sidebar"
     if isMobile then
-        self.Sidebar.Size = UDim2.new(0, 120, 1, -60)
+        self.Sidebar.Size = UDim2.new(0, 140, 1, -60)
         self.Sidebar.Position = UDim2.new(0, 0, 0, 60)
     else
         self.Sidebar.Size = UDim2.new(0, 180, 1, -70)
@@ -6066,8 +6066,8 @@ function Window:CreateGui()
     shadowCorner.Parent = self.SidebarShadow
     self.TabListContainer = Instance.new("ScrollingFrame")
     self.TabListContainer.Name = "TabListContainer"
-    self.TabListContainer.Size = UDim2.new(1, -16, 1, -16)
-    self.TabListContainer.Position = UDim2.new(0, 8, 0, 8)
+    self.TabListContainer.Size = UDim2.new(1, -12, 1, -12)
+    self.TabListContainer.Position = UDim2.new(0, 6, 0, 6)
     self.TabListContainer.BackgroundTransparency = 1
     self.TabListContainer.BorderSizePixel = 0
     self.TabListContainer.ScrollBarThickness = 2
@@ -6083,22 +6083,22 @@ function Window:CreateGui()
     self.TabListLayout.Parent = self.TabListContainer
     local tabPadding = Instance.new("UIPadding")
     if isMobile then
+        tabPadding.PaddingLeft = UDim.new(0, 8)
+        tabPadding.PaddingRight = UDim.new(0, 8)
+        tabPadding.PaddingTop = UDim.new(0, 12)
+        tabPadding.PaddingBottom = UDim.new(0, 12)
+    else
         tabPadding.PaddingLeft = UDim.new(0, 12)
         tabPadding.PaddingRight = UDim.new(0, 12)
         tabPadding.PaddingTop = UDim.new(0, 16)
         tabPadding.PaddingBottom = UDim.new(0, 16)
-    else
-        tabPadding.PaddingLeft = UDim.new(0, 16)
-        tabPadding.PaddingRight = UDim.new(0, 16)
-        tabPadding.PaddingTop = UDim.new(0, 20)
-        tabPadding.PaddingBottom = UDim.new(0, 20)
     end
     tabPadding.Parent = self.TabListContainer
     self.ContentContainer = Instance.new("Frame")
     self.ContentContainer.Name = "ContentContainer"
     if isMobile then
-        self.ContentContainer.Size = UDim2.new(1, -120, 1, -60)
-        self.ContentContainer.Position = UDim2.new(0, 120, 0, 60)
+        self.ContentContainer.Size = UDim2.new(1, -140, 1, -60)
+        self.ContentContainer.Position = UDim2.new(0, 140, 0, 60)
     else
         self.ContentContainer.Size = UDim2.new(1, -180, 1, -70)
         self.ContentContainer.Position = UDim2.new(0, 180, 0, 70)
@@ -7991,101 +7991,10 @@ local ObjectTree = {
         },
         {
             {
-                16,
-                2,
-                {
-                    "TextBox"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                7,
-                2,
-                {
-                    "FloatingControls"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                5,
-                2,
-                {
-                    "DraggableKeybind"
-                }
-            },
-            {
-                12,
-                2,
-                {
-                    "OptionsManager"
-                }
-            },
-            {
-                13,
-                2,
-                {
-                    "Paragraph"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
-                }
-            },
-            {
                 8,
                 2,
                 {
                     "Label"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
                 }
             },
             {
@@ -8096,10 +8005,24 @@ local ObjectTree = {
                 }
             },
             {
-                15,
+                3,
                 2,
                 {
-                    "Tab"
+                    "Config"
+                }
+            },
+            {
+                10,
+                2,
+                {
+                    "MobileFloatingIcon"
+                }
+            },
+            {
+                12,
+                2,
+                {
+                    "OptionsManager"
                 }
             },
             {
@@ -8110,10 +8033,87 @@ local ObjectTree = {
                 }
             },
             {
+                7,
+                2,
+                {
+                    "FloatingControls"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                16,
+                2,
+                {
+                    "TextBox"
+                }
+            },
+            {
+                5,
+                2,
+                {
+                    "DraggableKeybind"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                13,
+                2,
+                {
+                    "Paragraph"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
                 11,
                 2,
                 {
                     "Notifications"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
                 }
             }
         }
