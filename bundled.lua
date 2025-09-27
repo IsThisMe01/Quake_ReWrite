@@ -109,7 +109,7 @@ function Button:Create()
     self.Container.Name = self.Name .. "Button"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 44)
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -167,9 +167,8 @@ function Button:Create()
     self.ButtonLeftIcon.Parent = self.IconContainer
     self.ButtonText = Instance.new("TextLabel")
     self.ButtonText.Name = "Text"
-    self.ButtonText.Size = UDim2.new(1, -150, 0, 22)
+    self.ButtonText.Size = UDim2.new(1, -170, 1, 0)
     self.ButtonText.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
-    self.ButtonText.Size = UDim2.new(1, -150, 1, 0)
     self.ButtonText.TextYAlignment = Enum.TextYAlignment.Center
     self.ButtonText.BackgroundTransparency = 1
     self.ButtonText.Text = self.Name
@@ -183,7 +182,7 @@ function Button:Create()
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
         self.KeybindButton.Size = UDim2.new(0, isMobile and 32 or 28, 0, isMobile and 24 or 22)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -40 or -36, 0.5, 0)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -48 or -44, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(50, 55, 62)
         self.KeybindButton.Text = "⌨"
@@ -214,7 +213,7 @@ function Button:Create()
     self.ActionIndicator = Instance.new("Frame")
     self.ActionIndicator.Name = "ActionIndicator"
     self.ActionIndicator.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
-    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -72 or -64) or (isMobile and -44 or -48), 0.5, 0)
+    self.ActionIndicator.Position = UDim2.new(1, self.HasKeybind and (isMobile and -88 or -80) or (isMobile and -56 or -60), 0.5, 0)
     self.ActionIndicator.AnchorPoint = Vector2.new(0, 0.5)
     self.ActionIndicator.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ActionIndicator.BorderSizePixel = 0
@@ -1478,7 +1477,7 @@ function Dropdown:Create()
     self.Container.Name = self.Name .. "Dropdown"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 48)
+    self.Container.Size = UDim2.new(1, 0, 0, 56)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
@@ -1508,7 +1507,7 @@ function Dropdown:Create()
     corner.Parent = self.Container
     self.Header = Instance.new("Frame")
     self.Header.Name = "Header"
-    self.Header.Size = UDim2.new(1, 0, 0, 48)
+    self.Header.Size = UDim2.new(1, 0, 0, 56)
     self.Header.BackgroundTransparency = 1
     self.Header.Parent = self.Container
     local success, Lucide = pcall(function()
@@ -1546,9 +1545,8 @@ function Dropdown:Create()
     self.DropdownIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 0, 24)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -200 or -300, 1, 0)
     self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
-    self.NameLabel.Size = UDim2.new(1, isMobile and -180 or -280, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -1563,7 +1561,7 @@ function Dropdown:Create()
     self.SelectedContainer = Instance.new("Frame")
     self.SelectedContainer.Name = "SelectedContainer"
     self.SelectedContainer.Size = UDim2.new(0, isMobile and 90 or 120, 0, 32)
-    self.SelectedContainer.Position = UDim2.new(1, isMobile and -132 or -172, 0.5, 0)
+    self.SelectedContainer.Position = UDim2.new(1, isMobile and -148 or -188, 0.5, 0)
     self.SelectedContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.SelectedContainer.BackgroundColor3 = Color3.fromRGB(30, 35, 42)
     self.SelectedContainer.BorderSizePixel = 0
@@ -1596,7 +1594,7 @@ function Dropdown:Create()
     self.ArrowContainer = Instance.new("Frame")
     self.ArrowContainer.Name = "ArrowContainer"
     self.ArrowContainer.Size = UDim2.new(0, isMobile and 28 or 32, 0, isMobile and 28 or 32)
-    self.ArrowContainer.Position = UDim2.new(1, isMobile and -44 or -48, 0.5, 0)
+    self.ArrowContainer.Position = UDim2.new(1, isMobile and -52 or -56, 0.5, 0)
     self.ArrowContainer.AnchorPoint = Vector2.new(0, 0.5)
     self.ArrowContainer.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.ArrowContainer.BorderSizePixel = 0
@@ -1631,7 +1629,7 @@ function Dropdown:Create()
     self.SearchContainer = Instance.new("Frame")
     self.SearchContainer.Name = "SearchContainer"
     self.SearchContainer.Size = UDim2.new(1, -20, 0, 36)
-    self.SearchContainer.Position = UDim2.new(0, 10, 0, 56)
+    self.SearchContainer.Position = UDim2.new(0, 10, 0, 64)
     self.SearchContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.SearchContainer.BorderSizePixel = 0
     self.SearchContainer.Visible = false
@@ -1712,7 +1710,7 @@ function Dropdown:Create()
     self.Content = Instance.new("ScrollingFrame")
     self.Content.Name = "Content"
     self.Content.Size = UDim2.new(1, -20, 0, math.min(240, #self.Items * 44)) 
-    self.Content.Position = UDim2.new(0, 10, 0, 100)
+    self.Content.Position = UDim2.new(0, 10, 0, 108)
     self.Content.BackgroundTransparency = 1
     self.Content.BorderSizePixel = 0
     self.Content.ScrollBarThickness = 4
@@ -1838,7 +1836,7 @@ function Dropdown:CreateItems()
         local itemContainer = Instance.new("Frame")
         itemContainer.Name = "Item_" .. i
         local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-        itemContainer.Size = UDim2.new(1, 0, 0, isMobile and 44 or 42) 
+        itemContainer.Size = UDim2.new(1, 0, 0, isMobile and 48 or 46) 
         itemContainer.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
         itemContainer.BorderSizePixel = 0
         itemContainer.LayoutOrder = i
@@ -2075,9 +2073,9 @@ function Dropdown:Toggle(state)
     else
         self.Open = not self.Open
     end
-    local baseHeight = 48
+    local baseHeight = 56
     local searchHeight = 44
-    local contentHeight = math.min(240, #self.Items * 44) 
+    local contentHeight = math.min(240, #self.Items * 48) 
     if self.Open then
         self.SearchContainer.Visible = true
         self.Content.Visible = true
@@ -2176,8 +2174,8 @@ function Dropdown:FilterItems(searchText)
         end
     end
     self:CreateItems()
-    local contentHeight = math.min(240, #self.FilteredItems * 44) 
-    local baseHeight = 48
+    local contentHeight = math.min(240, #self.FilteredItems * 48) 
+    local baseHeight = 56
     local searchHeight = 44
     if self.Open then
         local sizeTween = TweenService:Create(
@@ -4246,7 +4244,7 @@ function Slider:Create()
     self.Container = Instance.new("Frame")
     self.Container.Name = self.Name .. "Slider"
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 52)
+    self.Container.Size = UDim2.new(1, 0, 0, 60)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -4307,9 +4305,8 @@ function Slider:Create()
     self.SliderIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 0, 24)
+    self.NameLabel.Size = UDim2.new(1, isMobile and -120 or -160, 1, 0)
     self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
-    self.NameLabel.Size = UDim2.new(1, isMobile and -100 or -140, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -4323,7 +4320,7 @@ function Slider:Create()
     self.ValueLabel = Instance.new("TextLabel")
     self.ValueLabel.Name = "Value"
     self.ValueLabel.Size = UDim2.new(0, isMobile and 40 or 50, 0, 20)
-    self.ValueLabel.Position = UDim2.new(1, isMobile and -56 or -74, 0.5, 0)
+    self.ValueLabel.Position = UDim2.new(1, isMobile and -64 or -82, 0.5, 0)
     self.ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
     self.ValueLabel.BackgroundTransparency = 1
     self.ValueLabel.Text = self:FormatValue(self.Value)
@@ -4335,8 +4332,8 @@ function Slider:Create()
     -- Enhanced slider track
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, isMobile and -112 or -138, 0, isMobile and 10 or 8)
-    self.SliderTrack.Position = UDim2.new(0, isMobile and 44 or 52, 1, -16)
+    self.SliderTrack.Size = UDim2.new(1, isMobile and -132 or -158, 0, isMobile and 10 or 8)
+    self.SliderTrack.Position = UDim2.new(0, isMobile and 44 or 52, 1, -18)
     self.SliderTrack.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(40, 45, 53)
     self.SliderTrack.BorderSizePixel = 0
@@ -4684,19 +4681,19 @@ function Tab:Create()
     self.ContainerLayout = Instance.new("UIListLayout")
     self.ContainerLayout.FillDirection = Enum.FillDirection.Vertical
     self.ContainerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 8 or 12) 
+    self.ContainerLayout.Padding = UDim.new(0, self.Window.IsMobile and 12 or 16) 
     self.ContainerLayout.Parent = self.Container
     local containerPadding = Instance.new("UIPadding")
     if self.Window.IsMobile then
-        containerPadding.PaddingLeft = UDim.new(0, 8)
-        containerPadding.PaddingRight = UDim.new(0, 8)
-        containerPadding.PaddingTop = UDim.new(0, 8)
-        containerPadding.PaddingBottom = UDim.new(0, 8)
+        containerPadding.PaddingLeft = UDim.new(0, 16)
+        containerPadding.PaddingRight = UDim.new(0, 16)
+        containerPadding.PaddingTop = UDim.new(0, 16)
+        containerPadding.PaddingBottom = UDim.new(0, 16)
     else
-        containerPadding.PaddingLeft = UDim.new(0, 12)
-        containerPadding.PaddingRight = UDim.new(0, 12)
-        containerPadding.PaddingTop = UDim.new(0, 10)
-        containerPadding.PaddingBottom = UDim.new(0, 10)
+        containerPadding.PaddingLeft = UDim.new(0, 20)
+        containerPadding.PaddingRight = UDim.new(0, 20)
+        containerPadding.PaddingTop = UDim.new(0, 20)
+        containerPadding.PaddingBottom = UDim.new(0, 20)
     end
     containerPadding.Parent = self.Container
     self.TabButton.MouseButton1Click:Connect(function()
@@ -4952,7 +4949,7 @@ function Tab:Section(name)
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Vertical
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, self.Window.IsMobile and 6 or 8)
+    layout.Padding = UDim.new(0, self.Window.IsMobile and 10 or 12)
     layout.Parent = content
     
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -5090,7 +5087,7 @@ function TextBox:Create()
     self.Container.Name = self.Name .. "TextBox"
     -- Taller on mobile to accommodate stacked layout
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 44)
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5153,7 +5150,7 @@ function TextBox:Create()
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
     -- On mobile, make the name label wider and positioned at the top
-    self.NameLabel.Size = UDim2.new(0, isMobile and 80 or 150, 1, 0)
+    self.NameLabel.Size = UDim2.new(0, isMobile and 100 or 170, 1, 0)
     self.NameLabel.Position = UDim2.new(0, isMobile and 52 or 60, 0, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
@@ -5165,8 +5162,8 @@ function TextBox:Create()
     self.NameLabel.Parent = self.Container
     self.InputBackground = Instance.new("Frame")
     self.InputBackground.Name = "InputBackground"
-    self.InputBackground.Size = UDim2.new(0, isMobile and 100 or 180, 0, isMobile and 26 or 28)
-    self.InputBackground.Position = UDim2.new(1, isMobile and -16 or -20, 0.5, 0)
+    self.InputBackground.Size = UDim2.new(0, isMobile and 120 or 200, 0, isMobile and 30 or 32)
+    self.InputBackground.Position = UDim2.new(1, isMobile and -20 or -24, 0.5, 0)
     self.InputBackground.AnchorPoint = Vector2.new(1, 0.5)
     self.InputBackground.BackgroundColor3 = Color3.fromRGB(28, 33, 40)
     self.InputBackground.BorderSizePixel = 0
@@ -5336,7 +5333,7 @@ function Toggle:Create()
     self.Container.Name = self.Name .. "Toggle"
     local UserInputService = game:GetService("UserInputService")
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-    self.Container.Size = UDim2.new(1, 0, 0, 44)
+    self.Container.Size = UDim2.new(1, 0, 0, 52)
     self.Container.BackgroundColor3 = Color3.fromRGB(26, 30, 36)
     self.Container.BorderSizePixel = 0
     self.Container.Parent = self.Tab.Container
@@ -5401,9 +5398,8 @@ function Toggle:Create()
     self.ToggleIcon.Parent = self.IconContainer
     self.NameLabel = Instance.new("TextLabel")
     self.NameLabel.Name = "Name"
-    self.NameLabel.Size = UDim2.new(1, -180, 0, 22)
+    self.NameLabel.Size = UDim2.new(1, -200, 1, 0)
     self.NameLabel.Position = UDim2.new(0, isMobile and 56 or 64, 0, 0)
-    self.NameLabel.Size = UDim2.new(1, -180, 1, 0)
     self.NameLabel.TextYAlignment = Enum.TextYAlignment.Center
     self.NameLabel.BackgroundTransparency = 1
     self.NameLabel.Text = self.Name
@@ -5417,7 +5413,7 @@ function Toggle:Create()
     self.ToggleBackground = Instance.new("Frame")
     self.ToggleBackground.Name = "Background"
     self.ToggleBackground.Size = UDim2.new(0, isMobile and 40 or 44, 0, isMobile and 22 or 24)
-    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -104 or -92) or (isMobile and -72 or -68), 0.5, 0)
+    self.ToggleBackground.Position = UDim2.new(1, self.HasKeybind and (isMobile and -120 or -108) or (isMobile and -88 or -84), 0.5, 0)
     self.ToggleBackground.AnchorPoint = Vector2.new(0, 0.5)
     self.ToggleBackground.BackgroundColor3 = Color3.fromRGB(55, 60, 68)
     self.ToggleBackground.BorderSizePixel = 0
@@ -5472,7 +5468,7 @@ function Toggle:Create()
         self.KeybindButton = Instance.new("TextButton")
         self.KeybindButton.Name = "KeybindButton"
         self.KeybindButton.Size = UDim2.new(0, isMobile and 36 or 32, 0, isMobile and 24 or 22)
-        self.KeybindButton.Position = UDim2.new(1, isMobile and -48 or -44, 0.5, 0)
+        self.KeybindButton.Position = UDim2.new(1, isMobile and -56 or -52, 0.5, 0)
         self.KeybindButton.AnchorPoint = Vector2.new(0, 0.5)
         self.KeybindButton.BackgroundColor3 = Color3.fromRGB(45, 50, 58)
         self.KeybindButton.Text = "⌨"
@@ -6083,19 +6079,19 @@ function Window:CreateGui()
     self.TabListLayout = Instance.new("UIListLayout")
     self.TabListLayout.FillDirection = Enum.FillDirection.Vertical
     self.TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    self.TabListLayout.Padding = UDim.new(0, 2) 
+    self.TabListLayout.Padding = UDim.new(0, 4) 
     self.TabListLayout.Parent = self.TabListContainer
     local tabPadding = Instance.new("UIPadding")
     if isMobile then
-        tabPadding.PaddingLeft = UDim.new(0, 6)
-        tabPadding.PaddingRight = UDim.new(0, 6)
-        tabPadding.PaddingTop = UDim.new(0, 8)
-        tabPadding.PaddingBottom = UDim.new(0, 8)
+        tabPadding.PaddingLeft = UDim.new(0, 12)
+        tabPadding.PaddingRight = UDim.new(0, 12)
+        tabPadding.PaddingTop = UDim.new(0, 16)
+        tabPadding.PaddingBottom = UDim.new(0, 16)
     else
-        tabPadding.PaddingLeft = UDim.new(0, 10)
-        tabPadding.PaddingRight = UDim.new(0, 10)
-        tabPadding.PaddingTop = UDim.new(0, 12)
-        tabPadding.PaddingBottom = UDim.new(0, 12)
+        tabPadding.PaddingLeft = UDim.new(0, 16)
+        tabPadding.PaddingRight = UDim.new(0, 16)
+        tabPadding.PaddingTop = UDim.new(0, 20)
+        tabPadding.PaddingBottom = UDim.new(0, 20)
     end
     tabPadding.Parent = self.TabListContainer
     self.ContentContainer = Instance.new("Frame")
@@ -6123,15 +6119,15 @@ function Window:CreateGui()
     contentCorner.Parent = self.ContentContainer
     local contentPadding = Instance.new("UIPadding")
     if isMobile then
-        contentPadding.PaddingLeft = UDim.new(0, 8)
-        contentPadding.PaddingRight = UDim.new(0, 8)
-        contentPadding.PaddingTop = UDim.new(0, 8)
-        contentPadding.PaddingBottom = UDim.new(0, 8)
+        contentPadding.PaddingLeft = UDim.new(0, 16)
+        contentPadding.PaddingRight = UDim.new(0, 16)
+        contentPadding.PaddingTop = UDim.new(0, 16)
+        contentPadding.PaddingBottom = UDim.new(0, 16)
     else
-        contentPadding.PaddingLeft = UDim.new(0, 12)
-        contentPadding.PaddingRight = UDim.new(0, 12)
-        contentPadding.PaddingTop = UDim.new(0, 12)
-        contentPadding.PaddingBottom = UDim.new(0, 12)
+        contentPadding.PaddingLeft = UDim.new(0, 20)
+        contentPadding.PaddingRight = UDim.new(0, 20)
+        contentPadding.PaddingTop = UDim.new(0, 20)
+        contentPadding.PaddingBottom = UDim.new(0, 20)
     end
     contentPadding.Parent = self.ContentContainer
     self:MakeDraggable()
@@ -8002,66 +7998,10 @@ local ObjectTree = {
                 }
             },
             {
-                15,
+                3,
                 2,
                 {
-                    "Tab"
-                }
-            },
-            {
-                8,
-                2,
-                {
-                    "Label"
-                }
-            },
-            {
-                18,
-                2,
-                {
-                    "Window"
-                }
-            },
-            {
-                9,
-                2,
-                {
-                    "Loading"
-                }
-            },
-            {
-                14,
-                2,
-                {
-                    "Slider"
-                }
-            },
-            {
-                10,
-                2,
-                {
-                    "MobileFloatingIcon"
-                }
-            },
-            {
-                2,
-                2,
-                {
-                    "Button"
-                }
-            },
-            {
-                6,
-                2,
-                {
-                    "Dropdown"
-                }
-            },
-            {
-                19,
-                2,
-                {
-                    "lucide"
+                    "Config"
                 }
             },
             {
@@ -8072,24 +8012,10 @@ local ObjectTree = {
                 }
             },
             {
-                17,
+                10,
                 2,
                 {
-                    "Toggle"
-                }
-            },
-            {
-                3,
-                2,
-                {
-                    "Config"
-                }
-            },
-            {
-                4,
-                2,
-                {
-                    "Credits"
+                    "MobileFloatingIcon"
                 }
             },
             {
@@ -8114,6 +8040,76 @@ local ObjectTree = {
                 }
             },
             {
+                19,
+                2,
+                {
+                    "lucide"
+                }
+            },
+            {
+                6,
+                2,
+                {
+                    "Dropdown"
+                }
+            },
+            {
+                9,
+                2,
+                {
+                    "Loading"
+                }
+            },
+            {
+                18,
+                2,
+                {
+                    "Window"
+                }
+            },
+            {
+                4,
+                2,
+                {
+                    "Credits"
+                }
+            },
+            {
+                8,
+                2,
+                {
+                    "Label"
+                }
+            },
+            {
+                14,
+                2,
+                {
+                    "Slider"
+                }
+            },
+            {
+                2,
+                2,
+                {
+                    "Button"
+                }
+            },
+            {
+                15,
+                2,
+                {
+                    "Tab"
+                }
+            },
+            {
+                17,
+                2,
+                {
+                    "Toggle"
+                }
+            },
+            {
                 11,
                 2,
                 {
@@ -8128,23 +8124,23 @@ local ObjectTree = {
 local LineOffsets = {
     8,
     88,
-    418,
-    574,
-    1102,
-    1440,
-    2361,
-    2947,
-    3000,
-    3344,
-    3592,
-    3895,
-    3992,
-    4215,
-    4561,
-    5072,
-    5307,
-    5722,
-    7163
+    417,
+    573,
+    1101,
+    1439,
+    2359,
+    2945,
+    2998,
+    3342,
+    3590,
+    3893,
+    3990,
+    4213,
+    4558,
+    5069,
+    5304,
+    5718,
+    7159
 }
 
 -- Misc AOT variable imports
